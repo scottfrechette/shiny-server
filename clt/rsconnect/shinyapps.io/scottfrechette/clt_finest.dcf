@@ -1,0 +1,12 @@
+name: clt_finest
+title: clt_finest
+username:
+account: scottfrechette
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 241747
+bundleId: 1104445
+url: https://scottfrechette.shinyapps.io/clt_finest/
+when: 1511974058.99243
+asMultiple: FALSE
+asStatic: FALSE

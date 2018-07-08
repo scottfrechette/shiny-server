@@ -1,0 +1,12 @@
+name: charlottes_finest
+title: charlottes_finest
+username:
+account: scottfrechette
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 238879
+bundleId: 1090242
+url: https://scottfrechette.shinyapps.io/charlottes_finest/
+when: 1511356583.38973
+asMultiple: FALSE
+asStatic: FALSE
