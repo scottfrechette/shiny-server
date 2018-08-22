@@ -38,90 +38,100 @@ playoff_leverage <- suppressMessages(read_csv("playoff_leverage.csv"))
 fvoa_season <- suppressMessages(read_csv("fvoa_season.csv"))
 suppressMessages(source("clt_colley.R"))
 
+matchups_prob <- suppressMessages(read_csv("matchups_prob.csv"))
+matchups_spread <- suppressMessages(read_csv("matchups_spread.csv"))
+clt_stats <- suppressMessages(read_csv("clt_stats.csv"))
+yahoo_rankings <- suppressMessages(read_csv("yahoo_rankings.csv"))
+fvoa_rankings <- suppressMessages(read_csv("fvoa_rankings.csv"))
+strength_schedule <- suppressMessages(read_csv("strength_schedule.csv"))
+colley_rankings <- suppressMessages(read_csv("colley_rankings.csv"))
+current_matchups <- suppressMessages(read_csv("current_matchups.csv"))
+
+
 # Prep Data ---------------------------------------------------------------
 
 
 weeks <- n_distinct(clt_tidy$Week)
 teams <- unique(clt_tidy$Team)
-
-matchups_prob <- all_matchups(clt_tidy, type = "prob")
-matchups_spread <- all_matchups(clt_tidy, type = "spread")
-
-t1_stats <- clt_tidy %>% rename(Team1 = Team, Score1 = Score)
-t2_stats <- clt_tidy %>% rename(Team2 = Team, Score2 = Score)
-yahoo_stats <- clt_weekly %>%
-  inner_join(t1_stats, by = c("Week", "Team1")) %>%
-  inner_join(t2_stats, by = c("Week", "Team2")) %>%
-  mutate(diff = Score1 - Score2,
-         win = if_else(diff > 0, 1, 0),
-         lose = if_else(diff < 0, 1, 0),
-         tie = if_else(diff == 0, 1, 0)) %>%
-  group_by(Team1) %>%
-  summarise(Wins = sum(win),
-            Losses = sum(lose),
-            Tie = sum(tie)) %>%
-  rename(Team = Team1) %>% 
-  arrange(-Wins, - Losses) %>%
-  mutate_if(is.numeric, as.integer)
-clt_stats <- clt_tidy %>% 
-  group_by(Team) %>% 
-  summarise(Points = sum(Score)) %>% 
-  right_join(yahoo_stats, by = "Team") %>% 
-  mutate(Percent = round(Wins/(Wins + Losses + Tie), 3)) %>%
-  unite(Record, c(Wins, Losses, Tie), sep = "-")
-
-yahoo_rankings <- clt_stats %>% 
-  arrange(-Percent, -Points) %>% 
-  mutate(`Yahoo Rank` = 1:n_distinct(Team)) %>% 
-  select(Team, `Yahoo Rank`)
-fvoa_rankings <- matchups_prob %>% 
-  select(-Team) %>% 
-  map_df(function(x) {round((mean(100 - x, na.rm=T) - 50)/.5, 2)}) %>% 
-  gather(Team, FVOA) %>% 
-  arrange(-FVOA) %>% 
-  mutate(`FVOA Rank` = dense_rank(-FVOA))
-strength_schedule <- fvoa_rankings %>% 
-  select(Team2 = Team, FVOA) %>% 
-  right_join(clt_weekly, by = "Team2") %>% 
-  rename(Team = Team1) %>% 
-  group_by(Team) %>% 
-  summarise(SoS = round(mean(FVOA), 2)) %>% 
-  arrange(SoS) %>% 
-  mutate("SoS Rank" = 1:nrow(.))
-colley_rankings <- clt_rankings %>% 
-  mutate(`Colley Rank` = min_rank(-Rating)) %>% 
-  select(Team, `Colley Rating` = Rating, `Colley Rank`)
-
-weekly_prob <- matchups_prob %>%
-  rename(Team1 = Team) %>% 
-  # mutate(Team1 = names(.)) %>% 
-  gather(Team2, Score, -Team1) %>% 
-  unite(Team, c(Team1, Team2))
-
-weekly_lines <- matchups_prob %>% 
-  rename(Team1 = Team) %>% 
-  gather(Team2, Line, -Team1) %>% 
-  mutate(Line = map_chr(Line, prob_to_odds)) %>% 
-  unite(Team, c(Team1, Team2))
-
-weekly_spread <- matchups_spread %>% 
-  # add_column(Team1 = teams, .before = 'Scott') %>% 
-  rename(Team1 = Team) %>% 
-  mutate_all(as.character) %>% 
-  gather(Team2, Spread, -Team1) %>% 
-  unite(Team, c(Team1, Team2)) %>% 
-  mutate(Spread = as.numeric(Spread))
-
-current_matchups <- clt_weekly %>% 
-  filter(Week == weeks + 1) %>%
-  unite(Team, c(Team1, Team2), remove = F) %>% 
-  inner_join(weekly_prob, by = "Team") %>% 
-  inner_join(weekly_spread, by = "Team") %>% 
-  inner_join(weekly_lines, by = "Team") %>% 
-  filter(Score >= 50) %>%
-  select(Winner = Team1, Loser = Team2, Spread, `Win Probability` = Score, Line) %>% 
-  arrange(Spread) %>% 
-  mutate(`Win Probability` = percent(`Win Probability`/100))
+# 
+# matchups_prob <- all_matchups(clt_tidy, type = "prob")
+# matchups_spread <- all_matchups(clt_tidy, type = "spread")
+# 
+# t1_stats <- clt_tidy %>% rename(Team1 = Team, Score1 = Score)
+# t2_stats <- clt_tidy %>% rename(Team2 = Team, Score2 = Score)
+# yahoo_stats <- clt_weekly %>%
+#   inner_join(t1_stats, by = c("Week", "Team1")) %>%
+#   inner_join(t2_stats, by = c("Week", "Team2")) %>%
+#   mutate(diff = Score1 - Score2,
+#          win = if_else(diff > 0, 1, 0),
+#          lose = if_else(diff < 0, 1, 0),
+#          tie = if_else(diff == 0, 1, 0)) %>%
+#   group_by(Team1) %>%
+#   summarise(Wins = sum(win),
+#             Losses = sum(lose),
+#             Tie = sum(tie)) %>%
+#   rename(Team = Team1) %>% 
+#   arrange(-Wins, - Losses) %>%
+#   mutate_if(is.numeric, as.integer)
+# clt_stats <- clt_tidy %>% 
+#   group_by(Team) %>% 
+#   summarise(Points = sum(Score)) %>% 
+#   right_join(yahoo_stats, by = "Team") %>% 
+#   mutate(Percent = round(Wins/(Wins + Losses + Tie), 3)) %>%
+#   unite(Record, c(Wins, Losses, Tie), sep = "-")
+# 
+# yahoo_rankings <- clt_stats %>% 
+#   arrange(-Percent, -Points) %>% 
+#   mutate(`Yahoo Rank` = 1:n_distinct(Team)) %>% 
+#   select(Team, `Yahoo Rank`)
+# fvoa_rankings <- matchups_prob %>% 
+#   select(-Team) %>% 
+#   map_df(function(x) {round((mean(100 - x, na.rm=T) - 50)/.5, 2)}) %>% 
+#   gather(Team, FVOA) %>% 
+#   arrange(-FVOA) %>% 
+#   mutate(`FVOA Rank` = dense_rank(-FVOA))
+# strength_schedule <- fvoa_rankings %>% 
+#   select(Team2 = Team, FVOA) %>% 
+#   right_join(clt_weekly, by = "Team2") %>% 
+#   rename(Team = Team1) %>% 
+#   group_by(Team) %>% 
+#   summarise(SoS = round(mean(FVOA), 2)) %>% 
+#   arrange(SoS) %>% 
+#   mutate("SoS Rank" = 1:nrow(.))
+# colley_rankings <- clt_rankings %>% 
+#   mutate(`Colley Rank` = min_rank(-Rating)) %>% 
+#   select(Team, `Colley Rating` = Rating, `Colley Rank`)
+# 
+# weekly_prob <- matchups_prob %>%
+#   rename(Team1 = Team) %>% 
+#   # mutate(Team1 = names(.)) %>% 
+#   gather(Team2, Score, -Team1) %>% 
+#   unite(Team, c(Team1, Team2))
+# 
+# weekly_lines <- matchups_prob %>% 
+#   rename(Team1 = Team) %>% 
+#   gather(Team2, Line, -Team1) %>% 
+#   mutate(Line = map_chr(Line, prob_to_odds)) %>% 
+#   unite(Team, c(Team1, Team2))
+# 
+# weekly_spread <- matchups_spread %>% 
+#   # add_column(Team1 = teams, .before = 'Scott') %>% 
+#   rename(Team1 = Team) %>% 
+#   mutate_all(as.character) %>% 
+#   gather(Team2, Spread, -Team1) %>% 
+#   unite(Team, c(Team1, Team2)) %>% 
+#   mutate(Spread = as.numeric(Spread))
+# 
+# current_matchups <- clt_weekly %>% 
+#   filter(Week == weeks + 1) %>%
+#   unite(Team, c(Team1, Team2), remove = F) %>% 
+#   inner_join(weekly_prob, by = "Team") %>% 
+#   inner_join(weekly_spread, by = "Team") %>% 
+#   inner_join(weekly_lines, by = "Team") %>% 
+#   filter(Score >= 50) %>%
+#   select(Winner = Team1, Loser = Team2, Spread, `Win Probability` = Score, Line) %>% 
+#   arrange(Spread) %>% 
+#   mutate(`Win Probability` = percent(`Win Probability`/100))
 
 # playoff_leverage_chart <- clt_weekly %>% 
 #   filter(Week == weeks + 1) %>% 
