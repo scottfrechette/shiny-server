@@ -4,198 +4,10 @@
 library(shiny)
 library(shinythemes)
 library(tidyverse)
-library(rlang)
-library(stringr)
-library(Hmisc)
-library(scales)
+library(fvoa)
 library(plotly)
-
-### Helper Functions ###
-
-weight_games <- function(scores, reg_games = 6) {
-  
-  # Slightly penalize outliers
-  bottom.outlier <- quantile(scores, 0.25) - IQR(scores) * 1.25
-  top.outlier <- quantile(scores, 0.75) + IQR(scores) * 1.25
-  outlier.weights <- ifelse(scores < bottom.outlier, 1 - (bottom.outlier - scores)/bottom.outlier, 
-                            ifelse(scores > top.outlier, 1 - (scores - top.outlier)/top.outlier, 1))
-  
-  # Add extra term for regression to mean weeks
-  if (length(scores) < reg_games) {outlier.weights <- c(outlier.weights, 1)}
-  
-  # Make sure no weight is negative due to extreme score
-  outlier.weights <- if_else(outlier.weights <= 0, 0.1, outlier.weights)
-  
-  
-  if (length(scores) < reg_games) {
-    
-    weekly.weights <- replicate(length(scores), NA)
-    uniform.weights <- rep(((10 - reg_games + length(scores))/10)/length(scores), length(scores))
-    if(length(scores) %% 2 == 0) { #even
-      index <- length(scores)/2
-      for (i in 1:length(scores)) {
-        weekly.weights[i] <- ifelse(i <= index, uniform.weights - ((index+1)-i)* .01, uniform.weights + (i-(index))* .01) # fix
-      }
-    } else { #odd
-      index <- (length(scores)+1)/2
-      for (i in 1:length(scores)) {
-        if (i != index) { 
-          weekly.weights[i] <- ifelse(i < index, uniform.weights - (index-i)*.01, uniform.weights + (i-index)*.01)
-        } else weekly.weights[i] <- uniform.weights[i]
-      }
-    }
-    
-    weekly.weights <- c(weekly.weights, (reg_games - length(scores))/10)
-    weekly.weights <- if_else(weekly.weights < 0, 0, weekly.weights)
-    
-  } else {
-    # Give more weight to recent games
-    # Extra weight increases throughout season
-    weekly.weights <- replicate(length(scores), NA)
-    uniform.weights <- 1/length(scores)
-    if(length(scores) %% 2 == 0) { #even
-      index <- length(scores)/2
-      for (i in 1:length(scores)) {
-        weekly.weights[i] <- ifelse(i <= index, uniform.weights - ((index+1)-i)* .01, uniform.weights + (i-(index))* .01) # fix
-      }
-    } else { #odd
-      index <- (length(scores)+1)/2
-      for (i in 1:length(scores)) {
-        if (i != index) { 
-          weekly.weights[i] <- ifelse(i < index, uniform.weights - (index-i)*.01, uniform.weights + (i-index)*.01)
-        } else {weekly.weights[i] <- uniform.weights}
-      }
-    }
-  }
-  
-  combined.weights <- outlier.weights * weekly.weights
-  combined.weights <- combined.weights/sum(combined.weights)
-  
-  if_else(combined.weights < 0, 0, combined.weights)
-}
-odds_conversion <- function(x) {
-  toAmericanOdds <- function(x) { 
-    if (!is.numeric(x))
-      x <- as.numeric(x)
-    x[x >= 2.0 & !is.na(x)] <- (x[x >= 2.0 & !is.na(x)] - 1) * 100
-    x[x < 2.0 & !is.na(x)] <- (-100) / (x[x < 2.0 & !is.na(x)] - 1)
-    # x <- round(x)
-    x <- round(x * 0.04)/0.04
-    return(x)
-  } # Convert number to American odds
-  ifelse(is.na(x), NA, if (toAmericanOdds(100/x) < 0) toAmericanOdds(100/x) else paste0("+", toAmericanOdds(100/x)))
-}
-all_matchups_prob <- function(league = clt, reg_games = 6) {
-  set.seed(42)
-  
-  l <- quo_name(enquo(league))
-  league <- eval_tidy(parse_quosure(paste0(quo_name(l), "_tidy")))
-  wk <- max(league$Week)
-  teams <- league %>% select(Team) %>% distinct()
-  team.names <- teams[[1]]
-  df <- as.data.frame(matrix(nrow=nrow(teams), ncol=nrow(teams)))
-  rownames(df) <- team.names
-  colnames(df) <- team.names
-  if (wk < reg_games) {
-    league_boot <- league %>% 
-      group_by(Team) %>% 
-      mutate(team_mean = weighted.mean(c(Score, 115), weight_games(Score, reg_games)),
-             team_sd = sqrt(wtd.var(c(Score, 115), weight_games(Score, reg_games), method="ML"))) %>%
-      select(Team, team_mean, team_sd) %>% 
-      ungroup() %>% 
-      distinct()
-  } else {
-    league_boot <- league %>% 
-      group_by(Team) %>% 
-      mutate(team_mean = weighted.mean(Score, weight_games(Score, reg_games)),
-             team_sd = sqrt(wtd.var(Score, weight_games(Score, reg_games), method="ML"))) %>%
-      select(Team, team_mean, team_sd) %>% 
-      ungroup() %>% 
-      distinct()
-  }
-  sims <- list()
-  sim_scores <- for(i in 1:nrow(teams)) {sims[[i]] <- rnorm(reps, league_boot[[i, 2]], league_boot[[i,3]])}
-  names(sims) <- teams[[1]]
-  matchup_season <- function(i, j) {
-    t1 <- rownames(df)[i] # index ID
-    t2 <- colnames(df)[j]
-    sim <- sims[[t1]] - sims[[t2]]
-    t1wins <- round(pnorm(0, mean(sim), sd(sim), lower.tail=FALSE)* 100, 2)
-  }
-  for(i in 1:dim(df)[1]) {
-    for(j in 1:dim(df)[2]) {
-      if (i == j) {NA} 
-      else if (is.na(df[i,j])==F) {next} 
-      else {
-        df[i,j] = matchup_season(i, j)
-        df[j,i] = 100 - df[i,j]
-      }
-    }
-  }
-  df
-}
-all_matchups_spread <- function(league = clt, reg_games = 6) {
-  set.seed(42)
-  
-  # Identify league and teams 
-  l <- quo_name(enquo(league))
-  league <- eval_tidy(parse_quosure(paste0(quo_name(l), "_tidy")))
-  teams <- league %>% select(Team) %>% distinct()
-  wk <- max(league$Week)
-  
-  # Create empty data frame
-  team.names <- teams[[1]]
-  df <- as.data.frame(matrix(nrow=nrow(teams), ncol=nrow(teams)))
-  rownames(df) <- team.names
-  colnames(df) <- team.names
-  
-  # Calculate each team's weighted mean/SD
-  if (wk < reg_games) {
-    league_boot <- league %>% 
-      group_by(Team) %>% 
-      mutate(team_mean = weighted.mean(c(Score, 115), weight_games(Score, reg_games)),
-             team_sd = sqrt(wtd.var(c(Score, 115), weight_games(Score, reg_games), method="ML"))) %>%
-      select(Team, team_mean, team_sd) %>% 
-      ungroup() %>% 
-      distinct()
-  } else {
-    league_boot <- league %>% 
-      group_by(Team) %>% 
-      mutate(team_mean = weighted.mean(Score, weight_games(Score, reg_games)),
-             team_sd = sqrt(wtd.var(Score, weight_games(Score, reg_games), method="ML"))) %>%
-      select(Team, team_mean, team_sd) %>% 
-      ungroup() %>% 
-      distinct()
-  }
-  
-  # Simulate 1e6 scores from team's mean/SD
-  sims <- list()
-  sim_scores <- for(i in 1:nrow(teams)) {sims[[i]] <- rnorm(reps, league_boot[[i, 2]], league_boot[[i,3]])}
-  names(sims) <- teams[[1]]
-  
-  # Function to calculate each individual matchup
-  matchup_season <- function(i, j) {
-    t1 <- rownames(df)[i] # index ID
-    t2 <- colnames(df)[j]
-    sim <- sims[[t1]] - sims[[t2]]
-    spread <- -mean(sim)
-    spread <- round(spread * 2) / 2
-    if_else(spread > 0, paste0("+", spread), 
-            if_else(spread < 0, paste(spread), paste(0)))
-  }
-  
-  # Loop over every combination of possible matchups
-  for(i in 1:dim(df)[1]) {
-    for(j in 1:dim(df)[2]) {
-      if (i == j) {df[i, j] <- "0"} 
-      else if (is.na(df[i,j])==F) {next}
-      else {
-        df[i,j] = matchup_season(i, j)
-      }
-    }
-  }
-  df
-} # Calculate spread of all  matchups
+library(rlang)
+library(Hmisc)
 
 ff_theme <- function(base_size = 12, base_family = "Helvetica") {
   theme(plot.title = element_text(hjust = 0.5),
@@ -206,7 +18,10 @@ ff_theme <- function(base_size = 12, base_family = "Helvetica") {
         panel.grid.major.y = element_line(color = "grey90", size = 0.2),
         strip.text = element_text(size =12))
 }
-reps <- 1e6
+
+### Initial Settings ###
+
+reps <-  1e6
 ranking_methods <- c("yahoo_rankings", "fvoa_rankings", "strength_schedule", "colley_rankings") %>%
   set_names(c("Yahoo", "FVOA", "Strength of Schedule", "Colley (BCS)"))
 sorting <- c("Yahoo Rank", "FVOA Rank", "SoS", "Colley Rank", "Points") %>%
@@ -229,8 +44,8 @@ suppressMessages(source("clt_colley.R"))
 weeks <- n_distinct(clt_tidy$Week)
 teams <- unique(clt_tidy$Team)
 
-matchups_prob <- all_matchups_prob()
-matchups_spread <- all_matchups_spread()
+matchups_prob <- all_matchups(clt_tidy, type = "prob")
+matchups_spread <- all_matchups(clt_tidy, type = "spread")
 
 t1_stats <- clt_tidy %>% rename(Team1 = Team, Score1 = Score)
 t2_stats <- clt_tidy %>% rename(Team2 = Team, Score2 = Score)
@@ -260,6 +75,7 @@ yahoo_rankings <- clt_stats %>%
   mutate(`Yahoo Rank` = 1:n_distinct(Team)) %>% 
   select(Team, `Yahoo Rank`)
 fvoa_rankings <- matchups_prob %>% 
+  select(-Team) %>% 
   map_df(function(x) {round((mean(100 - x, na.rm=T) - 50)/.5, 2)}) %>% 
   gather(Team, FVOA) %>% 
   arrange(-FVOA) %>% 
@@ -277,18 +93,20 @@ colley_rankings <- clt_rankings %>%
   select(Team, `Colley Rating` = Rating, `Colley Rank`)
 
 weekly_prob <- matchups_prob %>%
-  mutate(Team1 = names(.)) %>% 
+  rename(Team1 = Team) %>% 
+  # mutate(Team1 = names(.)) %>% 
   gather(Team2, Score, -Team1) %>% 
   unite(Team, c(Team1, Team2))
 
-weekly_lines <- as.data.frame(apply(matchups_prob, c(1, 2), odds_conversion)) %>%
-  add_column(Team1 = teams, .before = 'Scott') %>%
-  mutate_all(as.character) %>%
-  gather(Team2, Line, -Team1) %>%
+weekly_lines <- matchups_prob %>% 
+  rename(Team1 = Team) %>% 
+  gather(Team2, Line, -Team1) %>% 
+  mutate(Line = map_chr(Line, prob_to_odds)) %>% 
   unite(Team, c(Team1, Team2))
 
 weekly_spread <- matchups_spread %>% 
-  add_column(Team1 = teams, .before = 'Scott') %>% 
+  # add_column(Team1 = teams, .before = 'Scott') %>% 
+  rename(Team1 = Team) %>% 
   mutate_all(as.character) %>% 
   gather(Team2, Spread, -Team1) %>% 
   unite(Team, c(Team1, Team2)) %>% 
@@ -387,7 +205,7 @@ ui  <- navbarPage(
                    You may be #10 in the charts but you're #6 in our hearts"),
            
            
-
+           
            hr(),
            h5("Playoff Projections", align = "center"),
            br(),
