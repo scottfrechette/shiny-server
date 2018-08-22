@@ -6,8 +6,6 @@ library(shinythemes)
 library(tidyverse)
 library(fvoa)
 library(plotly)
-library(rlang)
-library(Hmisc)
 
 ff_theme <- function(base_size = 12, base_family = "Helvetica") {
   theme(plot.title = element_text(hjust = 0.5),
