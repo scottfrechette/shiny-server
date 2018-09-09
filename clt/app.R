@@ -8,18 +8,6 @@ library(fvoa)
 library(plotly)
 
 library(rlang)
-library(scales)
-library(Hmisc)
-
-theme_fvoa <- function(base_size = 12, base_family = "Helvetica") {
-  theme(plot.title = element_text(hjust = 0.5),
-        panel.background = element_blank(),
-        panel.border = element_rect(fill = NA, colour="grey50"),
-        strip.background = element_rect(color = "black"),
-        panel.grid = element_blank(),
-        panel.grid.major.y = element_line(color = "grey90", size = 0.2),
-        strip.text = element_text(size =12))
-}
 
 ### Initial Settings ###
 
@@ -31,158 +19,10 @@ sorting <- c("Yahoo Rank", "FVOA Rank", "SoS", "Colley Rank", "Points") %>%
 
 # Load Data ---------------------------------------------------------------
 
-clt_tidy <- suppressMessages(read_csv("clt_tidy.csv"))
-clt_proj <- suppressMessages(read_csv("clt_proj.csv"))
-clt_weekly <- suppressMessages(read_csv("clt_weekly.csv"))
-simulated_seasons <- suppressMessages(read_csv("simulated_seasons.csv"))
-model_eval <- suppressMessages(read_csv("model_eval.csv"))
-playoff_leverage <- suppressMessages(read_csv("playoff_leverage.csv"))
-fvoa_season <- suppressMessages(read_csv("fvoa_season.csv"))
-# suppressMessages(source("clt_colley.R"))
-
-matchups_prob <- suppressMessages(read_csv("matchups_prob.csv"))
-matchups_spread <- suppressMessages(read_csv("matchups_spread.csv"))
-clt_stats <- suppressMessages(read_csv("clt_stats.csv"))
-yahoo_rankings <- suppressMessages(read_csv("yahoo_rankings.csv"))
-fvoa_rankings <- suppressMessages(read_csv("fvoa_rankings.csv"))
-strength_schedule <- suppressMessages(read_csv("strength_schedule.csv"))
-colley_rankings <- suppressMessages(read_csv("colley_rankings.csv"))
-current_matchups <- suppressMessages(read_csv("current_matchups.csv"))
-
-
-# Prep Data ---------------------------------------------------------------
-
+load("clt-data.RData")
 
 weeks <- n_distinct(clt_tidy$Week)
 teams <- unique(clt_tidy$Team)
-# 
-# matchups_prob <- all_matchups(clt_tidy, type = "prob")
-# matchups_spread <- all_matchups(clt_tidy, type = "spread")
-# 
-# t1_stats <- clt_tidy %>% rename(Team1 = Team, Score1 = Score)
-# t2_stats <- clt_tidy %>% rename(Team2 = Team, Score2 = Score)
-# yahoo_stats <- clt_weekly %>%
-#   inner_join(t1_stats, by = c("Week", "Team1")) %>%
-#   inner_join(t2_stats, by = c("Week", "Team2")) %>%
-#   mutate(diff = Score1 - Score2,
-#          win = if_else(diff > 0, 1, 0),
-#          lose = if_else(diff < 0, 1, 0),
-#          tie = if_else(diff == 0, 1, 0)) %>%
-#   group_by(Team1) %>%
-#   summarise(Wins = sum(win),
-#             Losses = sum(lose),
-#             Tie = sum(tie)) %>%
-#   rename(Team = Team1) %>% 
-#   arrange(-Wins, - Losses) %>%
-#   mutate_if(is.numeric, as.integer)
-# clt_stats <- clt_tidy %>% 
-#   group_by(Team) %>% 
-#   summarise(Points = sum(Score)) %>% 
-#   right_join(yahoo_stats, by = "Team") %>% 
-#   mutate(Percent = round(Wins/(Wins + Losses + Tie), 3)) %>%
-#   unite(Record, c(Wins, Losses, Tie), sep = "-")
-# 
-# yahoo_rankings <- clt_stats %>% 
-#   arrange(-Percent, -Points) %>% 
-#   mutate(`Yahoo Rank` = 1:n_distinct(Team)) %>% 
-#   select(Team, `Yahoo Rank`)
-# fvoa_rankings <- matchups_prob %>% 
-#   select(-Team) %>% 
-#   map_df(function(x) {round((mean(100 - x, na.rm=T) - 50)/.5, 2)}) %>% 
-#   gather(Team, FVOA) %>% 
-#   arrange(-FVOA) %>% 
-#   mutate(`FVOA Rank` = dense_rank(-FVOA))
-# strength_schedule <- fvoa_rankings %>% 
-#   select(Team2 = Team, FVOA) %>% 
-#   right_join(clt_weekly, by = "Team2") %>% 
-#   rename(Team = Team1) %>% 
-#   group_by(Team) %>% 
-#   summarise(SoS = round(mean(FVOA), 2)) %>% 
-#   arrange(SoS) %>% 
-#   mutate("SoS Rank" = 1:nrow(.))
-# colley_rankings <- clt_rankings %>% 
-#   mutate(`Colley Rank` = min_rank(-Rating)) %>% 
-#   select(Team, `Colley Rating` = Rating, `Colley Rank`)
-# 
-# weekly_prob <- matchups_prob %>%
-#   rename(Team1 = Team) %>% 
-#   # mutate(Team1 = names(.)) %>% 
-#   gather(Team2, Score, -Team1) %>% 
-#   unite(Team, c(Team1, Team2))
-# 
-# weekly_lines <- matchups_prob %>% 
-#   rename(Team1 = Team) %>% 
-#   gather(Team2, Line, -Team1) %>% 
-#   mutate(Line = map_chr(Line, prob_to_odds)) %>% 
-#   unite(Team, c(Team1, Team2))
-# 
-# weekly_spread <- matchups_spread %>% 
-#   # add_column(Team1 = teams, .before = 'Scott') %>% 
-#   rename(Team1 = Team) %>% 
-#   mutate_all(as.character) %>% 
-#   gather(Team2, Spread, -Team1) %>% 
-#   unite(Team, c(Team1, Team2)) %>% 
-#   mutate(Spread = as.numeric(Spread))
-# 
-# current_matchups <- clt_weekly %>% 
-#   filter(Week == weeks + 1) %>%
-#   unite(Team, c(Team1, Team2), remove = F) %>% 
-#   inner_join(weekly_prob, by = "Team") %>% 
-#   inner_join(weekly_spread, by = "Team") %>% 
-#   inner_join(weekly_lines, by = "Team") %>% 
-#   filter(Score >= 50) %>%
-#   select(Winner = Team1, Loser = Team2, Spread, `Win Probability` = Score, Line) %>% 
-#   arrange(Spread) %>% 
-#   mutate(`Win Probability` = percent(`Win Probability`/100))
-
-# playoff_leverage_chart <- clt_weekly %>% 
-#   filter(Week == weeks + 1) %>% 
-#   mutate(x = list(playoff_leverage)) %>% 
-#   unnest() %>%
-#   mutate(sim_wins = Wins,
-#          loss_wins = pl_wins,
-#          win_wins = pl_wins + 1L,
-#          wins = if_else(Team == Team1, win_wins, 
-#                         if_else(Team == Team2, loss_wins, sim_wins))) %>% 
-#   select(Week:Team, wins) %>%
-#   arrange(-wins) %>% 
-#   group_by(Team1, sim) %>% 
-#   mutate(row = row_number(), 
-#          playoff = if_else(row <= 4, 1, 0)) %>% 
-#   ungroup() %>% 
-#   group_by(Team1, Team) %>% 
-#   summarise(Percent = sum(playoff/max(playoff_leverage$sim) * 100)) %>% 
-#   arrange(Team1, -Percent) %>% 
-#   rename(Winner = Team1) %>% 
-#   nest(Team:Percent) %>% 
-#   left_join(clt_weekly %>% 
-#               filter(Week == 11) %>% 
-#               select(-Week) %>% 
-#               rename(Winner = Team1, Loser = Team2), by = "Winner") %>% 
-#   select(Winner, Loser, data) %>% 
-#   unnest() %>% 
-#   filter(Winner == Team | Loser == Team) %>% 
-#   arrange(Team) %>% 
-#   mutate(style = if_else(Winner == Team, "Win", "Lose")) %>% 
-#   select(Team:style) %>% 
-#   spread(style, Percent) %>% 
-#   mutate(Delta = round(Win - Lose, 1), Total = 100) %>% 
-#   ggplot(aes(reorder(Team, Win), y = Total)) + 
-#   geom_bar(stat = "identity", fill = "white", color = "grey", alpha = 0.4) +
-#   geom_bar(stat = "identity", aes(y = Win, fill = Team), alpha = 0.5) +
-#   geom_bar(stat = "identity", aes(y = Lose, fill = Team)) +
-#   geom_text(aes(y = Total + 0.5, label = paste0(Delta, "%")), color = "grey30", hjust = 0) +
-#   scale_y_continuous(limits = c(0, 105), breaks = c(0, 25, 50, 75, 100)) +
-#   guides(fill = FALSE) +
-#   labs(x = "", y = "Chance to Make Playoffs", title = paste0("Playoff Probability Leverage (Week ", max(weeks) + 1, ")")) +
-#   coord_flip() +
-#   theme(plot.title = element_text(hjust = 0.5),
-#         panel.background = element_blank(),
-#         panel.border = element_blank(),
-#         strip.background = element_rect(color = "black"),
-#         panel.grid = element_blank(),
-#         panel.grid.major.x = element_line(color = "grey90", size = 0.2),
-#         strip.text = element_text(size =12))
 
 # UI ----------------------------------------------------------------------
 
@@ -474,31 +314,11 @@ ui  <- navbarPage(
 
 server <- function(input, output, session) {
   
-  ### Playoff Projections ###
-  
-  # output$weekly <- renderTable({
-  #   data_frame(
-  #     Team = c("German", "Scott", "Diaz", "Brian"),
-  #     Semifinals = percent(c(72.6, 59.4, 40.6, 27.4)/100),
-  #     Finals = percent(c(44.4, 29.3, 16.4, 9.8)/100)
-  #   )
-  # }, align = 'c', digits = 1)
-  
-  output$weekly <- renderTable({
-    data_frame(
-      Team = c("German", "Scott", "Diaz", "Brian"),
-      `1st` = percent(c(.444, .293, .164, .098)),
-      `2nd` = percent(c(.2817, .3013, .2416, .1754)),
-      `3rd` = percent(c(.173, .2416, .319, .2664)),
-      `4th` = percent(c(.1008, .1645, .2745, .4598))
-    )
-  }, align = 'c', digits = 1)
-  
   ### Weekly Projections ###
-  # 
-  # output$weekly <- renderTable({
-  #   current_matchups
-  # }, align = 'c', digits = 1)
+
+  output$weekly <- renderTable({
+    current_matchups
+  }, align = 'c', digits = 1)
   
   output$simulation <- renderTable({
     simulated_seasons %>% 
@@ -525,10 +345,10 @@ server <- function(input, output, session) {
     sort <- sorting[[input$sorting]]
     rank_sort <- rankings %>%
       arrange(rankings[[sort]]) %>%
-      mutate(Percent = percent(Percent))
+      mutate(Percent = format_pct(Percent))
     point_sort <- rankings %>%
       arrange(desc(rankings[[sort]])) %>%
-      mutate(Percent = percent(Percent))
+      mutate(Percent = format_pct(Percent))
     if (sort == "Points") {
       point_sort
     } else {
@@ -690,7 +510,7 @@ server <- function(input, output, session) {
     data.frame(Winner = c(input$team1, input$team1, input$team1, "Tie", input$team2, input$team2, input$team2),
                Type = c("Blowout", "Normal", "Squeaker", "Tie", "Squeaker", "Normal", "Blowout"),
                Margin = c("20+ points", "5-20", "<5 points", "-", "<5 points", "5-20", "20+ points"),
-               Probability = percent(c(t1blowout, t1normal, t1squeak, tie, t2squeak, t2normal, t2blowout)))
+               Probability = format_pct(c(t1blowout, t1normal, t1squeak, tie, t2squeak, t2normal, t2blowout)))
   }, align = 'c')
   
   ### Team Charts ###
