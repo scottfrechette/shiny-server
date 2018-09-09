@@ -7,7 +7,11 @@ library(tidyverse)
 library(fvoa)
 library(plotly)
 
-ff_theme <- function(base_size = 12, base_family = "Helvetica") {
+library(rlang)
+library(scales)
+library(Hmisc)
+
+theme_fvoa <- function(base_size = 12, base_family = "Helvetica") {
   theme(plot.title = element_text(hjust = 0.5),
         panel.background = element_blank(),
         panel.border = element_rect(fill = NA, colour="grey50"),
@@ -34,7 +38,7 @@ simulated_seasons <- suppressMessages(read_csv("simulated_seasons.csv"))
 model_eval <- suppressMessages(read_csv("model_eval.csv"))
 playoff_leverage <- suppressMessages(read_csv("playoff_leverage.csv"))
 fvoa_season <- suppressMessages(read_csv("fvoa_season.csv"))
-suppressMessages(source("clt_colley.R"))
+# suppressMessages(source("clt_colley.R"))
 
 matchups_prob <- suppressMessages(read_csv("matchups_prob.csv"))
 matchups_spread <- suppressMessages(read_csv("matchups_spread.csv"))
@@ -707,7 +711,7 @@ server <- function(input, output, session) {
         scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
         labs(y = "Score", x = "Week", title = "Weekly Scores") +
         guides(color=FALSE) +
-        ff_theme()
+        theme_fvoa()
       
       ggplotly(x, tooltip = c("group", "x", "y"))
       
@@ -723,7 +727,7 @@ server <- function(input, output, session) {
         scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
         labs(y = "Score", x = "Week", title = "Weekly Scores") +
         guides(color=FALSE) +
-        ff_theme()
+        theme_fvoa()
       
       ggplotly(x, tooltip = c("group", "x", "y"))
       
@@ -747,7 +751,7 @@ server <- function(input, output, session) {
         scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
         labs(y = "FVOA", x = "Week", title = "Weekly FVOA") +
         guides(color=FALSE) +
-        ff_theme()
+        theme_fvoa()
       
       ggplotly(x, tooltip = c("group", "x", "y"))
       
@@ -765,7 +769,7 @@ server <- function(input, output, session) {
         scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
         labs(y = "Score", x = "Week", title = "Weekly Scores") +
         guides(color=FALSE) +
-        ff_theme()
+        theme_fvoa()
       
       ggplotly(x, tooltip = c("group", "x", "y"))
       
@@ -788,7 +792,7 @@ server <- function(input, output, session) {
         scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
         labs(y = "Wins", x = "Week", title = "Projected Wins by Week") +
         guides(color=FALSE) +
-        ff_theme()
+        theme_fvoa()
       
       ggplotly(x, tooltip = c("group", "x", "y"))
       
@@ -805,7 +809,7 @@ server <- function(input, output, session) {
         scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
         labs(y = "Wins", x = "Week", title = "Projected Wins by Week") +
         guides(color=FALSE) +
-        ff_theme()
+        theme_fvoa()
       
       ggplotly(x, tooltip = c("group", "x", "y"))
     }
@@ -827,7 +831,7 @@ server <- function(input, output, session) {
         scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
         labs(y = "Points", x = "Week", title = "Projected Total Points by Week") +
         guides(color=FALSE) +
-        ff_theme()
+        theme_fvoa()
       
       ggplotly(x, tooltip = c("group", "x", "y"))
       
@@ -844,7 +848,7 @@ server <- function(input, output, session) {
         scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
         labs(y = "Points", x = "Week", title = "Projected Total Points by Week") +
         guides(color=FALSE) +
-        ff_theme()
+        theme_fvoa()
       
       ggplotly(x, tooltip = c("group", "x", "y"))
     }
@@ -866,7 +870,7 @@ server <- function(input, output, session) {
         scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
         labs(y = "Chance", x = "Week", title = "Projected Chance of Making Playoffs by Week") +
         guides(color=FALSE) +
-        ff_theme()
+        theme_fvoa()
       
       ggplotly(x, tooltip = c("group", "x", "y"))
       
@@ -883,7 +887,7 @@ server <- function(input, output, session) {
         scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
         labs(y = "Chance", x = "Week", title = "Projected Chance of Making Playoffs by Week") +
         guides(color=FALSE) +
-        ff_theme()
+        theme_fvoa()
       
       ggplotly(x, tooltip = c("group", "x", "y"))
     }
@@ -909,7 +913,7 @@ server <- function(input, output, session) {
       guides(fill=FALSE) +
       labs(y = "Margin") +
       scale_fill_manual(values = c(equal = "#619CFF", negative = "#F8766D", positive = "#00BA38")) +
-      ff_theme() + 
+      theme_fvoa() + 
       theme(panel.grid.major.y = element_blank())
   })
   
@@ -921,7 +925,7 @@ server <- function(input, output, session) {
       stat_summary(fun.y=mean, geom="point", shape=18, size=3, show.legend=FALSE) + 
       guides(fill=F) +
       labs(y = "Score", x = "", title = "Team Boxplots") +
-      ff_theme() + 
+      theme_fvoa() + 
       theme(panel.border = element_blank())
   })
   
@@ -938,7 +942,7 @@ server <- function(input, output, session) {
         geom_density(aes(fill = Team, color = Team), alpha = 0.2) + 
         labs(x = "Weekly Scores", y = "Density", title = "Density Plots") +
         guides(fill=FALSE) + 
-        ff_theme()
+        theme_fvoa()
       
       ggplotly(x, tooltip = c("fill", "x"))
       
@@ -952,7 +956,7 @@ server <- function(input, output, session) {
         geom_density(data = tm, aes(fill=Team, color = Team), alpha = 0.8) + 
         labs(x = "Weekly Scores", y = "Density", title = "Density Plots") +
         guides(fill=FALSE, color = FALSE) + 
-        ff_theme()
+        theme_fvoa()
       
       ggplotly(x, tooltip = c("fill", "x"))
     }
