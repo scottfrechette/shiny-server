@@ -6,23 +6,31 @@ library(shinythemes)
 library(tidyverse)
 library(fvoa)
 library(plotly)
+library(scales)
 
 library(rlang)
 
 ### Initial Settings ###
 
 reps <-  1e6
-ranking_methods <- c("yahoo_rankings", "fvoa_rankings", "strength_schedule", "colley_rankings") %>%
+ranking_methods <- c("yahoo_rankings", "fvoa_rankings", "sos_rankings", "colley_rankings") %>%
   set_names(c("Yahoo", "FVOA", "Strength of Schedule", "Colley (BCS)"))
-sorting <- c("Yahoo Rank", "FVOA Rank", "SoS", "Colley Rank", "Points") %>%
-  set_names(ranking_methods, "Points")
+sorting <- c("Yahoo Rank", "FVOA Rank", "SoS Rank", "Colley Rank", "Score") %>%
+  set_names(ranking_methods, "Score")
 
 # Load Data ---------------------------------------------------------------
 
-load("clt-data.RData")
+# load("clt-data.RData")
+load("~/shiny-server/clt/clt-data.RData")
 
-weeks <- n_distinct(clt_tidy$Week)
-teams <- unique(clt_tidy$Team)
+weeks <- n_distinct(clt_scores$Week)
+teams <- unique(clt_scores$Team)
+
+yahoo_rankings <- clt_rankings %>% select(Team, "Yahoo Rank")
+fvoa_rankings <- clt_rankings %>% select(Team, contains("FVOA"))
+sos_rankings <- clt_rankings %>% select(Team, contains("SoS"))
+colley_rankings <- clt_rankings %>% select(Team, Rating, "Colley Rank")
+
 
 # UI ----------------------------------------------------------------------
 
@@ -45,31 +53,23 @@ ui  <- navbarPage(
            h3("The Frechest of Takes"),
            h5(""),
            hr(),
-           p("FVOA went 2-3 against the Yahoo spread last week, 39-30-1 for the season"),
+           # p("FVOA went 2-3 against the Yahoo spread last week, 39-30-1 for the season"),
            
            p("Frech Stats:"),
-           tags$li("FVOA went 56% against the weekly Yahoo spread and 61% in all 630 possible head-to-head matchups"),
-           tags$li("4 of the 5 top teams in FVOA made the playoffs"),
-           tags$li("Poor Bobby is stuck in 7th overall despite 4th in FVOA & 3rd most points"),
-           tags$li("The last few weeks got interesting as the two teams projected 
-                   to make the 3rd and 4th spots fell out of the playoffs entirely"),
-           tags$li("And congrats to PFinn for a great run at the end to beat expectations. 
-                   You may be #10 in the charts but you're #6 in our hearts"),
-           
-           
+           tags$li("Don't make too much out of week 1"),
+           tags$li("But then again that's why everyone's here so looks like we have 4 teams in the driver's seat for playoffs"),
+           tags$li("PFinn - I really thought this might be your year...I swear FVOA doesn't have it out for you"),
+           tags$li("I've added in the Yahoo win probability so I'll try to schedule that to update daily"),
+
            
            hr(),
-           h5("Playoff Projections", align = "center"),
+           h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
            br(),
            fluidRow(tableOutput("weekly"), align="center"),
-           
-           # h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
-           # br(),
-           # fluidRow(tableOutput("weekly"), align="center"),
-           # br(),
-           # h5("Season Projections", align = "center"),
-           # br(),
-           # fluidRow(tableOutput("simulation"), align = "center"),
+           br(),
+           h5("Season Projections", align = "center"),
+           br(),
+           fluidRow(tableOutput("simulation"), align = "center"),
            hr(),
            p("FVOA Assumptions:"),
            tags$ol(
@@ -89,7 +89,6 @@ ui  <- navbarPage(
            sidebarLayout(
              sidebarPanel(
                checkboxGroupInput("rankings", "Choose Rankings:", 
-                                  # ranking_methods, selected = c("yahoo_rankings", "frech_rankings")),
                                   ranking_methods, selected = c("yahoo_rankings")),
                uiOutput("sorting")
              ), 
@@ -142,8 +141,8 @@ ui  <- navbarPage(
            fluidRow(tableOutput("matchup_breakdown"), align = "center"),
            hr(),
            fluidRow(column(4, offset = 1,
-                           selectInput("team1", "Team 1:", teams, selected = "Scott"), 
-                           selectInput("team2", "Team 2:", teams, selected = "Barrett")),
+                           selectInput("team1", "Team 1:", teams, selected = teams[[1]]), 
+                           selectInput("team2", "Team 2:", teams, selected = teams[[2]])),
                     column(4, offset = 1,
                            wellPanel(sliderInput("matchup_week", "Weeks to Include:", 1,
                                                  max(weeks), c(1, max), step = 1))))
@@ -292,20 +291,20 @@ ui  <- navbarPage(
                         tags$li("Zoom in on any part of the chart by dragging box over that area (double-click to return)")
                       )
              )
-             ),
+             )#,
   
   # Model Evaluation Tab-----------------------------------------------------
   
-  tabPanel("FVOA Evaluation",
-           h4("FVOA Accuracy by Week"),
-           hr(),
-           fluidRow(textOutput("eval_accuracy"), align = "center"),
-           br(),
-           fluidRow(column(8, offset = 2, plotOutput("eval_plot")), align = "center"),
-           br(),
-           p("Which teams screwed my model last week?", align = "center"),
-           fluidRow(tableOutput("eval_team"), align = "center")
-  )
+  # tabPanel("FVOA Evaluation",
+  #          h4("FVOA Accuracy by Week"),
+  #          hr(),
+  #          fluidRow(textOutput("eval_accuracy"), align = "center"),
+  #          br(),
+  #          fluidRow(column(8, offset = 2, plotOutput("eval_plot")), align = "center"),
+  #          br(),
+  #          p("Which teams screwed my model last week?", align = "center"),
+  #          fluidRow(tableOutput("eval_team"), align = "center")
+  # )
   
   # End of navbarPage
              )
@@ -317,11 +316,11 @@ server <- function(input, output, session) {
   ### Weekly Projections ###
 
   output$weekly <- renderTable({
-    current_matchups
+    clt_current_matchups
   }, align = 'c', digits = 1)
   
   output$simulation <- renderTable({
-    simulated_seasons %>% 
+    clt_simulated_season %>% 
       filter(Week == max(Week)) %>% 
       mutate(Playoffs = paste0(Percent, "%")) %>% 
       select(Team:Wins, Playoffs)
@@ -331,25 +330,36 @@ server <- function(input, output, session) {
   
   output$sorting <- renderUI({
     selectInput("sorting", "Sort Rankings By:", 
-                c(ranking_methods[ranking_methods %in% input$rankings], "Points"))
+                c(ranking_methods[ranking_methods %in% input$rankings], "Score"))
   })
   
+  ranking_selections <- function(rankings, ...) {
+    
+    dots <- quos(...)
+    
+    rankings %>% 
+      select(Team:Percent, contains(paste(!!! dots, collapse = "|")))
+  }
+  
   output$rankings <- renderTable({
-    rankings <- clt_stats
+    # rankings <- clt_rankings %>%
+    #   select(Team:Percent, matches(paste(ranking_methods[c(input$rankings)], collapse = "|")))
+    # rankings <- ranking_selections(rankings, input$rankings)
+    rankings <- clt_rankings %>%
+      select(Team:Percent)
+      # select(Team:Percent, matches(paste(input$rankings, sep = "|")))
     for(r in ranking_methods) {
       if (r %in% input$rankings) {
         tmp <- eval_tidy(parse_quosure(r))
-        rankings <- rankings %>% left_join(tmp, by = "Team")
-      } else next 
-    }
+    rankings <- rankings %>% left_join(tmp)
+      } else next
+    } 
     sort <- sorting[[input$sorting]]
     rank_sort <- rankings %>%
-      arrange(rankings[[sort]]) %>%
-      mutate(Percent = format_pct(Percent))
+      arrange(rankings[[sort]])
     point_sort <- rankings %>%
-      arrange(desc(rankings[[sort]])) %>%
-      mutate(Percent = format_pct(Percent))
-    if (sort == "Points") {
+      arrange(desc(rankings[[sort]]))
+    if (sort == "Score") {
       point_sort
     } else {
       rank_sort
@@ -359,27 +369,27 @@ server <- function(input, output, session) {
   ### League Tab ###
   matchups_prob <- reactive({
     set.seed(42)
-    teams <- clt_tidy %>% select(Team) %>% distinct()
+    teams <- clt_scores %>% select(Team) %>% distinct()
     reg_games <- 6
     team.names <- teams[[1]]
     df <- as.data.frame(matrix(nrow=nrow(teams), ncol=nrow(teams)))
     rownames(df) <- team.names
     colnames(df) <- team.names
     if (input$league_week[2] - input$league_week[1] < 5) {
-      league <- clt_tidy %>%
+      league <- clt_scores %>%
         filter(Week %in% input$league_week[1]:input$league_week[2]) %>%
         group_by(Team) %>%
         mutate(team_mean = weighted.mean(c(Score, 115), weight_games(Score, reg_games)),
-               team_sd = sqrt(wtd.var(c(Score, 115), weight_games(Score, reg_games), method="ML"))) %>%
+               team_sd = sqrt(weighted_sd(c(Score, 115), weight_games(Score, reg_games), method="ML"))) %>%
         select(Team, team_mean, team_sd) %>%
         ungroup() %>%
         distinct()
     } else {
-      league <- clt_tidy %>%
+      league <- clt_scores %>%
         filter(Week %in% input$league_week[1]:input$league_week[2]) %>%
         group_by(Team) %>%
         mutate(team_mean = weighted.mean(Score, weight_games(Score, reg_games)),
-               team_sd = sqrt(wtd.var(Score, weight_games(Score, reg_games), method="ML"))) %>%
+               team_sd = sqrt(weighted_sd(Score, weight_games(Score, reg_games), method="ML"))) %>%
         select(Team, team_mean, team_sd) %>%
         ungroup() %>%
         distinct()
@@ -408,27 +418,27 @@ server <- function(input, output, session) {
   
   matchups_spread <- reactive({
     set.seed(42)
-    teams <- clt_tidy %>% select(Team) %>% distinct()
+    teams <- clt_scores %>% select(Team) %>% distinct()
     reg_games <- 6
     team.names <- teams[[1]]
     df <- as.data.frame(matrix(nrow=nrow(teams), ncol=nrow(teams)))
     rownames(df) <- team.names
     colnames(df) <- team.names
     if (input$league_week[2] - input$league_week[1] < 5) {
-      league <- clt_tidy %>% 
+      league <- clt_scores %>% 
         filter(Week %in% input$league_week[1]:input$league_week[2]) %>%
         group_by(Team) %>% 
         mutate(team_mean = weighted.mean(c(Score, 115), weight_games(Score, reg_games)),
-               team_sd = sqrt(wtd.var(c(Score, 115), weight_games(Score, reg_games), method="ML"))) %>%
+               team_sd = sqrt(weighted_sd(c(Score, 115), weight_games(Score, reg_games), method="ML"))) %>%
         select(Team, team_mean, team_sd) %>% 
         ungroup() %>% 
         distinct()
     } else {
-      league <- clt_tidy %>% 
+      league <- clt_scores %>% 
         filter(Week %in% input$league_week[1]:input$league_week[2]) %>%
         group_by(Team) %>% 
         mutate(team_mean = weighted.mean(Score, weight_games(Score, reg_games)),
-               team_sd = sqrt(wtd.var(Score, weight_games(Score, reg_games), method="ML"))) %>%
+               team_sd = sqrt(weighted_sd(Score, weight_games(Score, reg_games), method="ML"))) %>%
         select(Team, team_mean, team_sd) %>% 
         ungroup() %>% 
         distinct()
@@ -473,26 +483,26 @@ server <- function(input, output, session) {
   
   output$lines <- renderTable({
     matchups_spread()%>% 
-      add_column(Team = teams, .before = 'Scott')
+      add_column(Team = teams, .before = 1)
   }, align = 'c')
   
   ### Matchups Tab ###
   output$matchup_breakdown <- renderTable({
     reg_games <- 6
-    league <- clt_tidy %>% filter(Week %in% input$matchup_week[1]:input$matchup_week[2])
+    league <- clt_scores %>% filter(Week %in% input$matchup_week[1]:input$matchup_week[2])
     t1.scores <- league %>% filter(Team == input$team1) %>% pull(Score)
     t2.scores <- league %>% filter(Team == input$team2) %>% pull(Score)
     if (input$matchup_week[2] - input$matchup_week[1] < 5) {
       t1.mean <- weighted.mean(c(t1.scores, 115), weight_games(t1.scores, reg_games))
-      t1.sd <- sqrt(wtd.var(c(t1.scores, 115), weight_games(t1.scores, reg_games), method="ML"))
+      t1.sd <- sqrt(weighted_sd(c(t1.scores, 115), weight_games(t1.scores, reg_games), method="ML"))
       t2.mean <- weighted.mean(c(t2.scores, 115), weight_games(t2.scores, reg_games))
-      t2.sd <- sqrt(wtd.var(c(t2.scores, 115), weight_games(t2.scores, reg_games), method="ML"))
+      t2.sd <- sqrt(weighted_sd(c(t2.scores, 115), weight_games(t2.scores, reg_games), method="ML"))
       
     } else {
       t1.mean <- weighted.mean(t1.scores, weight_games(t1.scores, reg_games))
-      t1.sd <- sqrt(wtd.var(t1.scores, weight_games(t1.scores, reg_games), method="ML"))
+      t1.sd <- sqrt(weighted_sd(t1.scores, weight_games(t1.scores, reg_games), method="ML"))
       t2.mean <- weighted.mean(t2.scores, weight_games(t2.scores, reg_games))
-      t2.sd <- sqrt(wtd.var(t2.scores, weight_games(t2.scores, reg_games), method="ML"))
+      t2.sd <- sqrt(weighted_sd(t2.scores, weight_games(t2.scores, reg_games), method="ML"))
     }
     
     t1.sim <- rnorm(reps, t1.mean, t1.sd)
@@ -522,8 +532,8 @@ server <- function(input, output, session) {
   output$weekly_plot <- renderPlotly({
     
     if (is.null(input$team_week)) {
-      x <- ggplot(clt_tidy, aes(Week, Score)) +
-        geom_smooth(se=F, color = "darkgrey", n = n_distinct(clt_tidy$Week), linetype=2) +
+      x <- ggplot(clt_scores, aes(Week, Score)) +
+        geom_smooth(se=F, color = "darkgrey", n = n_distinct(clt_scores$Week), linetype=2) +
         geom_line(alpha = 0.5, aes(group=Team, color=Team), size = 1.5) +
         geom_point(aes(group=Team, color=Team)) +
         scale_y_continuous(breaks = pretty_breaks(n = 5)) +
@@ -536,10 +546,10 @@ server <- function(input, output, session) {
       ggplotly(x, tooltip = c("group", "x", "y"))
       
     } else {
-      tm <- clt_tidy %>% filter(Team %in% input$team_week)
+      tm <- clt_scores %>% filter(Team %in% input$team_week)
       
-      x <- ggplot(clt_tidy, aes(Week, Score)) +
-        geom_smooth(se=F, color = "darkgrey", n = n_distinct(clt_tidy$Week), linetype=2) +
+      x <- ggplot(clt_scores, aes(Week, Score)) +
+        geom_smooth(se=F, color = "darkgrey", n = n_distinct(clt_scores$Week), linetype=2) +
         geom_line(alpha = 0.2, aes(group=Team, color=Team), size = 1.5) +
         geom_line(data = tm, aes(group=Team, color=Team), size = 2) + 
         geom_point(aes(group=Team, color=Team)) +
@@ -561,8 +571,8 @@ server <- function(input, output, session) {
   output$fvoa_plot <- renderPlotly({
     
     if (is.null(input$team_fvoa)) {
-      x <- ggplot(fvoa_season, aes(Week, FVOA)) +
-        # geom_smooth(se=F, color = "darkgrey", n = n_distinct(clt_tidy$Week), linetype=2) +
+      x <- ggplot(clt_fvoa_season, aes(Week, FVOA)) +
+        # geom_smooth(se=F, color = "darkgrey", n = n_distinct(clt_scores$Week), linetype=2) +
         geom_line(alpha = 0.5, aes(group=Team, color=Team), size = 1.5) +
         geom_point(aes(group=Team, color=Team)) +
         geom_segment(x = 1, y = 0, xend = 15, yend = 0, color = "darkgrey", linetype = 2) +
@@ -576,10 +586,10 @@ server <- function(input, output, session) {
       ggplotly(x, tooltip = c("group", "x", "y"))
       
     } else {
-      tm <- fvoa_season %>% filter(Team %in% input$team_fvoa)
+      tm <- clt_fvoa_season %>% filter(Team %in% input$team_fvoa)
       
-      x <- ggplot(fvoa_season, aes(Week, FVOA)) +
-        # geom_smooth(se=F, color = "darkgrey", n = n_distinct(clt_tidy$Week), linetype=2) +
+      x <- ggplot(clt_fvoa_season, aes(Week, FVOA)) +
+        # geom_smooth(se=F, color = "darkgrey", n = n_distinct(clt_scores$Week), linetype=2) +
         geom_line(alpha = 0.2, aes(group=Team, color=Team), size = 1.5) +
         geom_line(data = tm, aes(group=Team, color=Team), size = 2) + 
         geom_point(aes(group=Team, color=Team)) +
@@ -603,7 +613,7 @@ server <- function(input, output, session) {
   output$sim_wins <- renderPlotly({
     
     if (is.null(input$team_wins)) {
-      x <- simulated_seasons %>% 
+      x <- clt_simulated_season %>% 
         ggplot(aes(Week, Wins)) +
         geom_line(alpha = 0.5, aes(group=Team, color=Team), size = 1.5) +
         geom_point(aes(group=Team, color=Team)) +
@@ -617,9 +627,9 @@ server <- function(input, output, session) {
       ggplotly(x, tooltip = c("group", "x", "y"))
       
     } else {
-      tm <- simulated_seasons %>% filter(Team %in% input$team_wins)
+      tm <- clt_simulated_season %>% filter(Team %in% input$team_wins)
       
-      x <- simulated_seasons %>% 
+      x <- clt_simulated_season %>% 
         ggplot(aes(Week, Wins)) +
         geom_line(alpha = 0.2, aes(group=Team, color=Team), size = 1.5) +
         geom_line(data = tm, aes(group=Team, color=Team), size = 2) + 
@@ -642,9 +652,9 @@ server <- function(input, output, session) {
   output$sim_points <- renderPlotly({
     
     if (is.null(input$team_points)) {
-      x <- simulated_seasons %>% 
+      x <- clt_simulated_season %>% 
         ggplot(aes(Week, Points)) +
-        geom_smooth(se=F, color = "darkgrey", n = n_distinct(clt_tidy$Week), linetype = 2) +
+        geom_smooth(se=F, color = "darkgrey", n = n_distinct(clt_scores$Week), linetype = 2) +
         geom_line(alpha = 0.5, aes(group=Team, color=Team), size = 1.5) +
         geom_point(aes(group=Team, color=Team)) +
         scale_y_continuous(breaks = pretty_breaks(n = 5)) +
@@ -656,11 +666,11 @@ server <- function(input, output, session) {
       ggplotly(x, tooltip = c("group", "x", "y"))
       
     } else {
-      tm <- simulated_seasons %>% filter(Team %in% input$team_points)
+      tm <- clt_simulated_season %>% filter(Team %in% input$team_points)
       
-      x <- simulated_seasons %>% 
+      x <- clt_simulated_season %>% 
         ggplot(aes(Week, Points)) +
-        geom_smooth(se=F, color = "darkgrey", n = n_distinct(clt_tidy$Week), linetype=2) +
+        geom_smooth(se=F, color = "darkgrey", n = n_distinct(clt_scores$Week), linetype=2) +
         geom_line(alpha = 0.2, aes(group=Team, color=Team), size = 1.5) +
         geom_line(data = tm, aes(group=Team, color=Team), size = 2) + 
         geom_point(aes(group=Team, color=Team)) +
@@ -681,7 +691,7 @@ server <- function(input, output, session) {
   output$sim_playoffs <- renderPlotly({
     
     if (is.null(input$team_playoffs)) {
-      x <- simulated_seasons %>% 
+      x <- clt_simulated_season %>% 
         ggplot(aes(Week, Percent)) +
         geom_line(alpha = 0.5, aes(group=Team, color=Team), size = 1.5) +
         geom_point(aes(group=Team, color=Team)) +
@@ -695,9 +705,9 @@ server <- function(input, output, session) {
       ggplotly(x, tooltip = c("group", "x", "y"))
       
     } else {
-      tm <- simulated_seasons %>% filter(Team %in% input$team_playoffs)
+      tm <- clt_simulated_season %>% filter(Team %in% input$team_playoffs)
       
-      x <- simulated_seasons %>% 
+      x <- clt_simulated_season %>% 
         ggplot(aes(Week, Percent)) +
         geom_line(alpha = 0.2, aes(group=Team, color=Team), size = 1.5) +
         geom_line(data = tm, aes(group=Team, color=Team), size = 2) + 
@@ -720,9 +730,9 @@ server <- function(input, output, session) {
   output$projected <- renderPlot({
     clt_proj %>%
       filter(Week %in% input$proj_week[1]:input$proj_week[2]) %>%
-      spread(Type, Score) %>% 
+      # spread(Type, Score) %>% 
       group_by(Team) %>% 
-      mutate(margin = act-proj,
+      mutate(margin = Score-Proj,
              sign = if_else(margin >=0, "positive", "negative"),
              avg = mean(margin),
              pos_count = sum(if_else(sign == "positive", 1, 0))) %>%
@@ -738,7 +748,7 @@ server <- function(input, output, session) {
   })
   
   output$boxplot <- renderPlot({
-    clt_tidy %>% 
+    clt_scores %>% 
       filter(Week %in% input$boxplot_week[1]:input$boxplot_week[2]) %>%
       ggplot(aes(x=reorder(Team, -Score, fun=mean), y=Score, fill=Team)) + 
       geom_boxplot(coef = 1.25, outlier.alpha = 0.6) + 
@@ -756,7 +766,7 @@ server <- function(input, output, session) {
   output$density <- renderPlotly({
     
     if (is.null(input$team_density)) {
-      x <- clt_tidy %>% 
+      x <- clt_scores %>% 
         filter(Week %in% input$density_week[1]:input$density_week[2]) %>%
         ggplot(aes(Score)) +
         geom_density(aes(fill = Team, color = Team), alpha = 0.2) + 
@@ -767,9 +777,9 @@ server <- function(input, output, session) {
       ggplotly(x, tooltip = c("fill", "x"))
       
     } else {
-      tm <- clt_tidy %>% filter(Team %in% input$team_density)
+      tm <- clt_scores %>% filter(Team %in% input$team_density)
       
-      x <- clt_tidy %>% 
+      x <- clt_scores %>% 
         filter(Week %in% input$density_week[1]:input$density_week[2]) %>% 
         ggplot(aes(Score)) +
         geom_density(aes(fill = Team, color = Team), alpha = 0.1) + 
