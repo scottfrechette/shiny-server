@@ -21,7 +21,7 @@ sorting <- c("Yahoo Rank", "FVOA Rank", "SoS Rank", "Colley Rank", "Score") %>%
 # Load Data ---------------------------------------------------------------
 
 # load("clt-data.RData")
-load("~/shiny-server/clt/clt-data.RData")
+load("clt-data.RData")
 
 weeks <- n_distinct(clt_scores$Week)
 teams <- unique(clt_scores$Team)
