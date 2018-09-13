@@ -15,13 +15,13 @@ library(rlang)
 reps <-  1e6
 ranking_methods <- c("yahoo_rankings", "fvoa_rankings", "sos_rankings", "colley_rankings") %>%
   set_names(c("Yahoo", "FVOA", "Strength of Schedule", "Colley (BCS)"))
-sorting <- c("Yahoo Rank", "FVOA Rank", "SoS Rank", "Colley Rank", "Score") %>%
-  set_names(ranking_methods, "Score")
+sorting <- c("Yahoo Rank", "FVOA Rank", "SoS Rank", "Colley Rank", "Points") %>%
+  set_names(ranking_methods, "Points")
 
 # Load Data ---------------------------------------------------------------
 
 # load("clt-data.RData")
-load("clt-data.RData")
+load(here::here("clt", "clt-data.RData"))
 
 weeks <- n_distinct(clt_scores$Week)
 teams <- unique(clt_scores$Team)
@@ -29,7 +29,7 @@ teams <- unique(clt_scores$Team)
 yahoo_rankings <- clt_rankings %>% select(Team, "Yahoo Rank")
 fvoa_rankings <- clt_rankings %>% select(Team, contains("FVOA"))
 sos_rankings <- clt_rankings %>% select(Team, contains("SoS"))
-colley_rankings <- clt_rankings %>% select(Team, Rating, "Colley Rank")
+colley_rankings <- clt_rankings %>% select(Team, contains("Colley"))
 
 
 # UI ----------------------------------------------------------------------
@@ -246,18 +246,18 @@ ui  <- navbarPage(
                       )
                       ),
              
-             # tabPanel("Playoff Leverage",
-             #          h5("How much will winning/losing your next game affect your playoff chances?"),
-             #          plotOutput("playoff_leverage"),
-             #          h5("Chart Notes:"),
-             #          tags$ol(
-             #            tags$li("Full bar is your chance of making playoffs with win"),
-             #            tags$li("Darker portion is your chance of making playoffs with loss"),
-             #            tags$li("The difference between these two, the light portion and number listed to the right,
-             #                    is the playoff leverage of this game"),
-             #            tags$li("Note: these are all treated independently of the other teams winning/losing so it's not exact")
-             #            )
-             # ),
+             tabPanel("Playoff Leverage",
+                      h5("How much will winning/losing your next game affect your playoff chances?"),
+                      plotOutput("playoff_leverage"),
+                      h5("Chart Notes:"),
+                      tags$ol(
+                        tags$li("Full bar is your chance of making playoffs with win"),
+                        tags$li("Darker portion is your chance of making playoffs with loss"),
+                        tags$li("The difference between these two, the light portion and number listed to the right,
+                                is the playoff leverage of this game"),
+                        tags$li("Note: these are all treated independently of the other teams winning/losing so it's not exact")
+                        )
+             ),
              
              tabPanel("Projected v Actual Scores",
                       h5("How did your team perform against Yahoo projections?"),
@@ -330,7 +330,7 @@ server <- function(input, output, session) {
   
   output$sorting <- renderUI({
     selectInput("sorting", "Sort Rankings By:", 
-                c(ranking_methods[ranking_methods %in% input$rankings], "Score"))
+                c(ranking_methods[ranking_methods %in% input$rankings], "Points"))
   })
   
   ranking_selections <- function(rankings, ...) {
@@ -359,12 +359,12 @@ server <- function(input, output, session) {
       arrange(rankings[[sort]])
     point_sort <- rankings %>%
       arrange(desc(rankings[[sort]]))
-    if (sort == "Score") {
+    if (sort == "Points") {
       point_sort
     } else {
       rank_sort
     }
-  }, align = 'c', digits = 3)
+  }, align = 'c', digits = 2)
   
   ### League Tab ###
   matchups_prob <- reactive({
@@ -723,9 +723,9 @@ server <- function(input, output, session) {
     }
   })
   
-  # output$playoff_leverage <- renderPlot({
-  #   playoff_leverage_chart
-  # })
+  output$playoff_leverage <- renderPlot({
+    clt_playoff_leverage_chart
+  })
   
   output$projected <- renderPlot({
     clt_proj %>%
