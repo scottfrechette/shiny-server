@@ -259,6 +259,14 @@ ui  <- navbarPage(
                         )
              ),
              
+             tabPanel("Manager Evaluation",
+                      h5("How well did you manage your team?"),
+                      plotOutput("manager"),
+                      hr(),
+                      fluidRow(column(4, offset = 4, wellPanel(sliderInput("proj_week", "Weeks to Include:", 1,
+                                                                           max(weeks), c(1, max), step = 1))))
+             ),
+             
              tabPanel("Projected v Actual Scores",
                       h5("How did your team perform against Yahoo projections?"),
                       plotOutput("projected"),
@@ -317,7 +325,7 @@ server <- function(input, output, session) {
 
   output$weekly <- renderTable({
     clt_current_matchups
-  }, align = 'c', digits = 1)
+  }, align = 'c', digits = 0)
   
   output$simulation <- renderTable({
     clt_simulated_season %>% 
@@ -725,6 +733,10 @@ server <- function(input, output, session) {
   
   output$playoff_leverage <- renderPlot({
     clt_playoff_leverage_chart
+  })
+  
+  output$manager <- renderPlot({
+    clt_lineup_eval
   })
   
   output$projected <- renderPlot({

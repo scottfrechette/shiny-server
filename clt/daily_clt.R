@@ -53,13 +53,15 @@ clt_fvoa_season <- calculate_fvoa_season(clt_scores)
 clt_matchups_prob <- all_matchups(clt_scores, type = "prob")
 clt_matchups_spread <- all_matchups(clt_scores, type = "spread")
 clt_rankings <- calculate_rankings(clt_schedule, clt_scores)
-clt_current_matchups <- current_matchups(current_week, clt_schedule, clt_scores, clt_yahoo_win_prob)
-clt_playoff_leverage_chart <- playoff_leverage_plot(clt_scores, clt_schedule, playoff_leverage)
-# clt_lineup_eval <- evaluate_lineup(clt_team)
+clt_current_matchups <- current_matchups(current_week, clt_schedule, 
+                                         clt_scores, clt_yahoo_win_prob)
+clt_playoff_leverage_chart <- playoff_leverage_plot(clt_scores, clt_schedule, 
+                                                    playoff_leverage)
+clt_lineup_eval <- evaluate_lineup(clt_team, plot = T)
 
 save(clt_schedule, clt_team, clt_proj, clt_scores,
      clt_simulated_season, clt_model_eval, clt_fvoa_season,
      clt_matchups_prob, clt_matchups_spread,
      clt_rankings, clt_current_matchups,
-     clt_playoff_leverage_chart,
+     clt_playoff_leverage_chart, clt_lineup_eval, 
      file = here::here("clt", "clt-data.RData"))
