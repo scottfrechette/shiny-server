@@ -7,8 +7,7 @@ library(tidyverse)
 library(fvoa)
 library(plotly)
 library(scales)
-
-library(rlang)
+library(lubridate)
 
 ### Initial Settings ###
 
@@ -17,6 +16,16 @@ ranking_methods <- c("yahoo_rankings", "fvoa_rankings", "sos_rankings", "colley_
   set_names(c("Yahoo", "FVOA", "Strength of Schedule", "Colley (BCS)"))
 sorting <- c("Yahoo Rank", "FVOA Rank", "SoS Rank", "Colley Rank", "Points") %>%
   set_names(ranking_methods, "Points")
+
+today_week <- today() %>%
+  floor_date(unit = "week", week_start = 2) %>%
+  week()
+start_week <- as_date("2018-09-03") %>%
+  floor_date(unit = "week", week_start = 2) %>%
+  week()
+current_week <- today_week - start_week
+weeks_played <- current_week - 1
+frech_stats <- 1
 
 # Load Data ---------------------------------------------------------------
 
@@ -55,12 +64,35 @@ ui  <- navbarPage(
            hr(),
            # p("FVOA went 2-3 against the Yahoo spread last week, 39-30-1 for the season"),
            
-           p("Frech Stats:"),
-           tags$li("Don't make too much out of week 1"),
-           tags$li("But then again that's why everyone's here so looks like we have 4 teams in the driver's seat for playoffs"),
-           tags$li("PFinn - I really thought this might be your year...I swear FVOA doesn't have it out for you"),
-           tags$li("I've added in the Yahoo win probability so I'll try to schedule that to update daily"),
-
+           p(str_glue("Frech Stats - Week {frech_stats}:")),
+           # if(1 == 1) {
+           tags$li(
+             if(weeks_played == frech_stats) {"Don't make too much out of week 1"
+             } else {
+               "TBD"
+             }
+           ),
+           tags$li(
+             if(weeks_played == frech_stats) {
+               "But then again that's why everyone's here so looks like we have 4 teams in the driver's seat for playoffs"
+             } else {
+               "TBD"
+             }
+           ),
+           tags$li(
+             if(weeks_played == frech_stats) {
+               "PFinn - I really thought this might be your year...I swear FVOA doesn't have it out for you"
+             } else {
+               "TBD"
+             }
+           ),
+           tags$li(
+             if(weeks_played == frech_stats) {
+               "I've added in the Yahoo win probability so I'll try to schedule that to update daily"
+             } else {
+               "TBD"
+             }
+           ),
            
            hr(),
            h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
@@ -75,6 +107,9 @@ ui  <- navbarPage(
            tags$ol(
              tags$li(HTML("<u><strong>Team scores only</strong></u> - opponent is random and you can't play defense 
                           so win-loss record is irrelevant")),
+             tags$li(HTML("<u><strong>Regression to mean</strong></u> - scores are slightly regressed to 
+                          our league's historical average for first six weeks on a 
+                          sliding scale (50% for week 1, 33% for week 2, etc.)")),
              tags$li(HTML("<u><strong>Recency bias</strong></u> - recent games are more predictive because of things 
                           like injuries, waiver wire pickups, and trades")),
              tags$li(HTML("<u><strong>Outliers</strong></u> - freak games by your WR3 are not very predictive so very 
