@@ -45,7 +45,11 @@ clt_scores <- clt_proj %>% select(-Proj)
 
 
 # Run FVOA analysis
-clt_simulated_season <- simulate_season(clt_schedule, clt_scores, "clt")
+clt_simulated_season <- simulate_season(clt_schedule, clt_scores, "clt") %>% 
+  left_join(team_ids, by = "Team") %>% 
+  select(-Team) %>% 
+  rename(Team = team) %>% 
+  select(Team, everything())
 if(weeks_played > 1) {
   clt_model_eval <- evaluate_model(clt_scores)
   } else {clt_model_eval <- NULL}
