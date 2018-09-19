@@ -8,6 +8,7 @@ library(fvoa)
 library(plotly)
 library(scales)
 library(lubridate)
+library(rlang)
 
 ### Initial Settings ###
 
@@ -20,12 +21,10 @@ sorting <- c("Yahoo Rank", "FVOA Rank", "SoS Rank", "Colley Rank", "Points") %>%
 today_week <- today() %>%
   floor_date(unit = "week", week_start = 2) %>%
   week()
-start_week <- as_date("2018-09-03") %>%
-  floor_date(unit = "week", week_start = 2) %>%
-  week()
+start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 1
+frech_stats <- 2
 
 # Load Data ---------------------------------------------------------------
 
@@ -63,36 +62,37 @@ ui  <- navbarPage(
            h5(""),
            hr(),
            # p("FVOA went 2-3 against the Yahoo spread last week, 39-30-1 for the season"),
-           
+
            p(str_glue("Frech Stats - Week {frech_stats}:")),
            # if(1 == 1) {
            tags$li(
-             if(weeks_played == frech_stats) {"Don't make too much out of week 1"
+             if(weeks_played == frech_stats) {
+               "Well this is why you shouldn't make too much out of week 1, in fact I'd still wait before "
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "But then again that's why everyone's here so looks like we have 4 teams in the driver's seat for playoffs"
+               "But I will say I'm happy for PFinn - welcome to the top of the board"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "PFinn - I really thought this might be your year...I swear FVOA doesn't have it out for you"
+               "Looks like FVOA is predicting some close games this week"
              } else {
                "TBD"
              }
            ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "I've added in the Yahoo win probability so I'll try to schedule that to update daily"
-             } else {
-               "TBD"
-             }
-           ),
+           # tags$li(
+           #   if(weeks_played == frech_stats) {
+           #     ""
+           #   } else {
+           #     "TBD"
+           #   }
+           # ),
            
            hr(),
            h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
