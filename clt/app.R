@@ -1,3 +1,6 @@
+####### CLT App #######
+
+
 # Initialize --------------------------------------------------------------
 
 ### Load Packages ###
@@ -67,7 +70,7 @@ ui  <- navbarPage(
            # if(1 == 1) {
            tags$li(
              if(weeks_played == frech_stats) {
-               "Well this is why you shouldn't make too much out of week 1, in fact I'd still wait before "
+               "Well this is why you shouldn't make too much out of week 1, we had some major shifts this week"
              } else {
                "TBD"
              }

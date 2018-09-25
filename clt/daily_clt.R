@@ -46,7 +46,8 @@ clt_scores <- clt_proj %>%
 # Run FVOA analysis
 clt_simulated_season <- simulate_season(clt_schedule, clt_scores, "clt") 
 playoff_leverage <- read_csv(here::here("clt", "playoff_leverage.csv"))
-clt_model_eval <- evaluate_model(clt_scores)
+# clt_model_eval <- evaluate_model(clt_scores)
+clt_model_eval <- NULL
 clt_fvoa_season <- calculate_fvoa_season(clt_scores)
 clt_matchups_prob <- all_matchups(clt_scores, type = "prob")
 clt_matchups_spread <- all_matchups(clt_scores, type = "spread")
@@ -55,7 +56,7 @@ clt_current_matchups <- current_matchups(current_week, clt_schedule,
                                          clt_scores, clt_yahoo_win_prob)
 clt_playoff_leverage_chart <- playoff_leverage_plot(clt_scores, clt_schedule, 
                                                     playoff_leverage)
-clt_lineup_eval <- evaluate_lineup(clt_team, plot = T)
+clt_lineup_eval <- evaluate_lineup(clt_team, flex = 0, plot = T)
 
 # Save data for Shiny app
 save(clt_schedule, clt_team, clt_proj, clt_scores,
