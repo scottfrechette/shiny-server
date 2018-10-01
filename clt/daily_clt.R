@@ -46,8 +46,7 @@ clt_scores <- clt_proj %>%
 # Run FVOA analysis
 clt_simulated_season <- simulate_season(clt_schedule, clt_scores, "clt") 
 playoff_leverage <- read_csv(here::here("clt", "playoff_leverage.csv"))
-# clt_model_eval <- evaluate_model(clt_scores)
-clt_model_eval <- NULL
+clt_model_eval <- evaluate_model(clt_scores, output = "shiny")
 clt_fvoa_season <- calculate_fvoa_season(clt_scores)
 clt_matchups_prob <- all_matchups(clt_scores, type = "prob")
 clt_matchups_spread <- all_matchups(clt_scores, type = "spread")

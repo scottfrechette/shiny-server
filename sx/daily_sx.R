@@ -17,7 +17,6 @@ weeks_played <- current_week - 1
 sx_schedule <- scrape_schedule("espn", 299999)  # run weekly for changes in team names
 sx_team <- scrape_team(weeks_played, "espn", 299999) %>% 
   unnest()
-# sx_espn_win_prob <- scrape_win_prob(current_week, "espn", 299999)             # Not possible
 
 # Replace team names
 source(here::here("sx", "sx_lookupIDs.R"))
@@ -36,9 +35,6 @@ sx_schedule <- sx_schedule %>%
 sx_team <- sx_team %>% 
   left_join(sx_lookup_ids, by = "team_id") %>% 
   select(team_id, Week, Team = team, Score:Points) 
-# sx_espn_win_prob <- sx_espn_win_prob %>%                                      # Not possible
-#   left_join(lookup_id, by = "team_id") %>% 
-#   select(team_id, Team = team, type, win_prob)
 
 # Extract scores
 sx_scores <- extract_weekly_scores(sx_team)
@@ -47,8 +43,7 @@ sx_scores <- extract_weekly_scores(sx_team)
 # Run FVOA analysis
 sx_simulated_season <- simulate_season(sx_schedule, sx_scores, "sx")
 playoff_leverage <- read_csv(here::here("sx", "playoff_leverage.csv"))
-# sx_model_eval <- evaluate_model(sx_scores)
-sx_model_eval <- NULL
+sx_model_eval <- evaluate_model(sx_scores, output = "shiny")
 sx_fvoa_season <- calculate_fvoa_season(sx_scores)
 sx_matchups_prob <- all_matchups(sx_scores, type = "prob")
 sx_matchups_spread <- all_matchups(sx_scores, type = "spread")

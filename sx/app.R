@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 2
+frech_stats <- 3
 
 # Load Data ---------------------------------------------------------------
 
@@ -56,7 +56,7 @@ ui  <- navbarPage(
   inverse = F,
   
   # footer = "Frech Takes",
-  title = "Charlotte's Finest",
+  title = "Seacows Football",
   
   # Frech Takes Tab----------------------------------------------------------
   
@@ -70,32 +70,39 @@ ui  <- navbarPage(
            # if(1 == 1) {
            tags$li(
              if(weeks_played == frech_stats) {
-               "Looks like so far we have four dominant teams to beat - Brazil, Burg, Wikle, and Jang"
+               "Looks like so far we have five dominant teams to beat - Brazil, Burg, Ford, Wikle, and Jang"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "That said - it looks like our league is mirroring the insanity of NFL week 3 with Ford upsetting heavy favorite Brazil"
+               "Even though Jersey is in 4th FVOA really doesn't trust his team yet and has him ranked 7th"
              } else {
                "TBD"
              }
            ),
-           # tags$li(
-           #   if(weeks_played == frech_stats) {
-           #     "Looks like FVOA is predicting some close games this week"
-           #   } else {
-           #     "TBD"
-           #   }
-           # ),
-           # tags$li(
-           #   if(weeks_played == frech_stats) {
-           #     ""
-           #   } else {
-           #     "TBD"
-           #   }
-           # ),
+           tags$li(
+             if(weeks_played == frech_stats) {
+               "Poor Kral - right now everyone has at least a 1 in 5 chance of making except him"
+             } else {
+               "TBD"
+             }
+           ),
+           tags$li(
+             if(weeks_played == frech_stats) {
+               "Though I will say even though no one saw it Ford's team had really low chances last week but his dominant showing last week shot him up in the rankings"
+             } else {
+               "TBD"
+             }
+           ),
+           tags$li(
+             if(weeks_played == frech_stats) {
+               "Also weird fact - the rankings are almost alphabetical...damn Wikle screwing it up"
+             } else {
+               "TBD"
+             }
+           ),
            
            hr(),
            h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
@@ -146,7 +153,7 @@ ui  <- navbarPage(
                           and is based on win-loss record adjusted for strength of schedule")),
              tags$li("So in other words, Colley ranks on record only, 
                      FVOA and SoS rank on points only,
-                     and espn ranks on record and points")
+                     and ESPN ranks on record and points")
              )
              ),
   
@@ -337,20 +344,20 @@ ui  <- navbarPage(
                         tags$li("Zoom in on any part of the chart by dragging box over that area (double-click to return)")
                       )
              )
-             )#,
+             ),
   
   # Model Evaluation Tab-----------------------------------------------------
-  
-  # tabPanel("FVOA Evaluation",
-  #          h4("FVOA Accuracy by Week"),
-  #          hr(),
-  #          fluidRow(textOutput("eval_accuracy"), align = "center"),
-  #          br(),
-  #          fluidRow(column(8, offset = 2, plotOutput("eval_plot")), align = "center"),
-  #          br(),
-  #          p("Which teams screwed my model last week?", align = "center"),
-  #          fluidRow(tableOutput("eval_team"), align = "center")
-  # )
+
+  tabPanel("FVOA Evaluation",
+           h4("FVOA Accuracy by Week"),
+           hr(),
+           fluidRow(textOutput("eval_accuracy"), align = "center"),
+           br(),
+           fluidRow(column(8, offset = 2, plotOutput("eval_plot")), align = "center"),
+           br(),
+           p("Which teams screwed my model last week?", align = "center"),
+           fluidRow(tableOutput("eval_team"), align = "center")
+  )
   
   # End of navbarPage
              )
@@ -846,39 +853,17 @@ server <- function(input, output, session) {
   ### Model Evaluation ###
   
   output$eval_accuracy <- renderText({
-    correct <- round(sum(map_dbl(model_eval %>% select(-week), sum, na.rm=T))/
-                       (((ncol(model_eval)-1)^2 - (ncol(model_eval)-1)) * (max(model_eval$week)-1)), 4) * 100
-    paste0("The model has correctly predicted ", correct, "% of games this season")
+    sx_model_eval[[1]]
   })
   
   output$eval_plot <- renderPlot({
-    benchmark <- length(unique(teams))^2 - length(teams)
-    nested_model_eval <- model_eval %>% group_by(week) %>% nest()
-    data_frame(weekly = map_dbl(nested_model_eval$data, sum, na.rm=T)) %>% 
-      mutate(week = 2:(length(weekly)+1),
-             delta = weekly - benchmark/2,
-             percent = round(weekly/benchmark * 100, 1),
-             sign = ifelse(delta > 0, "positive", ifelse(delta < 0, "negative", "equal"))) %>% 
-      ggplot(aes(week, delta, fill=sign, label=percent)) + 
-      geom_bar(stat = 'identity') + 
-      geom_text(size = 3, alpha = 0.7) +
-      scale_x_continuous(name = "Week", breaks = 2:weeks) +
-      scale_y_continuous(limits = c(0-benchmark/2, benchmark/2), 
-                         breaks = c(0-benchmark/2, ((0-benchmark/2)/2), 0, benchmark/4, benchmark/2),
-                         labels = c(0, 25, 50, 75, 100)) +
-      scale_fill_manual(values = c(equal = "#619CFF", negative = "#F8766D", positive = "#00BA38")) +
-      labs(title = "Weekly Evaluation of Model", x = "Week (starting with Week 2)", y = "Percent Correct") +
-      theme(panel.background= element_blank(), panel.border = element_blank()) +
-      guides(fill=F)
+    sx_model_eval[[2]]
   })
   
   output$eval_team = renderTable({
-    team_accuracy <- sapply(paste("Week", 1:weeks), function(x) NULL)
-    for (i in 2:15) {team_accuracy[[i]] <- map_dbl(model_eval %>% filter(week == i) %>% select(-week), sum, na.rm=T) %>% sort()}
-    current_team_accuracy <- team_accuracy[[weeks]]
-    data_frame(Team = names(current_team_accuracy),
-               "Games Wrong" = length(current_team_accuracy) - current_team_accuracy) %>%
-      arrange(-`Games Wrong`, Team)
+    sx_model_eval[[3]] %>% 
+      filter(Week == weeks_played) %>% 
+      select(-Week)
   }, digits = 0, align = 'c')
   
 }
