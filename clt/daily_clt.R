@@ -14,7 +14,7 @@ current_week <- today_week - start_week
 weeks_played <- current_week - 1
 
 # Scrape data
-clt_schedule <- scrape_schedule("yahoo", 150019) # run weekly for changes in team names
+clt_schedule <- scrape_schedule("yahoo", 150019)
 clt_team <- scrape_team(weeks_played, "yahoo", 150019) %>% 
   unnest()
 clt_yahoo_win_prob <- scrape_win_prob(current_week, "yahoo", 150019)

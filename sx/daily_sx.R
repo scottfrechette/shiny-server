@@ -14,7 +14,7 @@ current_week <- today_week - start_week
 weeks_played <- current_week - 1
 
 # Scrape data
-sx_schedule <- scrape_schedule("espn", 299999)  # run weekly for changes in team names
+sx_schedule <- scrape_schedule("espn", 299999)
 sx_team <- scrape_team(weeks_played, "espn", 299999) %>% 
   unnest()
 
@@ -48,7 +48,7 @@ sx_fvoa_season <- calculate_fvoa_season(sx_scores)
 sx_matchups_prob <- all_matchups(sx_scores, type = "prob")
 sx_matchups_spread <- all_matchups(sx_scores, type = "spread")
 sx_rankings <- calculate_rankings(sx_schedule, sx_scores) %>% 
-  mutate(`Colley Rank` = min_rank(-`Colley Rating`))                           # Fix Colley rankings
+  mutate(`Colley Rank` = min_rank(-`Colley Rating`))
 sx_current_matchups <- current_matchups(current_week, sx_schedule,
                                          sx_scores)
 sx_playoff_leverage_chart <- playoff_leverage_plot(sx_scores, sx_schedule,
