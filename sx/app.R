@@ -67,42 +67,42 @@ ui  <- navbarPage(
            # p("FVOA went 2-3 against the espn spread last week, 39-30-1 for the season"),
            
            p(str_glue("Week {frech_stats}:")),
-           # if(1 == 1) {
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "Looks like so far we have five dominant teams to beat - Brazil, Burg, Ford, Wikle, and Jang"
-             } else {
-               "TBD"
-             }
-           ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "Even though Jersey is in 4th FVOA really doesn't trust his team yet and has him ranked 7th"
-             } else {
-               "TBD"
-             }
-           ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "Poor Kral - right now everyone has at least a 1 in 5 chance of making except him"
-             } else {
-               "TBD"
-             }
-           ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "Though I will say even though no one saw it Ford's team had really low chances last week but his dominant showing last week shot him up in the rankings"
-             } else {
-               "TBD"
-             }
-           ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "Also weird fact - the rankings are almost alphabetical...damn Wikle screwing it up"
-             } else {
-               "TBD"
-             }
-           ),
+           tags$li("TBD"),
+           # tags$li(
+           #   if(weeks_played == frech_stats) {
+           #     "Looks like so far we have five dominant teams to beat - Brazil, Burg, Ford, Wikle, and Jang"
+           #   } else {
+           #     "TBD"
+           #   }
+           # ),
+           # tags$li(
+           #   if(weeks_played == frech_stats) {
+           #     "Even though Jersey is in 4th FVOA really doesn't trust his team yet and has him ranked 7th"
+           #   } else {
+           #     "TBD"
+           #   }
+           # ),
+           # tags$li(
+           #   if(weeks_played == frech_stats) {
+           #     "Poor Kral - right now everyone has at least a 1 in 5 chance of making except him"
+           #   } else {
+           #     "TBD"
+           #   }
+           # ),
+           # tags$li(
+           #   if(weeks_played == frech_stats) {
+           #     "Though I will say even though no one saw it Ford's team had really low chances last week but his dominant showing last week shot him up in the rankings"
+           #   } else {
+           #     "TBD"
+           #   }
+           # ),
+           # tags$li(
+           #   if(weeks_played == frech_stats) {
+           #     "Also weird fact - the rankings are almost alphabetical...damn Wikle screwing it up"
+           #   } else {
+           #     "TBD"
+           #   }
+           # ),
            
            hr(),
            h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),

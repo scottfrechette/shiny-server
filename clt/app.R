@@ -67,35 +67,36 @@ ui  <- navbarPage(
            # p("FVOA went 2-3 against the Yahoo spread last week, 39-30-1 for the season"),
 
            p(str_glue("Frech Stats - Week {frech_stats}:")),
+           tags$li("TBD"),
            # if(1 == 1) {
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "Looks like 2 teams have shot ahead and we'd have a fun run for the last 2 spots if the playoffs were closer"
-             } else {
-               "TBD"
-             }
-           ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "Because of that everyone has at least a 1 in 8 shot of making the playoffs still"
-             } else {
-               "TBD"
-             }
-           ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "FVOA in particular really likes Justin's team and still doesn't trust Bobby relative to their current rankings"
-             } else {
-               "TBD"
-             }
-           ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "Looks like Diaz left a lot on his bench this week"
-             } else {
-               "TBD"
-             }
-           ),
+           # tags$li(
+           #   if(weeks_played == frech_stats) {
+           #     "Looks like 2 teams have shot ahead and we'd have a fun run for the last 2 spots if the playoffs were closer"
+           #   } else {
+           #     "TBD"
+           #   }
+           # ),
+           # tags$li(
+           #   if(weeks_played == frech_stats) {
+           #     "Because of that everyone has at least a 1 in 8 shot of making the playoffs still"
+           #   } else {
+           #     "TBD"
+           #   }
+           # ),
+           # tags$li(
+           #   if(weeks_played == frech_stats) {
+           #     "FVOA in particular really likes Justin's team and still doesn't trust Bobby relative to their current rankings"
+           #   } else {
+           #     "TBD"
+           #   }
+           # ),
+           # tags$li(
+           #   if(weeks_played == frech_stats) {
+           #     "Looks like Diaz left a lot on his bench this week"
+           #   } else {
+           #     "TBD"
+           #   }
+           # ),
            
            hr(),
            h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),

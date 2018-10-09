@@ -1,9 +1,12 @@
+oldw <- getOption("warn")
+options(warn = -1)
+
 # Load packages
-library(tidyverse)
-library(lubridate)
-library(rvest)
-library(here)
-library(fvoa)
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(lubridate))
+suppressPackageStartupMessages(library(rvest))
+suppressPackageStartupMessages(library(here))
+suppressPackageStartupMessages(library(fvoa))
 
 # Identify current week
 today_week <- today() %>%
@@ -64,3 +67,5 @@ save(clt_schedule, clt_team, clt_proj, clt_scores,
      clt_rankings, clt_current_matchups,
      clt_playoff_leverage_chart, clt_lineup_eval, 
      file = here::here("clt", "clt-data.RData"))
+
+options(warn = oldw)

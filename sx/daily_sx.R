@@ -1,9 +1,12 @@
+oldw <- getOption("warn")
+options(warn = -1)
+
 # Load packages
-library(tidyverse)
-library(lubridate)
-library(rvest)
-library(here)
-library(fvoa)
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(lubridate))
+suppressPackageStartupMessages(library(rvest))
+suppressPackageStartupMessages(library(here))
+suppressPackageStartupMessages(library(fvoa))
 
 # Identify current week
 today_week <- today() %>%
@@ -62,3 +65,5 @@ save(sx_schedule, sx_team, sx_scores,
      sx_rankings, sx_current_matchups,
      sx_playoff_leverage_chart, sx_lineup_eval, 
      file = here::here("sx", "sx-data.RData"))
+
+options(warn = oldw)
