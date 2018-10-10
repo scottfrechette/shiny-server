@@ -230,52 +230,14 @@ ui  <- navbarPage(
                       )
              ),
              
-             tabPanel("Simulated Wins",
-                      plotlyOutput("sim_wins"),
+             tabPanel("Simulation Charts",
+                      plotlyOutput("sim_chart"),
                       hr(),
-                      fluidRow(checkboxGroupInput("team_wins", "Teams to Highlight:", sort(teams), inline = T), align = "center"),
-                      fluidRow(actionButton("clear_teams_wins", "Clear Teams"), align = "center"),
-                      br(),
-                      p("Calculated by simulating all remaining matchups in the season and 
-                        figuring out the total number of wins for each team. I then do this another 999 times and 
-                        take the average. This will happen every week to see which teams are getting stronger 
-                        against their competition."),
-                      hr(),
-                      h5("Chart Notes:"),
-                      tags$ol(
-                        tags$li("Click Team names on right to add/remove"),
-                        tags$li("Use checkboxes below to highlight"),
-                        tags$li("Hover over any point to get detailed info"),
-                        tags$li("Zoom in on any part of the chart by dragging box over that area (double-click to return)"),
-                        tags$li("Dotted grey line gives the league average (7 wins)")
-                      )
-                      ),
-             
-             tabPanel("Simulated Total Points",
-                      plotlyOutput("sim_points"),
-                      hr(),
-                      fluidRow(checkboxGroupInput("team_points", "Teams to Highlight:", sort(teams), inline = T), align = "center"),
-                      fluidRow(actionButton("clear_teams_points", "Clear Teams"), align = "center"),
-                      br(),
-                      p("Calculated by simulating all remaining matchups in the season and figuring out the total
-                        amount of points for each team. I then do this another 999 times and take the average.
-                        This will happen every week to see which teams are getting stronger."),
-                      hr(),
-                      h5("Chart Notes:"),
-                      tags$ol(
-                        tags$li("Click Team names on right to add/remove"),
-                        tags$li("Use checkboxes below to highlight"),
-                        tags$li("Hover over any point to get detailed info"),
-                        tags$li("Zoom in on any part of the chart by dragging box over that area (double-click to return)"),
-                        tags$li("Dotted grey line gives the average total points for each week")
-                      )
-                      ),
-             
-             tabPanel("Simulated Playoff Chances",
-                      plotlyOutput("sim_playoffs"),
-                      hr(),
-                      fluidRow(checkboxGroupInput("team_playoffs", "Teams to Highlight:", sort(teams), inline = T), align = "center"),
-                      fluidRow(actionButton("clear_teams_playoffs", "Clear Teams"), align = "center"),
+                      fluidRow(selectizeInput("sim_chart_selection", "Show Simulations For:", selected = "Wins",
+                                              c("Wins", "Points", "Playoff Chances")),
+                               align = "center"),
+                      fluidRow(checkboxGroupInput("team_sims", "Teams to Highlight:", sort(teams), inline = T), align = "center"),
+                      fluidRow(actionButton("clear_teams_sims", "Clear Teams"), align = "center"),
                       br(),
                       p("Calculated by simulating all remaining matchups in the season and figuring out the best 4 teams.
                         I then do this another 999 times and figure out the percentage of each team making the playoffs.
@@ -287,9 +249,9 @@ ui  <- navbarPage(
                         tags$li("Use checkboxes below to highlight"),
                         tags$li("Hover over any point to get detailed info"),
                         tags$li("Zoom in on any part of the chart by dragging box over that area (double-click to return)"),
-                        tags$li("Dotted grey line gives the baseline (40%)")
+                        tags$li(textOutput("sim_text"))
                       )
-                      ),
+             ),
              
              tabPanel("Playoff Leverage",
                       h5("How much will winning/losing your next game affect your playoff chances?"),
@@ -658,6 +620,141 @@ server <- function(input, output, session) {
       ggplotly(x, tooltip = c("group", "x", "y"))
       
     }
+  })
+  
+  observeEvent(input$clear_teams_sims, {
+    updateCheckboxGroupInput(session, "team_sims", selected = character(0))
+  })
+  
+  output$sim_text <- renderText({
+    
+    if(input$sim_chart_selection == "Wins") {
+      "Dotted grey line gives the league average (7 wins)"
+    } else if(input$sim_chart_selection == "Points") {
+      "Dotted grey line gives the average total points for each week"
+    } else if(input$sim_chart_selection == "Playoff Chances") {
+      "Dotted grey line gives the baseline (40%)"
+    } else {
+      "ERROR"
+    }
+    
+  })
+  
+  output$sim_chart <- renderPlotly({
+    
+    if (input$sim_chart_selection == "Wins") {
+      
+      if (is.null(input$team_sims)) {
+        x <- sx_simulated_season %>% 
+          ggplot(aes(Week, Wins)) +
+          geom_line(alpha = 0.5, aes(group=Team, color=Team), size = 1.5) +
+          geom_point(aes(group=Team, color=Team)) +
+          geom_segment(x = 1, y = 7.5, xend = 15, yend = 7.5, color = "darkgrey", linetype = 2) +
+          scale_y_continuous(breaks = c(0, 2, 4, 6, 8, 10, 12, 14), limits = c(0, 15)) +
+          scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
+          labs(y = "Wins", x = "Week", title = "Projected Wins by Week") +
+          guides(color=FALSE) +
+          theme_fvoa() + 
+          tidyquant::scale_color_tq(theme = "dark")
+        
+        ggplotly(x, tooltip = c("group", "x", "y"))
+        
+      } else {
+        tm <- sx_simulated_season %>% filter(Team %in% input$team_sims)
+        
+        x <- sx_simulated_season %>% 
+          ggplot(aes(Week, Wins)) +
+          geom_line(alpha = 0.2, aes(group=Team, color=Team), size = 1.5) +
+          geom_line(data = tm, aes(group=Team, color=Team), size = 2) + 
+          geom_point(aes(group=Team, color=Team)) +
+          geom_segment(x = 1, y = 7.5, xend = 15, yend = 7.5, color = "darkgrey", linetype = 2) +
+          scale_y_continuous(breaks = c(0, 2, 4, 6, 8, 10, 12, 14), limits = c(0, 15)) +
+          scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
+          labs(y = "Wins", x = "Week", title = "Projected Wins by Week") +
+          guides(color=FALSE) +
+          theme_fvoa() + 
+          tidyquant::scale_color_tq(theme = "dark")
+        
+        ggplotly(x, tooltip = c("group", "x", "y"))
+      }
+      
+    } else if (input$sim_chart_selection == "Points") {
+      
+      if (is.null(input$team_sims)) {
+        x <- sx_simulated_season %>% 
+          ggplot(aes(Week, Points)) +
+          geom_smooth(se=F, color = "darkgrey", n = n_distinct(sx_scores$Week), linetype = 2) +
+          geom_line(alpha = 0.5, aes(group=Team, color=Team), size = 1.5) +
+          geom_point(aes(group=Team, color=Team)) +
+          scale_y_continuous(breaks = pretty_breaks(n = 5)) +
+          scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
+          labs(y = "Points", x = "Week", title = "Projected Total Points by Week") +
+          guides(color=FALSE) +
+          theme_fvoa() + 
+          tidyquant::scale_color_tq(theme = "dark")
+        
+        ggplotly(x, tooltip = c("group", "x", "y"))
+        
+      } else {
+        tm <- sx_simulated_season %>% filter(Team %in% input$team_sims)
+        
+        x <- sx_simulated_season %>% 
+          ggplot(aes(Week, Points)) +
+          geom_smooth(se=F, color = "darkgrey", n = n_distinct(sx_scores$Week), linetype=2) +
+          geom_line(alpha = 0.2, aes(group=Team, color=Team), size = 1.5) +
+          geom_line(data = tm, aes(group=Team, color=Team), size = 2) + 
+          geom_point(aes(group=Team, color=Team)) +
+          scale_y_continuous(breaks = pretty_breaks(n = 5)) +
+          scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
+          labs(y = "Points", x = "Week", title = "Projected Total Points by Week") +
+          guides(color=FALSE) +
+          theme_fvoa() + 
+          tidyquant::scale_color_tq(theme = "dark")
+        
+        ggplotly(x, tooltip = c("group", "x", "y"))
+      }
+      
+    } else if (input$sim_chart_selection == "Playoff Chances") {
+      
+      if (is.null(input$team_sims)) {
+        x <- sx_simulated_season %>% 
+          ggplot(aes(Week, Percent)) +
+          geom_line(alpha = 0.5, aes(group=Team, color=Team), size = 1.5) +
+          geom_point(aes(group=Team, color=Team)) +
+          geom_segment(x = 1, y = 40, xend = 15, yend = 40, color = "darkgrey", linetype = 2) +
+          scale_y_continuous(breaks = c(0, 20, 40, 60, 80, 100), limits = c(0, 100)) +
+          scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
+          labs(y = "Chance", x = "Week", title = "Projected Chance of Making Playoffs by Week") +
+          guides(color=FALSE) +
+          theme_fvoa() + 
+          tidyquant::scale_color_tq(theme = "dark")
+        
+        ggplotly(x, tooltip = c("group", "x", "y"))
+        
+      } else {
+        tm <- sx_simulated_season %>% filter(Team %in% input$team_sims)
+        
+        x <- sx_simulated_season %>% 
+          ggplot(aes(Week, Percent)) +
+          geom_line(alpha = 0.2, aes(group=Team, color=Team), size = 1.5) +
+          geom_line(data = tm, aes(group=Team, color=Team), size = 2) + 
+          geom_point(aes(group=Team, color=Team)) +
+          geom_segment(x = 1, y = 40, xend = 15, yend = 40, color = "darkgrey", linetype = 2) +
+          scale_y_continuous(breaks = c(0, 20, 40, 60, 80, 100), limits = c(0, 100)) +
+          scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
+          labs(y = "Chance", x = "Week", title = "Projected Chance of Making Playoffs by Week") +
+          guides(color=FALSE) +
+          theme_fvoa() + 
+          tidyquant::scale_color_tq(theme = "dark")
+        
+        ggplotly(x, tooltip = c("group", "x", "y"))
+      }
+      
+      
+    } else {
+      "ERROR"
+    }
+    
   })
   
   observeEvent(input$clear_teams_wins, {
