@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 4
+frech_stats <- 5
 
 # Load Data ---------------------------------------------------------------
 
@@ -67,36 +67,34 @@ ui  <- navbarPage(
            # p("FVOA went 2-3 against the Yahoo spread last week, 39-30-1 for the season"),
 
            p(str_glue("Frech Stats - Week {frech_stats}:")),
-           tags$li("TBD"),
-           # if(1 == 1) {
-           # tags$li(
-           #   if(weeks_played == frech_stats) {
-           #     "Looks like 2 teams have shot ahead and we'd have a fun run for the last 2 spots if the playoffs were closer"
-           #   } else {
-           #     "TBD"
-           #   }
-           # ),
-           # tags$li(
-           #   if(weeks_played == frech_stats) {
-           #     "Because of that everyone has at least a 1 in 8 shot of making the playoffs still"
-           #   } else {
-           #     "TBD"
-           #   }
-           # ),
-           # tags$li(
-           #   if(weeks_played == frech_stats) {
-           #     "FVOA in particular really likes Justin's team and still doesn't trust Bobby relative to their current rankings"
-           #   } else {
-           #     "TBD"
-           #   }
-           # ),
-           # tags$li(
-           #   if(weeks_played == frech_stats) {
-           #     "Looks like Diaz left a lot on his bench this week"
-           #   } else {
-           #     "TBD"
-           #   }
-           # ),
+           tags$li(
+             if(weeks_played == frech_stats) {
+               "PFinn still looking pretty at 5-0 with FVOA feeling good about his chances"
+             } else {
+               "TBD"
+             }
+           ),
+           tags$li(
+             if(weeks_played == frech_stats) {
+               "FVOA really loves Justin's team even though he's sitting at 1-4"
+             } else {
+               "TBD"
+             }
+           ),
+           tags$li(
+             if(weeks_played == frech_stats) {
+               "On the other hand it's not a fan of what Bobby's putting together these days"
+             } else {
+               "TBD"
+             }
+           ),
+           tags$li(
+             if(weeks_played == frech_stats) {
+               "Also looks like Drew Brees record-setting night not only cost me $30 but also gave Diaz a huge boost in the rankings"
+             } else {
+               "TBD"
+             }
+           ),
            
            hr(),
            h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
@@ -550,7 +548,8 @@ server <- function(input, output, session) {
         scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
         labs(y = "Score", x = "Week", title = "Weekly Scores") +
         guides(color=FALSE) +
-        theme_fvoa()
+        theme_fvoa() + 
+        tidyquant::scale_color_tq(theme = "dark")
       
       ggplotly(x, tooltip = c("group", "x", "y"))
       
@@ -566,7 +565,8 @@ server <- function(input, output, session) {
         scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
         labs(y = "Score", x = "Week", title = "Weekly Scores") +
         guides(color=FALSE) +
-        theme_fvoa()
+        theme_fvoa() + 
+        tidyquant::scale_color_tq(theme = "dark")
       
       ggplotly(x, tooltip = c("group", "x", "y"))
       
@@ -590,7 +590,8 @@ server <- function(input, output, session) {
         scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
         labs(y = "FVOA", x = "Week", title = "Weekly FVOA") +
         guides(color=FALSE) +
-        theme_fvoa()
+        theme_fvoa() + 
+        tidyquant::scale_color_tq(theme = "dark")
       
       ggplotly(x, tooltip = c("group", "x", "y"))
       
@@ -608,7 +609,8 @@ server <- function(input, output, session) {
         scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
         labs(y = "Score", x = "Week", title = "Weekly Scores") +
         guides(color=FALSE) +
-        theme_fvoa()
+        theme_fvoa() + 
+        tidyquant::scale_color_tq(theme = "dark")
       
       ggplotly(x, tooltip = c("group", "x", "y"))
       
@@ -752,7 +754,8 @@ server <- function(input, output, session) {
   
   
   output$playoff_leverage <- renderPlot({
-    clt_playoff_leverage_chart
+    clt_playoff_leverage_chart + 
+      tidyquant::scale_fill_tq(theme = "dark")
   })
   
   output$manager <- renderPlot({
@@ -788,6 +791,7 @@ server <- function(input, output, session) {
       guides(fill=F) +
       labs(y = "Score", x = "", title = "Team Boxplots") +
       theme_fvoa() + 
+      tidyquant::scale_fill_tq(theme = "dark") + 
       theme(panel.border = element_blank())
   })
   
@@ -804,7 +808,9 @@ server <- function(input, output, session) {
         geom_density(aes(fill = Team, color = Team), alpha = 0.2) + 
         labs(x = "Weekly Scores", y = "Density", title = "Density Plots") +
         guides(fill=FALSE) + 
-        theme_fvoa()
+        theme_fvoa() + 
+        tidyquant::scale_fill_tq(theme = "dark") + 
+        tidyquant::scale_color_tq(theme = "dark")
       
       ggplotly(x, tooltip = c("fill", "x"))
       
@@ -818,7 +824,9 @@ server <- function(input, output, session) {
         geom_density(data = tm, aes(fill=Team, color = Team), alpha = 0.8) + 
         labs(x = "Weekly Scores", y = "Density", title = "Density Plots") +
         guides(fill=FALSE, color = FALSE) + 
-        theme_fvoa()
+        theme_fvoa() + 
+        tidyquant::scale_fill_tq(theme = "dark") + 
+        tidyquant::scale_color_tq(theme = "dark")
       
       ggplotly(x, tooltip = c("fill", "x"))
     }

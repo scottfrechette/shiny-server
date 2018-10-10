@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 4
+frech_stats <- 5
 
 # Load Data ---------------------------------------------------------------
 
@@ -67,42 +67,27 @@ ui  <- navbarPage(
            # p("FVOA went 2-3 against the espn spread last week, 39-30-1 for the season"),
            
            p(str_glue("Week {frech_stats}:")),
-           tags$li("TBD"),
-           # tags$li(
-           #   if(weeks_played == frech_stats) {
-           #     "Looks like so far we have five dominant teams to beat - Brazil, Burg, Ford, Wikle, and Jang"
-           #   } else {
-           #     "TBD"
-           #   }
-           # ),
-           # tags$li(
-           #   if(weeks_played == frech_stats) {
-           #     "Even though Jersey is in 4th FVOA really doesn't trust his team yet and has him ranked 7th"
-           #   } else {
-           #     "TBD"
-           #   }
-           # ),
-           # tags$li(
-           #   if(weeks_played == frech_stats) {
-           #     "Poor Kral - right now everyone has at least a 1 in 5 chance of making except him"
-           #   } else {
-           #     "TBD"
-           #   }
-           # ),
-           # tags$li(
-           #   if(weeks_played == frech_stats) {
-           #     "Though I will say even though no one saw it Ford's team had really low chances last week but his dominant showing last week shot him up in the rankings"
-           #   } else {
-           #     "TBD"
-           #   }
-           # ),
-           # tags$li(
-           #   if(weeks_played == frech_stats) {
-           #     "Also weird fact - the rankings are almost alphabetical...damn Wikle screwing it up"
-           #   } else {
-           #     "TBD"
-           #   }
-           # ),
+           tags$li(
+             if(weeks_played == frech_stats) {
+               "It's interesting that we don't really have any teams breaking away from the pack too much yet"
+             } else {
+               "TBD"
+             }
+           ),
+           tags$li(
+             if(weeks_played == frech_stats) {
+               "Though FVOA is really loving on Ford's team right now despite him sitting in 5th (he'd be favored in any matchup in fact)"
+             } else {
+               "TBD"
+             }
+           ),
+           tags$li(
+             if(weeks_played == frech_stats) {
+               "Meanwhile Kral's team is squeaking by with 2 wins but FVOA has no faith"
+             } else {
+               "TBD"
+             }
+           ),
            
            hr(),
            h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
@@ -557,7 +542,8 @@ server <- function(input, output, session) {
         scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
         labs(y = "Score", x = "Week", title = "Weekly Scores") +
         guides(color=FALSE) +
-        theme_fvoa()
+        theme_fvoa() + 
+        tidyquant::scale_color_tq(theme = "dark")
       
       ggplotly(x, tooltip = c("group", "x", "y"))
       
@@ -573,7 +559,8 @@ server <- function(input, output, session) {
         scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
         labs(y = "Score", x = "Week", title = "Weekly Scores") +
         guides(color=FALSE) +
-        theme_fvoa()
+        theme_fvoa() + 
+        tidyquant::scale_color_tq(theme = "dark")
       
       ggplotly(x, tooltip = c("group", "x", "y"))
       
@@ -597,7 +584,8 @@ server <- function(input, output, session) {
         scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
         labs(y = "FVOA", x = "Week", title = "Weekly FVOA") +
         guides(color=FALSE) +
-        theme_fvoa()
+        theme_fvoa() + 
+        tidyquant::scale_color_tq(theme = "dark")
       
       ggplotly(x, tooltip = c("group", "x", "y"))
       
@@ -615,7 +603,8 @@ server <- function(input, output, session) {
         scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
         labs(y = "Score", x = "Week", title = "Weekly Scores") +
         guides(color=FALSE) +
-        theme_fvoa()
+        theme_fvoa() + 
+        tidyquant::scale_color_tq(theme = "dark")
       
       ggplotly(x, tooltip = c("group", "x", "y"))
       
@@ -757,125 +746,9 @@ server <- function(input, output, session) {
     
   })
   
-  observeEvent(input$clear_teams_wins, {
-    updateCheckboxGroupInput(session, "team_wins", selected = character(0))
-  })
-  
-  output$sim_wins <- renderPlotly({
-    
-    if (is.null(input$team_wins)) {
-      x <- sx_simulated_season %>% 
-        ggplot(aes(Week, Wins)) +
-        geom_line(alpha = 0.5, aes(group=Team, color=Team), size = 1.5) +
-        geom_point(aes(group=Team, color=Team)) +
-        geom_segment(x = 1, y = 7.5, xend = 15, yend = 7.5, color = "darkgrey", linetype = 2) +
-        scale_y_continuous(breaks = c(0, 2, 4, 6, 8, 10, 12, 14), limits = c(0, 15)) +
-        scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
-        labs(y = "Wins", x = "Week", title = "Projected Wins by Week") +
-        guides(color=FALSE) +
-        theme_fvoa()
-      
-      ggplotly(x, tooltip = c("group", "x", "y"))
-      
-    } else {
-      tm <- sx_simulated_season %>% filter(Team %in% input$team_wins)
-      
-      x <- sx_simulated_season %>% 
-        ggplot(aes(Week, Wins)) +
-        geom_line(alpha = 0.2, aes(group=Team, color=Team), size = 1.5) +
-        geom_line(data = tm, aes(group=Team, color=Team), size = 2) + 
-        geom_point(aes(group=Team, color=Team)) +
-        geom_segment(x = 1, y = 7.5, xend = 15, yend = 7.5, color = "darkgrey", linetype = 2) +
-        scale_y_continuous(breaks = c(0, 2, 4, 6, 8, 10, 12, 14), limits = c(0, 15)) +
-        scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
-        labs(y = "Wins", x = "Week", title = "Projected Wins by Week") +
-        guides(color=FALSE) +
-        theme_fvoa()
-      
-      ggplotly(x, tooltip = c("group", "x", "y"))
-    }
-  })
-  
-  observeEvent(input$clear_teams_points, {
-    updateCheckboxGroupInput(session, "team_points", selected = character(0))
-  })
-  
-  output$sim_points <- renderPlotly({
-    
-    if (is.null(input$team_points)) {
-      x <- sx_simulated_season %>% 
-        ggplot(aes(Week, Points)) +
-        geom_smooth(se=F, color = "darkgrey", n = n_distinct(sx_scores$Week), linetype = 2) +
-        geom_line(alpha = 0.5, aes(group=Team, color=Team), size = 1.5) +
-        geom_point(aes(group=Team, color=Team)) +
-        scale_y_continuous(breaks = pretty_breaks(n = 5)) +
-        scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
-        labs(y = "Points", x = "Week", title = "Projected Total Points by Week") +
-        guides(color=FALSE) +
-        theme_fvoa()
-      
-      ggplotly(x, tooltip = c("group", "x", "y"))
-      
-    } else {
-      tm <- sx_simulated_season %>% filter(Team %in% input$team_points)
-      
-      x <- sx_simulated_season %>% 
-        ggplot(aes(Week, Points)) +
-        geom_smooth(se=F, color = "darkgrey", n = n_distinct(sx_scores$Week), linetype=2) +
-        geom_line(alpha = 0.2, aes(group=Team, color=Team), size = 1.5) +
-        geom_line(data = tm, aes(group=Team, color=Team), size = 2) + 
-        geom_point(aes(group=Team, color=Team)) +
-        scale_y_continuous(breaks = pretty_breaks(n = 5)) +
-        scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
-        labs(y = "Points", x = "Week", title = "Projected Total Points by Week") +
-        guides(color=FALSE) +
-        theme_fvoa()
-      
-      ggplotly(x, tooltip = c("group", "x", "y"))
-    }
-  })
-  
-  observeEvent(input$clear_teams_playoffs, {
-    updateCheckboxGroupInput(session, "team_playoffs", selected = character(0))
-  })
-  
-  output$sim_playoffs <- renderPlotly({
-    
-    if (is.null(input$team_playoffs)) {
-      x <- sx_simulated_season %>% 
-        ggplot(aes(Week, Percent)) +
-        geom_line(alpha = 0.5, aes(group=Team, color=Team), size = 1.5) +
-        geom_point(aes(group=Team, color=Team)) +
-        geom_segment(x = 1, y = 40, xend = 15, yend = 40, color = "darkgrey", linetype = 2) +
-        scale_y_continuous(breaks = c(0, 20, 40, 60, 80, 100), limits = c(0, 100)) +
-        scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
-        labs(y = "Chance", x = "Week", title = "Projected Chance of Making Playoffs by Week") +
-        guides(color=FALSE) +
-        theme_fvoa()
-      
-      ggplotly(x, tooltip = c("group", "x", "y"))
-      
-    } else {
-      tm <- sx_simulated_season %>% filter(Team %in% input$team_playoffs)
-      
-      x <- sx_simulated_season %>% 
-        ggplot(aes(Week, Percent)) +
-        geom_line(alpha = 0.2, aes(group=Team, color=Team), size = 1.5) +
-        geom_line(data = tm, aes(group=Team, color=Team), size = 2) + 
-        geom_point(aes(group=Team, color=Team)) +
-        geom_segment(x = 1, y = 40, xend = 15, yend = 40, color = "darkgrey", linetype = 2) +
-        scale_y_continuous(breaks = c(0, 20, 40, 60, 80, 100), limits = c(0, 100)) +
-        scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
-        labs(y = "Chance", x = "Week", title = "Projected Chance of Making Playoffs by Week") +
-        guides(color=FALSE) +
-        theme_fvoa()
-      
-      ggplotly(x, tooltip = c("group", "x", "y"))
-    }
-  })
-  
   output$playoff_leverage <- renderPlot({
-    sx_playoff_leverage_chart
+    sx_playoff_leverage_chart + 
+      tidyquant::scale_fill_tq(theme = "dark")
   })
   
   output$manager <- renderPlot({
@@ -911,7 +784,8 @@ server <- function(input, output, session) {
       guides(fill=F) +
       labs(y = "Score", x = "", title = "Team Boxplots") +
       theme_fvoa() + 
-      theme(panel.border = element_blank())
+      theme(panel.border = element_blank()) + 
+      tidyquant::scale_fill_tq(theme = "dark")
   })
   
   observeEvent(input$clear_teams_density, {
@@ -927,7 +801,9 @@ server <- function(input, output, session) {
         geom_density(aes(fill = Team, color = Team), alpha = 0.2) + 
         labs(x = "Weekly Scores", y = "Density", title = "Density Plots") +
         guides(fill=FALSE) + 
-        theme_fvoa()
+        theme_fvoa() + 
+        tidyquant::scale_fill_tq(theme = "dark") + 
+        tidyquant::scale_color_tq(theme = "dark")
       
       ggplotly(x, tooltip = c("fill", "x"))
       
@@ -941,7 +817,10 @@ server <- function(input, output, session) {
         geom_density(data = tm, aes(fill=Team, color = Team), alpha = 0.8) + 
         labs(x = "Weekly Scores", y = "Density", title = "Density Plots") +
         guides(fill=FALSE, color = FALSE) + 
-        theme_fvoa()
+        theme_fvoa() + 
+        tidyquant::scale_fill_tq(theme = "dark") + 
+        tidyquant::scale_color_tq(theme = "dark")
+      
       
       ggplotly(x, tooltip = c("fill", "x"))
     }
