@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 5
+frech_stats <- 6
 
 # Load Data ---------------------------------------------------------------
 
@@ -66,31 +66,31 @@ ui  <- navbarPage(
            hr(),
            # p("FVOA went 2-3 against the Yahoo spread last week, 39-30-1 for the season"),
 
-           p(str_glue("Frech Stats - Week {frech_stats}:")),
+           p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "PFinn still looking pretty at 5-0 with FVOA feeling good about his chances"
+               "FVOA really doesn't trust PFinn or Bobby's teams"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "FVOA really loves Justin's team even though he's sitting at 1-4"
+               "Still sees something in Justin's team despite only 2 wins"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "On the other hand it's not a fan of what Bobby's putting together these days"
+               "Eric and Diaz are starting to pull away from the rest of the pack it seems to join the top ranks"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Also looks like Drew Brees record-setting night not only cost me $30 but also gave Diaz a huge boost in the rankings"
+               "The matchup between Eric and Brian has around a combined 20% swing in playoff leverage so it's a huge midseason game"
              } else {
                "TBD"
              }
