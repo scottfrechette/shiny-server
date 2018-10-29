@@ -27,11 +27,10 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 6
+frech_stats <- 7
 
 # Load Data ---------------------------------------------------------------
 
-# load("clt-data.RData")
 load(here::here("clt", "clt-data.RData"))
 
 weeks <- n_distinct(clt_scores$Week)
@@ -69,28 +68,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "FVOA really doesn't trust PFinn or Bobby's teams"
+               "It is legitimately shocking that a team tied for first has an 89% chance of beating the other first place team. Almost like that owner had to create the damn model or something."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Still sees something in Justin's team despite only 2 wins"
+               "Big test of FVOA this week with Justin and Bobby, the two teams FVOA disagrees with standings the most. And a whopping 30 point playoff swing to boot."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Eric and Diaz are starting to pull away from the rest of the pack it seems to join the top ranks"
+               "Eric has had a rough last two weeks of getting $30 stolen from him (almost literally this week). At least FVOA has a lot of faith in his playoff chances to make up for it."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "The matchup between Eric and Brian has around a combined 20% swing in playoff leverage so it's a huge midseason game"
+               "And let's not overlook the amazing match between David and German to be the first to 0% chance of making the playoffs."
              } else {
                "TBD"
              }
@@ -140,7 +139,7 @@ ui  <- navbarPage(
                           This is your percent above/below the average team. 
                           This can also be used to get a rough percent of Team 1 beating Team 2 by
                           calculating (Team 1 FVOA - Team 2 FVOA)/2 + 50")),
-             tags$li(HTML("<u><strong>SoS</strong></u>: strength of schedule based on FVOA scores")),
+             tags$li(HTML("<u><strong>SoS</strong></u>: strength of schedule based on FVOA scores (higher means harder schedule)")),
              tags$li(HTML("<u><strong>Colley</strong></u>: one of the models that was used in the BCS computer rankings
                           and is based on win-loss record adjusted for strength of schedule")),
              tags$li("So in other words, Colley ranks on record only, 

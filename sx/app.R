@@ -27,11 +27,10 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 6
+frech_stats <- 7
 
 # Load Data ---------------------------------------------------------------
 
-# load("sx-data.RData")
 load(here::here("sx", "sx-data.RData"))
 
 weeks <- n_distinct(sx_scores$Week)
@@ -69,28 +68,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "It's amazing much parity there is aside from Brazil's clearly dominant team with Jersey right behind him"
+               "Well this is awkward - the team FVOA trusts the least is my own. I clearly need to tweak some things..."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "FVOA still loving on our Commish though despite his 2 wins"
+               "FVOA is still loving on our Commish despite falling to 7th"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "The matchup between Kral and Burg has a combined 33% swing in playoff leverage so it's a huge midseason game"
+               "Big matchup between Burg and Brazil - over 25% playoff swing. Can Burg stop the FVOA tumble?"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "I left a shit ton of points on my bench last week"
+               "Kral's team has gone from worst to 3rd in just 2 weeks according to FVOA"
              } else {
                "TBD"
              }
