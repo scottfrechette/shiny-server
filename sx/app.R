@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 7
+frech_stats <- 10
 
 # Load Data ---------------------------------------------------------------
 
@@ -68,28 +68,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Well this is awkward - the team FVOA trusts the least is my own. I clearly need to tweak some things..."
+               "Well Burgess you can stop complaining about being solidly unlucky, because now your team is hovering between unlucky and just bad. Not only is your matchup with Jersey a 34-point playoff swing but FVOA also has it as a near coin-flip, so it's a huge week for you."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "FVOA is still loving on our Commish despite falling to 7th"
+               "Ford continues his streak of underperforming relative to FVOA"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Big matchup between Burg and Brazil - over 25% playoff swing. Can Burg stop the FVOA tumble?"
+               "Brazil's team bounced back in a huge way this week after his brutal loss to Jangaard two weeks ago"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Kral's team has gone from worst to 3rd in just 2 weeks according to FVOA"
+               "Looks like we've got a decent chance we know who the final four will be, although Burg and Jang are still hovering on the outskirts"
              } else {
                "TBD"
              }
@@ -262,6 +262,14 @@ ui  <- navbarPage(
                       plotOutput("manager"),
                       hr(),
                       fluidRow(column(4, offset = 4, wellPanel(sliderInput("proj_week", "Weeks to Include:", 1,
+                                                                           max(weeks), c(1, max), step = 1))))
+             ),
+             
+             tabPanel("Skill v Luck",
+                      h5("How good or lucky is your team?"),
+                      plotOutput("quadrant"),
+                      hr(),
+                      fluidRow(column(4, offset = 4, wellPanel(sliderInput("quad_week", "Weeks to Include:", 1,
                                                                            max(weeks), c(1, max), step = 1))))
              ),
              
@@ -760,6 +768,13 @@ server <- function(input, output, session) {
   output$manager <- renderPlot({
     sx_lineup_eval
   })
+  
+  output$quadrant <- renderPlot({
+    calculate_quadrants(sx_scores, sx_schedule,
+                        start = input$quad_week[1],
+                        end = input$quad_week[2]) %>% 
+      plot_quadrant() 
+    })
   
   output$projected <- renderPlot({
     sx_proj %>%

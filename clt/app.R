@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 7
+frech_stats <- 10
 
 # Load Data ---------------------------------------------------------------
 
@@ -68,33 +68,33 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "It is legitimately shocking that a team tied for first has an 89% chance of beating the other first place team. Almost like that owner had to create the damn model or something."
+               "PFinn's team continues to disappoint FVOA but remain in the hunt for the playoffs, must be why he's hovering on lucky"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Big test of FVOA this week with Justin and Bobby, the two teams FVOA disagrees with standings the most. And a whopping 30 point playoff swing to boot."
+               "Justin's big win has shown just how unlucky his team is, and his matchup this week with PFinn has a 30-point playoff swing so it's a big test for him"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Eric has had a rough last two weeks of getting $30 stolen from him (almost literally this week). At least FVOA has a lot of faith in his playoff chances to make up for it."
+               "Looks like Brian left a lot of points on his bench last week"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "And let's not overlook the amazing match between David and German to be the first to 0% chance of making the playoffs."
+               "And of course let's all revel at German's team that continues to flatline"
              } else {
                "TBD"
              }
            ),
-           
+
            hr(),
            h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
            br(),
@@ -262,6 +262,14 @@ ui  <- navbarPage(
                       plotOutput("manager"),
                       hr(),
                       fluidRow(column(4, offset = 4, wellPanel(sliderInput("proj_week", "Weeks to Include:", 1,
+                                                                           max(weeks), c(1, max), step = 1))))
+             ),
+             
+             tabPanel("Skill v Luck",
+                      h5("How good or lucky is your team?"),
+                      plotOutput("quadrant"),
+                      hr(),
+                      fluidRow(column(4, offset = 4, wellPanel(sliderInput("quad_week", "Weeks to Include:", 1,
                                                                            max(weeks), c(1, max), step = 1))))
              ),
              
@@ -759,6 +767,13 @@ server <- function(input, output, session) {
   
   output$manager <- renderPlot({
     clt_lineup_eval
+  })
+  
+  output$quadrant <- renderPlot({
+    calculate_quadrants(clt_scores, clt_schedule,
+                        start = input$quad_week[1],
+                        end = input$quad_week[2]) %>% 
+      plot_quadrant()
   })
   
   output$projected <- renderPlot({
