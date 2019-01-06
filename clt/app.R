@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 10
+frech_stats <- 15
 
 # Load Data ---------------------------------------------------------------
 
@@ -63,46 +63,40 @@ ui  <- navbarPage(
            h3("The Frechest of Takes"),
            h5(""),
            hr(),
-           # p("FVOA went 2-3 against the Yahoo spread last week, 39-30-1 for the season"),
 
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "PFinn's team continues to disappoint FVOA but remain in the hunt for the playoffs, must be why he's hovering on lucky"
+               "After all that the 3 teams fighting for the last 2 playoff spots all lost, even if it did come down to the wire with McCaffrey"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Justin's big win has shown just how unlucky his team is, and his matchup this week with PFinn has a 30-point playoff swing so it's a big test for him"
+               "FVOA has Justin and I at nearly a coin flip (slightly in my favor) but only gives PFinn a 1 in 7 chance to make it to the finals. Godspeed my friend."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Looks like Brian left a lot of points on his bench last week"
-             } else {
-               "TBD"
-             }
-           ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "And of course let's all revel at German's team that continues to flatline"
+               "Though I'm not sure what it says about FVOA (or our league) that the 2nd worst team snuck into the playoffs somehow"
              } else {
                "TBD"
              }
            ),
 
            hr(),
-           h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
-           br(),
-           fluidRow(tableOutput("weekly"), align="center"),
-           br(),
-           h5("Season Projections", align = "center"),
-           br(),
-           fluidRow(tableOutput("simulation"), align = "center"),
+           h5("Playoff Projections", align = "center"),
+           fluidRow(tableOutput("playoffs"), align = "center"),
+           # h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
+           # br(),
+           # fluidRow(tableOutput("weekly"), align="center"),
+           # br(),
+           # h5("Season Projections", align = "center"),
+           # br(),
+           # fluidRow(tableOutput("simulation"), align = "center"),
            hr(),
            p("FVOA Assumptions:"),
            tags$ol(
@@ -224,8 +218,8 @@ ui  <- navbarPage(
              tabPanel("Simulation Charts",
                       plotlyOutput("sim_chart"),
                       hr(),
-                      fluidRow(selectizeInput("sim_chart_selection", "Show Simulations For:", selected = "Wins",
-                                           c("Wins", "Points", "Playoff Chances")),
+                      fluidRow(selectizeInput("sim_chart_selection", "Show Simulations For:", selected = "Playoff Chances",
+                                              c("Playoff Chances", "Wins", "Points")),
                                align = "center"),
                       fluidRow(checkboxGroupInput("team_sims", "Teams to Highlight:", sort(teams), inline = T), align = "center"),
                       fluidRow(actionButton("clear_teams_sims", "Clear Teams"), align = "center"),
@@ -328,6 +322,13 @@ ui  <- navbarPage(
 server <- function(input, output, session) {
   
   ### Weekly Projections ###
+  
+  output$playoffs <- renderTable({
+    data_frame(Winner = c("Scott", "Eric", "Justin", "PFinn"),
+               Percent = c("40%", "31%", "27%", "2%"),
+               Odds = c("5:2", "7:2", "4:1", "59:1"),
+               BettingLine = c("+150", "+225", "+300", "+5775"))
+  }, align = "c")
 
   output$weekly <- renderTable({
     clt_current_matchups
