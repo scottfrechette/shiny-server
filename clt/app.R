@@ -27,11 +27,10 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 5
+frech_stats <- 15
 
 # Load Data ---------------------------------------------------------------
 
-# load("clt-data.RData")
 load(here::here("clt", "clt-data.RData"))
 
 weeks <- n_distinct(clt_scores$Week)
@@ -64,46 +63,40 @@ ui  <- navbarPage(
            h3("The Frechest of Takes"),
            h5(""),
            hr(),
-           # p("FVOA went 2-3 against the Yahoo spread last week, 39-30-1 for the season"),
 
-           p(str_glue("Frech Stats - Week {frech_stats}:")),
+           p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "PFinn still looking pretty at 5-0 with FVOA feeling good about his chances"
+               "After all that the 3 teams fighting for the last 2 playoff spots all lost, even if it did come down to the wire with McCaffrey"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "FVOA really loves Justin's team even though he's sitting at 1-4"
+               "FVOA has Justin and I at nearly a coin flip (slightly in my favor) but only gives PFinn a 1 in 7 chance to make it to the finals. Godspeed my friend."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "On the other hand it's not a fan of what Bobby's putting together these days"
+               "Though I'm not sure what it says about FVOA (or our league) that the 2nd worst team snuck into the playoffs somehow"
              } else {
                "TBD"
              }
            ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "Also looks like Drew Brees record-setting night not only cost me $30 but also gave Diaz a huge boost in the rankings"
-             } else {
-               "TBD"
-             }
-           ),
-           
+
            hr(),
-           h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
-           br(),
-           fluidRow(tableOutput("weekly"), align="center"),
-           br(),
-           h5("Season Projections", align = "center"),
-           br(),
-           fluidRow(tableOutput("simulation"), align = "center"),
+           h5("Playoff Projections", align = "center"),
+           fluidRow(tableOutput("playoffs"), align = "center"),
+           # h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
+           # br(),
+           # fluidRow(tableOutput("weekly"), align="center"),
+           # br(),
+           # h5("Season Projections", align = "center"),
+           # br(),
+           # fluidRow(tableOutput("simulation"), align = "center"),
            hr(),
            p("FVOA Assumptions:"),
            tags$ol(
@@ -140,7 +133,7 @@ ui  <- navbarPage(
                           This is your percent above/below the average team. 
                           This can also be used to get a rough percent of Team 1 beating Team 2 by
                           calculating (Team 1 FVOA - Team 2 FVOA)/2 + 50")),
-             tags$li(HTML("<u><strong>SoS</strong></u>: strength of schedule based on FVOA scores")),
+             tags$li(HTML("<u><strong>SoS</strong></u>: strength of schedule based on FVOA scores (higher means harder schedule)")),
              tags$li(HTML("<u><strong>Colley</strong></u>: one of the models that was used in the BCS computer rankings
                           and is based on win-loss record adjusted for strength of schedule")),
              tags$li("So in other words, Colley ranks on record only, 
@@ -225,8 +218,8 @@ ui  <- navbarPage(
              tabPanel("Simulation Charts",
                       plotlyOutput("sim_chart"),
                       hr(),
-                      fluidRow(selectizeInput("sim_chart_selection", "Show Simulations For:", selected = "Wins",
-                                           c("Wins", "Points", "Playoff Chances")),
+                      fluidRow(selectizeInput("sim_chart_selection", "Show Simulations For:", selected = "Playoff Chances",
+                                              c("Playoff Chances", "Wins", "Points")),
                                align = "center"),
                       fluidRow(checkboxGroupInput("team_sims", "Teams to Highlight:", sort(teams), inline = T), align = "center"),
                       fluidRow(actionButton("clear_teams_sims", "Clear Teams"), align = "center"),
@@ -263,6 +256,14 @@ ui  <- navbarPage(
                       plotOutput("manager"),
                       hr(),
                       fluidRow(column(4, offset = 4, wellPanel(sliderInput("proj_week", "Weeks to Include:", 1,
+                                                                           max(weeks), c(1, max), step = 1))))
+             ),
+             
+             tabPanel("Skill v Luck",
+                      h5("How good or lucky is your team?"),
+                      plotOutput("quadrant"),
+                      hr(),
+                      fluidRow(column(4, offset = 4, wellPanel(sliderInput("quad_week", "Weeks to Include:", 1,
                                                                            max(weeks), c(1, max), step = 1))))
              ),
              
@@ -321,6 +322,13 @@ ui  <- navbarPage(
 server <- function(input, output, session) {
   
   ### Weekly Projections ###
+  
+  output$playoffs <- renderTable({
+    data_frame(Winner = c("Scott", "Eric", "Justin", "PFinn"),
+               Percent = c("40%", "31%", "27%", "2%"),
+               Odds = c("5:2", "7:2", "4:1", "59:1"),
+               BettingLine = c("+150", "+225", "+300", "+5775"))
+  }, align = "c")
 
   output$weekly <- renderTable({
     clt_current_matchups
@@ -760,6 +768,13 @@ server <- function(input, output, session) {
   
   output$manager <- renderPlot({
     clt_lineup_eval
+  })
+  
+  output$quadrant <- renderPlot({
+    calculate_quadrants(clt_scores, clt_schedule,
+                        start = input$quad_week[1],
+                        end = input$quad_week[2]) %>% 
+      plot_quadrant()
   })
   
   output$projected <- renderPlot({

@@ -27,11 +27,10 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 5
+frech_stats <- 15
 
 # Load Data ---------------------------------------------------------------
 
-# load("sx-data.RData")
 load(here::here("sx", "sx-data.RData"))
 
 weeks <- n_distinct(sx_scores$Week)
@@ -64,39 +63,40 @@ ui  <- navbarPage(
            h3("The Frechest of Takes"),
            h5(""),
            hr(),
-           # p("FVOA went 2-3 against the espn spread last week, 39-30-1 for the season"),
-           
-           p(str_glue("Week {frech_stats}:")),
+
+           p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "It's interesting that we don't really have any teams breaking away from the pack too much yet"
+               "Well I think we can officially say Burgess' team isn't lucky after all, it's just bad"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Though FVOA is really loving on Ford's team right now despite him sitting in 5th (he'd be favored in any matchup in fact)"
+               "There was a 24% chance Jersey beat Brazil and an 8% chance he won by at least 36, which was a major shocker of the season (other than Ford somehow not making the playoffs)"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Meanwhile Kral's team is squeaking by with 2 wins but FVOA has no faith"
+               "Looks like I've got a 54% chance of beating Jersey, with almost a 55% chance one of us blows the other out so anything could happen"
              } else {
                "TBD"
              }
            ),
            
            hr(),
-           h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
-           br(),
-           fluidRow(tableOutput("weekly"), align="center"),
-           br(),
-           h5("Season Projections", align = "center"),
-           br(),
-           fluidRow(tableOutput("simulation"), align = "center"),
+           h5("Playoff Projections", align = "center"),
+           fluidRow(tableOutput("playoffs"), align = "center"),
+           # h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
+           # br(),
+           # fluidRow(tableOutput("weekly"), align="center"),
+           # br(),
+           # h5("Season Projections", align = "center"),
+           # br(),
+           # fluidRow(tableOutput("simulation"), align = "center"),
            hr(),
            p("FVOA Assumptions:"),
            tags$ol(
@@ -218,8 +218,8 @@ ui  <- navbarPage(
              tabPanel("Simulation Charts",
                       plotlyOutput("sim_chart"),
                       hr(),
-                      fluidRow(selectizeInput("sim_chart_selection", "Show Simulations For:", selected = "Wins",
-                                              c("Wins", "Points", "Playoff Chances")),
+                      fluidRow(selectizeInput("sim_chart_selection", "Show Simulations For:", selected = "Playoff Chances",
+                                              c("Playoff Chances", "Wins", "Points")),
                                align = "center"),
                       fluidRow(checkboxGroupInput("team_sims", "Teams to Highlight:", sort(teams), inline = T), align = "center"),
                       fluidRow(actionButton("clear_teams_sims", "Clear Teams"), align = "center"),
@@ -256,6 +256,14 @@ ui  <- navbarPage(
                       plotOutput("manager"),
                       hr(),
                       fluidRow(column(4, offset = 4, wellPanel(sliderInput("proj_week", "Weeks to Include:", 1,
+                                                                           max(weeks), c(1, max), step = 1))))
+             ),
+             
+             tabPanel("Skill v Luck",
+                      h5("How good or lucky is your team?"),
+                      plotOutput("quadrant"),
+                      hr(),
+                      fluidRow(column(4, offset = 4, wellPanel(sliderInput("quad_week", "Weeks to Include:", 1,
                                                                            max(weeks), c(1, max), step = 1))))
              ),
              
@@ -314,6 +322,13 @@ ui  <- navbarPage(
 server <- function(input, output, session) {
   
   ### Weekly Projections ###
+  
+  output$playoffs <- renderTable({
+    data_frame(Winner = c("Brazil", "Scott", "Jersey", "Burg"),
+               Percent = c("57%", "20.3%", "11.6%", "8.5%"),
+               Odds = c("2:1", "5:1", "17:2", "12:1"),
+               BettingLine = c("-125", "+400", "+775", "+1075"))
+  }, align = "c")
   
   output$weekly <- renderTable({
     sx_current_matchups %>% 
@@ -489,7 +504,9 @@ server <- function(input, output, session) {
   
   ### Matchups Tab ###
   output$matchup_breakdown <- renderTable({
+    set.seed(42)
     reg_games <- 6
+    reps <- 1e6
     league <- sx_scores %>% filter(Week %in% input$matchup_week[1]:input$matchup_week[2])
     t1.scores <- league %>% filter(Team == input$team1) %>% pull(Score)
     t2.scores <- league %>% filter(Team == input$team2) %>% pull(Score)
@@ -754,6 +771,13 @@ server <- function(input, output, session) {
   output$manager <- renderPlot({
     sx_lineup_eval
   })
+  
+  output$quadrant <- renderPlot({
+    calculate_quadrants(sx_scores, sx_schedule,
+                        start = input$quad_week[1],
+                        end = input$quad_week[2]) %>% 
+      plot_quadrant() 
+    })
   
   output$projected <- renderPlot({
     sx_proj %>%
