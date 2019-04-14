@@ -5,30 +5,37 @@ library(googlesheets)
 library(tidyverse)
 
 answers <- gs_title("GOT") %>% 
-    gs_read(ws = 1)
+    gs_read(ws = 1) %>% 
+    rename(Team = `How do you know me?`) %>% 
+    select(-Timestamp, -`Email Address`)
 
 points <- gs_title("GOT") %>% 
-    gs_read(ws = 2)
+    gs_read(ws = 2) %>% 
+    drop_na(answer) %>% 
+    mutate(correct = "yes")
 
 got <- answers %>% 
     gather(question, answer,
-           -Person, -Team) %>% 
+           -Name, -Team) %>% 
     separate_rows(answer, sep = ",") %>% 
-    left_join(points, by = c("question", "answer"))
+    left_join(points, by = c("question", "answer")) %>%
+    mutate(points = str_extract(answer, "(?<=\\().*(?=\\))") %>% 
+               str_extract("\\d*") %>% 
+               as.numeric)
 
 points_earned <- got %>% 
     filter(!is.na(correct)) %>% 
-    count(Person, Team, 
+    count(Name, Team, 
           wt = points, name = "Points")
 
 points_remaining <- got %>% 
     filter(is.na(correct)) %>% 
-    count(Person, Team, 
+    count(Name, Team, 
           wt = points, name = "PPR")
 
 got_points <- full_join(points_earned, 
                         points_remaining,
-                        by = c("Person", "Team")) %>% 
+                        by = c("Name", "Team")) %>% 
     replace_na(list(Points = 0,
                     PPR = 0)) %>% 
     arrange(-Points)
