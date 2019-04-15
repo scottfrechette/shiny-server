@@ -14,6 +14,7 @@ got <- answers %>%
   gather(question, answer,
          -Name, -Team) %>% 
   separate_rows(answer, sep = ",") %>% 
+  mutate(answer = str_trim(answer)) %>% 
   left_join(points, by = c("question", "answer")) %>%
   mutate(points = case_when(
     answer %in% c("Die", "Live",
