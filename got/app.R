@@ -11,20 +11,24 @@ answers <- gs_title("GOT") %>%
 
 points <- gs_title("GOT") %>% 
     gs_read(ws = 2) %>% 
-    drop_na(answer) %>% 
-    mutate(correct = "yes")
+    filter(correct == "yes")
 
 got <- answers %>% 
     gather(question, answer,
            -Name, -Team) %>% 
     separate_rows(answer, sep = ",") %>% 
     left_join(points, by = c("question", "answer")) %>%
-    mutate(points = str_extract(answer, "(?<=\\().*(?=\\))") %>% 
+    mutate(points = case_when(
+        answer %in% c("Die", "Live",
+                      "Reanimated/Turned", 
+                      "Not Seen/Unknown") ~ 10,
+        !str_detect(answer, "\\d") ~ 50,
+        TRUE ~ str_extract(answer, "(?<=\\().*(?=\\))") %>% # fix this 
                str_extract("\\d*") %>% 
-               as.numeric)
+               as.numeric))
 
 points_earned <- got %>% 
-    filter(!is.na(correct)) %>% 
+    filter(correct == "yes") %>% 
     count(Name, Team, 
           wt = points, name = "Points")
 
@@ -40,33 +44,32 @@ got_points <- full_join(points_earned,
                     PPR = 0)) %>% 
     arrange(-Points)
 
-# Define UI for application that draws a histogram
+
+
 ui <- fluidPage(
     
-    # Application title
     titlePanel("Game of Thrones Predictions"),
     
-    # Sidebar with a slider input for number of bins 
     sidebarLayout(
         sidebarPanel(
             selectInput("teams", "Choose Teams:", 
-                        got_points$Team)
+                        got_points$Team,
+                        selected = "All")
         ),
         
-        # Show a plot of the generated distribution
         mainPanel(
             tableOutput("table")
         )
     )
 )
 
-# Define server logic required to draw a histogram
 server <- function(input, output) {
     
     output$table <- renderTable({
         if(input$teams != "All") {
             got_points %>% 
-                filter(Team %in% c(input$teams, "All"))
+                filter(Team %in% c(input$teams, "All")) %>% 
+                select(-Team)
         } else {
             got_points
         }
@@ -74,5 +77,4 @@ server <- function(input, output) {
     }, align = "c", digits = 0)
 }
 
-# Run the application 
 shinyApp(ui = ui, server = server)
