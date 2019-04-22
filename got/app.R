@@ -179,7 +179,8 @@ server <- function(input, output) {
                 distinct(Week = week,
                          Question = question,
                          Answer = answer_clean,
-                         Points = points)
+                         Points = points) %>% 
+                arrange(Week, -Points)
             
         } else {
             
@@ -188,7 +189,8 @@ server <- function(input, output) {
                 distinct(Week = week,
                          Question = question,
                          Answer = answer_clean,
-                         Points = points)
+                         Points = points) %>% 
+                arrange(-Points)
             
         }
         

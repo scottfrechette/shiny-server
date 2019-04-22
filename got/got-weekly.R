@@ -17,7 +17,8 @@ answers <- gs_title("GOT") %>%
 
 points <- answers %>% 
   filter(!is.na(points)) %>% 
-  select(-category)
+  select(-category) %>% 
+  arrange(week, -points)
 
 category <- answers %>% 
   distinct(question, category)
