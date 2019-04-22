@@ -33,14 +33,15 @@ got <- responses %>%
   left_join(points, by = c("question", "answer")) %>%
   mutate(
     possible_points = case_when(
+      points == 0                       ~ 0,
       answer %in% c("Die", "Live",
                     "Reanimated/Turned", 
                     "Not Seen/Unknown") ~ 10,
-      !str_detect(answer, "\\d") ~ 50,
-      TRUE ~ str_extract(answer, "\\(\\d.*\\)$") %>% 
-        str_extract("(?<=\\().*(?=\\))") %>% 
-        str_extract("\\d*") %>% 
-        as.numeric()),
+      !str_detect(answer, "\\d")        ~ 50,
+      TRUE                              ~ str_extract(answer, "\\(\\d.*\\)$") %>% 
+                                            str_extract("(?<=\\().*(?=\\))") %>% 
+                                            str_extract("\\d*") %>% 
+                                            as.numeric()),
     answer_clean = str_remove(answer, " \\(\\d.*\\)$")
   )
 

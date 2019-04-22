@@ -3,7 +3,6 @@
 library(shiny)
 library(tidyverse)
 library(plotly)
-# library(gghighlight)
 
 load(here::here("got", "got-data.RData"))
 
