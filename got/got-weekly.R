@@ -12,7 +12,7 @@ answers <- gs_title("GOT") %>%
 # points: 
 # >0 - correct answer
 # =0 - already ruled out (but question still undecided)
-# <0 - incorrect answer
+# <0 - incorrect answer in multichoice
 # NA - undecided
 
 points <- answers %>% 
