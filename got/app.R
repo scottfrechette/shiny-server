@@ -47,6 +47,7 @@ ui <- navbarPage(
                                  c("All", got %>% 
                                        filter(!is.na(week)) %>% 
                                        distinct(week) %>% 
+                                       arrange(week) %>% 
                                        pull()),
                                  selected = "All")
                  ),
