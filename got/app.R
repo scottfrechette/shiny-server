@@ -175,7 +175,8 @@ server <- function(input, output) {
         if(input$week == "All") {
             
             got %>% 
-                filter(!is.na(week)) %>% 
+                filter(!is.na(week),
+                       points %/% 1 == points) %>% 
                 distinct(Week = week,
                          Question = question,
                          Answer = answer_clean,
@@ -185,7 +186,8 @@ server <- function(input, output) {
         } else {
             
             got %>% 
-                filter(week %in% input$week) %>% 
+                filter(week %in% input$week,
+                       points %/% 1 == points) %>% 
                 distinct(Week = week,
                          Question = question,
                          Answer = answer_clean,
