@@ -31,8 +31,16 @@ got <- responses %>%
   mutate(answer = str_trim(answer)) %>% 
   left_join(category, by = "question") %>% 
   left_join(points, by = c("question", "answer")) %>%
+  group_by(question) %>% 
+  mutate(answered = sum(points > 0, na.rm = T)) %>% 
+  ungroup() %>% 
   mutate(
+    answered = case_when(
+      question == "Euron" ~ 1L,
+      str_detect(question, "Azor Ahai") ~ 1L,
+      TRUE ~ answered),
     possible_points = case_when(
+      answered > 0                      ~ 0,
       points == 0                       ~ 0,
       answer %in% c("Die", "Live",
                     "Reanimated/Turned", 
@@ -51,7 +59,8 @@ points_earned <- got %>%
         wt = points, name = "Points")
 
 points_remaining <- got %>% 
-  filter(is.na(points)) %>% 
+  filter(is.na(points) &
+         answered == 0) %>% 
   count(Name, Team, 
         wt = possible_points, name = "PPR")
 
