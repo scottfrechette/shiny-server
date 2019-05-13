@@ -35,6 +35,10 @@ got <- responses %>%
   mutate(answered = sum(points > 0, na.rm = T)) %>% 
   ungroup() %>% 
   mutate(
+    points = case_when(
+      Name == "Johnerd Stark" & week == 1 ~ points / 2,
+      TRUE ~ points
+    ),
     answered = case_when(
       question == "Euron" ~ 1L,
       str_detect(question, "Azor Ahai") ~ 1L,
