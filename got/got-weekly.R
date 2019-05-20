@@ -32,7 +32,7 @@ got <- responses %>%
   left_join(category, by = "question") %>% 
   left_join(points, by = c("question", "answer")) %>%
   group_by(question) %>% 
-  mutate(answered = sum(points > 0, na.rm = T)) %>% 
+  mutate(answered = sum(abs(points) > 0, na.rm = T)) %>% 
   ungroup() %>% 
   mutate(
     points = case_when(
@@ -43,17 +43,18 @@ got <- responses %>%
       question == "Euron" ~ 1L,
       str_detect(question, "Azor Ahai") ~ 1L,
       TRUE ~ answered),
-    possible_points = case_when(
-      answered > 0                      ~ 0,
-      points == 0                       ~ 0,
-      answer %in% c("Die", "Live",
-                    "Reanimated/Turned", 
-                    "Not Seen/Unknown") ~ 10,
-      !str_detect(answer, "\\d")        ~ 50,
-      TRUE                              ~ str_extract(answer, "\\(\\d.*\\)$") %>% 
-                                            str_extract("(?<=\\().*(?=\\))") %>% 
-                                            str_extract("\\d*") %>% 
-                                            as.numeric()),
+    possible_points = 0,
+    # possible_points = case_when(
+    #   answered > 0                      ~ 0,
+    #   points == 0                       ~ 0,
+    #   answer %in% c("Die", "Live",
+    #                 "Reanimated/Turned",
+    #                 "Not Seen/Unknown") ~ 10,
+    #   !str_detect(answer, "\\d")        ~ 50,
+    #   TRUE                              ~ str_extract(answer, "\\(\\d.*\\)$") %>% 
+    #                                         str_extract("(?<=\\().*(?=\\))") %>% 
+    #                                         str_extract("\\d*") %>% 
+    #                                         as.numeric()),
     answer_clean = str_remove(answer, " \\(\\d.*\\)$")
   )
 
