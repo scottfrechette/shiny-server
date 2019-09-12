@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 15
+frech_stats <- 1
 
 # Load Data ---------------------------------------------------------------
 
@@ -67,36 +67,36 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "After all that the 3 teams fighting for the last 2 playoff spots all lost, even if it did come down to the wire with McCaffrey"
+               "We're back baby. Everyone's on the board with at least a small chance of making the playoffs, so let the fun begin."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "FVOA has Justin and I at nearly a coin flip (slightly in my favor) but only gives PFinn a 1 in 7 chance to make it to the finals. Godspeed my friend."
+               "Just like the NFL we shouldn't overanalyze week 1, but so far it looks like German and Bobby might be the teams to beat, followed by Diaz and Barrett."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Though I'm not sure what it says about FVOA (or our league) that the 2nd worst team snuck into the playoffs somehow"
+               "Of course it helps when German and Bobby's teams both overperform and PFinn and I leave lots of points on our benches."
              } else {
                "TBD"
              }
            ),
 
            hr(),
-           h5("Playoff Projections", align = "center"),
-           fluidRow(tableOutput("playoffs"), align = "center"),
-           # h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
-           # br(),
-           # fluidRow(tableOutput("weekly"), align="center"),
-           # br(),
-           # h5("Season Projections", align = "center"),
-           # br(),
-           # fluidRow(tableOutput("simulation"), align = "center"),
+           # h5("Playoff Projections", align = "center"),
+           # fluidRow(tableOutput("playoffs"), align = "center"),
+           h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
+           br(),
+           fluidRow(tableOutput("weekly"), align="center"),
+           br(),
+           h5("Season Projections", align = "center"),
+           br(),
+           fluidRow(tableOutput("simulation"), align = "center"),
            hr(),
            p("FVOA Assumptions:"),
            tags$ol(
@@ -299,20 +299,20 @@ ui  <- navbarPage(
                         tags$li("Zoom in on any part of the chart by dragging box over that area (double-click to return)")
                       )
              )
-             ),
+             )#,
   
   # Model Evaluation Tab-----------------------------------------------------
   
-  tabPanel("FVOA Evaluation",
-           h4("FVOA Accuracy by Week"),
-           hr(),
-           fluidRow(textOutput("eval_accuracy"), align = "center"),
-           br(),
-           fluidRow(column(8, offset = 2, plotOutput("eval_plot")), align = "center"),
-           br(),
-           p("Which teams screwed my model last week?", align = "center"),
-           fluidRow(tableOutput("eval_team"), align = "center")
-  )
+  # tabPanel("FVOA Evaluation",
+  #          h4("FVOA Accuracy by Week"),
+  #          hr(),
+  #          fluidRow(textOutput("eval_accuracy"), align = "center"),
+  #          br(),
+  #          fluidRow(column(8, offset = 2, plotOutput("eval_plot")), align = "center"),
+  #          br(),
+  #          p("Which teams screwed my model last week?", align = "center"),
+  #          fluidRow(tableOutput("eval_team"), align = "center")
+  # )
   
   # End of navbarPage
              )
@@ -324,7 +324,7 @@ server <- function(input, output, session) {
   ### Weekly Projections ###
   
   output$playoffs <- renderTable({
-    data_frame(Winner = c("Scott", "Eric", "Justin", "PFinn"),
+    tibble(Winner = c("Scott", "Eric", "Justin", "PFinn"),
                Percent = c("40%", "31%", "27%", "2%"),
                Odds = c("5:2", "7:2", "4:1", "59:1"),
                BettingLine = c("+150", "+225", "+300", "+5775"))
