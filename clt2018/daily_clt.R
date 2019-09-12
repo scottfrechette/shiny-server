@@ -17,14 +17,14 @@ current_week <- today_week - start_week
 weeks_played <- current_week - 1
 
 # Scrape data
-clt_schedule <- scrape_schedule("yahoo", 96662)
-clt_team <- scrape_team(weeks_played, "yahoo", 96662) %>% 
+clt_schedule <- scrape_schedule("yahoo", 150019)
+clt_team <- scrape_team(weeks_played, "yahoo", 150019) %>% 
   unnest()
-clt_yahoo_win_prob <- scrape_win_prob(current_week, "yahoo", 96662)
+clt_yahoo_win_prob <- scrape_win_prob(current_week, "yahoo", 150019)
 
 # Replace team names
-source(here::here("shiny-server", "clt", "lookup_id.R"))
-team_ids <- yahoo_teamIDs(96662) %>% 
+source(here::here("clt", "lookup_id.R"))
+team_ids <- yahoo_teamIDs(150019) %>% 
   left_join(lookup_id, by = "team_id") %>% 
   mutate(team = factor(team)) %>% 
   select(-team_id)
@@ -48,7 +48,7 @@ clt_scores <- clt_proj %>%
 
 # Run FVOA analysis
 clt_simulated_season <- simulate_season(clt_schedule, clt_scores, "clt") 
-playoff_leverage <- read_csv(here::here("shiny-server", "clt", "playoff_leverage.csv"))
+playoff_leverage <- read_csv(here::here("clt", "playoff_leverage.csv"))
 clt_model_eval <- evaluate_model(clt_scores, output = "shiny")
 clt_fvoa_season <- calculate_fvoa_season(clt_scores)
 clt_matchups_prob <- all_matchups(clt_scores, type = "prob")
@@ -62,11 +62,10 @@ clt_lineup_eval <- evaluate_lineup(clt_team, flex = 0, plot = T)
 
 # Save data for Shiny app
 save(clt_schedule, clt_team, clt_proj, clt_scores,
-     clt_simulated_season, #clt_model_eval, 
-     clt_fvoa_season,
+     clt_simulated_season, clt_model_eval, clt_fvoa_season,
      clt_matchups_prob, clt_matchups_spread,
      clt_rankings, clt_current_matchups,
      clt_playoff_leverage_chart, clt_lineup_eval, 
-     file = here::here("shiny-server", "clt", "clt-data.RData"))
+     file = here::here("clt", "clt-data.RData"))
 
 options(warn = oldw)
