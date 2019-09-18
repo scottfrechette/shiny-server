@@ -29,6 +29,10 @@ current_week <- today_week - start_week
 weeks_played <- current_week - 1
 frech_stats <- 15
 
+
+fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
+                 "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
+
 # Load Data ---------------------------------------------------------------
 
 load(here::here("clt", "clt-data.RData"))
@@ -557,7 +561,7 @@ server <- function(input, output, session) {
         labs(y = "Score", x = "Week", title = "Weekly Scores") +
         guides(color=FALSE) +
         theme_fvoa() + 
-        tidyquant::scale_color_tq(theme = "dark")
+        scale_color_manual(values = fvoa_colors)
       
       ggplotly(x, tooltip = c("group", "x", "y"))
       
@@ -574,7 +578,7 @@ server <- function(input, output, session) {
         labs(y = "Score", x = "Week", title = "Weekly Scores") +
         guides(color=FALSE) +
         theme_fvoa() + 
-        tidyquant::scale_color_tq(theme = "dark")
+        scale_color_manual(values = fvoa_colors)
       
       ggplotly(x, tooltip = c("group", "x", "y"))
       
@@ -599,7 +603,7 @@ server <- function(input, output, session) {
         labs(y = "FVOA", x = "Week", title = "Weekly FVOA") +
         guides(color=FALSE) +
         theme_fvoa() + 
-        tidyquant::scale_color_tq(theme = "dark")
+        scale_color_manual(values = fvoa_colors)
       
       ggplotly(x, tooltip = c("group", "x", "y"))
       
@@ -618,7 +622,7 @@ server <- function(input, output, session) {
         labs(y = "Score", x = "Week", title = "Weekly Scores") +
         guides(color=FALSE) +
         theme_fvoa() + 
-        tidyquant::scale_color_tq(theme = "dark")
+        scale_color_manual(values = fvoa_colors)
       
       ggplotly(x, tooltip = c("group", "x", "y"))
       
@@ -658,7 +662,7 @@ server <- function(input, output, session) {
           labs(y = "Wins", x = "Week", title = "Projected Wins by Week") +
           guides(color=FALSE) +
           theme_fvoa() + 
-          tidyquant::scale_color_tq(theme = "dark")
+          scale_color_manual(values = fvoa_colors)
         
         ggplotly(x, tooltip = c("group", "x", "y"))
         
@@ -676,7 +680,7 @@ server <- function(input, output, session) {
           labs(y = "Wins", x = "Week", title = "Projected Wins by Week") +
           guides(color=FALSE) +
           theme_fvoa() + 
-          tidyquant::scale_color_tq(theme = "dark")
+          scale_color_manual(values = fvoa_colors)
         
         ggplotly(x, tooltip = c("group", "x", "y"))
       }
@@ -694,7 +698,7 @@ server <- function(input, output, session) {
           labs(y = "Points", x = "Week", title = "Projected Total Points by Week") +
           guides(color=FALSE) +
           theme_fvoa() + 
-          tidyquant::scale_color_tq(theme = "dark")
+          scale_color_manual(values = fvoa_colors)
         
         ggplotly(x, tooltip = c("group", "x", "y"))
         
@@ -712,7 +716,7 @@ server <- function(input, output, session) {
           labs(y = "Points", x = "Week", title = "Projected Total Points by Week") +
           guides(color=FALSE) +
           theme_fvoa() + 
-          tidyquant::scale_color_tq(theme = "dark")
+          scale_color_manual(values = fvoa_colors)
         
         ggplotly(x, tooltip = c("group", "x", "y"))
       }
@@ -730,7 +734,7 @@ server <- function(input, output, session) {
           labs(y = "Chance", x = "Week", title = "Projected Chance of Making Playoffs by Week") +
           guides(color=FALSE) +
           theme_fvoa() + 
-          tidyquant::scale_color_tq(theme = "dark")
+          scale_color_manual(values = fvoa_colors)
         
         ggplotly(x, tooltip = c("group", "x", "y"))
         
@@ -748,7 +752,7 @@ server <- function(input, output, session) {
           labs(y = "Chance", x = "Week", title = "Projected Chance of Making Playoffs by Week") +
           guides(color=FALSE) +
           theme_fvoa() + 
-          tidyquant::scale_color_tq(theme = "dark")
+          scale_color_manual(values = fvoa_colors)
         
         ggplotly(x, tooltip = c("group", "x", "y"))
       }
@@ -763,7 +767,7 @@ server <- function(input, output, session) {
   
   output$playoff_leverage <- renderPlot({
     clt_playoff_leverage_chart + 
-      tidyquant::scale_fill_tq(theme = "dark")
+      scale_fill_manual(values = fvoa_colors)
   })
   
   output$manager <- renderPlot({
@@ -806,7 +810,7 @@ server <- function(input, output, session) {
       guides(fill=F) +
       labs(y = "Score", x = "", title = "Team Boxplots") +
       theme_fvoa() + 
-      tidyquant::scale_fill_tq(theme = "dark") + 
+      scale_fill_manual(values = fvoa_colors) + 
       theme(panel.border = element_blank())
   })
   
@@ -824,8 +828,8 @@ server <- function(input, output, session) {
         labs(x = "Weekly Scores", y = "Density", title = "Density Plots") +
         guides(fill=FALSE) + 
         theme_fvoa() + 
-        tidyquant::scale_fill_tq(theme = "dark") + 
-        tidyquant::scale_color_tq(theme = "dark")
+        scale_fill_manual(values = fvoa_colors) + 
+        scale_color_manual(values = fvoa_colors)
       
       ggplotly(x, tooltip = c("fill", "x"))
       
@@ -840,8 +844,8 @@ server <- function(input, output, session) {
         labs(x = "Weekly Scores", y = "Density", title = "Density Plots") +
         guides(fill=FALSE, color = FALSE) + 
         theme_fvoa() + 
-        tidyquant::scale_fill_tq(theme = "dark") + 
-        tidyquant::scale_color_tq(theme = "dark")
+        scale_fill_manual(values = fvoa_colors) + 
+        scale_color_manual(values = fvoa_colors)
       
       ggplotly(x, tooltip = c("fill", "x"))
     }
