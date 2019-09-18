@@ -863,7 +863,7 @@ server <- function(input, output, session) {
   output$eval_team = renderTable({
     clt_model_eval[[3]] %>% 
       filter(Week == weeks_played) %>% 
-      select(-Week)
+      select(Team, Correct)
   }, digits = 0, align = 'c')
   
 }
