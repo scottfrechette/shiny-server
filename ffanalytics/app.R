@@ -5,10 +5,10 @@ library(tidyverse)
 
 load(here::here("ffanalytics", "projection-data.RData"))
 
-ffanalytics_plot <- function(projections, pos, n_players) {
+ffanalytics_plot <- function(projections, pstn, n_players) {
     
     projections %>%
-        filter(pos == {{pos}},
+        filter(pos == {{pstn}},
                !str_detect(team, "FA"),
                avg_type == "average") %>%
         top_n(n_players, points) %>%
@@ -35,7 +35,8 @@ ui <- fluidPage(
                         selected = "CLT"),
             selectInput("position", 
                         "Select Position:",
-                        choices = c("QB", "RB", "WR", "TE", "DST", "K", "DE", "CB"),
+                        choices = c("QB", "RB", "WR", "TE", 
+                                    "DST", "K", "DE", "CB"),
                         selected = "QB"
                         ),
             sliderInput("n_players",
@@ -64,7 +65,9 @@ server <- function(input, output) {
     })
     
     output$ranking_plot <- renderPlot({
-        ffanalytics_plot(projections(), pos = input$position, n_players = input$n_players)
+        ffanalytics_plot(projections(), 
+                         pstn = input$position, 
+                         n_players = input$n_players)
     })
 }
 
