@@ -216,12 +216,15 @@ sx_team <- tibble(Week = 1:weeks_played) %>%
   mutate(data = map(Week, ~ scrape_weekly(week = .x))) %>% 
   unnest(data) %>% 
   left_join(sx_lookup_ids, by = "teamID") %>% 
+  mutate(pts = if_else(roster != "BN", act, 0)) %>% 
+  add_count(team, Week, wt = pts, name = "Score") %>% 
   select(teamID, Week, Team = team, 
-         Score = score, Player = player,
+         # Score = score,
+         Score, Player = player,
          Position = position, Lineup = roster, 
          Proj = proj, Points = act)
 
-# Extract scores
+sx# Extract scores
 sx_scores <- bind_rows(sx_league %>% 
                          select(Week = week, teamID = team1, Score = team1_points),
                        sx_league %>% 

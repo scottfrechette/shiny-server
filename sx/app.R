@@ -31,11 +31,11 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 3
+frech_stats <- 2
 
 # Load Data ---------------------------------------------------------------
 
-load(here::here("sx2018", "sx-data.RData"))
+load(here::here("sx", "sx-data.RData"))
 
 weeks <- n_distinct(sx_scores$Week)
 teams <- unique(sx_scores$Team)
@@ -71,36 +71,34 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Well I think we can officially say Burgess' team isn't lucky after all, it's just bad"
+               "We're back baby - though now we've added some serious shit talkers to the mix."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "There was a 24% chance Jersey beat Brazil and an 8% chance he won by at least 36, which was a major shocker of the season (other than Ford somehow not making the playoffs)"
+               "It seems like we already have a top tier forming of Bethany, Jangaard, and Wikle, with Ford and Jersey right behind them."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Looks like I've got a 54% chance of beating Jersey, with almost a 55% chance one of us blows the other out so anything could happen"
+               "There's still a lot of time, but maybe that's just me selfishly hoping my 1.8% chance of making the playoffs goes up dramatically."
              } else {
                "TBD"
              }
            ),
            
            hr(),
-           h5("Playoff Projections", align = "center"),
-           fluidRow(tableOutput("playoffs"), align = "center"),
-           # h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
-           # br(),
-           # fluidRow(tableOutput("weekly"), align="center"),
-           # br(),
-           # h5("Season Projections", align = "center"),
-           # br(),
-           # fluidRow(tableOutput("simulation"), align = "center"),
+           h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
+           br(),
+           fluidRow(tableOutput("weekly"), align="center"),
+           br(),
+           h5("Season Projections", align = "center"),
+           br(),
+           fluidRow(tableOutput("simulation"), align = "center"),
            hr(),
            p("FVOA Assumptions:"),
            tags$ol(
@@ -867,7 +865,7 @@ server <- function(input, output, session) {
   output$eval_team = renderTable({
     sx_model_eval[[3]] %>% 
       filter(Week == weeks_played) %>% 
-      select(-Week)
+      select(Team, Correct)
   }, digits = 0, align = 'c')
   
 }
