@@ -39,10 +39,10 @@ ui <- fluidPage(
                                     "DST", "K", "DE", "CB"),
                         selected = "QB"
                         ),
-            sliderInput("n_players",
+            numericInput("n_players",
                         "Number of Players:",
                         min = 1,
-                        max = 75,
+                        max = 70,
                         value = 30)
         ),
 
