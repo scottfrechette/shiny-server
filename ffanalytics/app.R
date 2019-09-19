@@ -46,7 +46,7 @@ ui <- fluidPage(
         ),
 
         mainPanel(
-           plotOutput("ranking_plot", height = "750px")
+           plotOutput("ranking_plot", height = "600px")
         )
     )
 )
