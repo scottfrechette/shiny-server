@@ -7,19 +7,54 @@ load(here::here("ffanalytics", "projection-data.RData"))
 
 ffanalytics_plot <- function(projections, pstn, n_players) {
     
-    projections %>%
-        filter(pos == {{pstn}},
-               !str_detect(team, "FA"),
-               avg_type == "average") %>%
-        top_n(n_players, points) %>%
-        arrange(-pos_rank) %>%
-        mutate(player = str_glue("{first_name} {last_name} ({team})")) %>%
-        ggplot(aes(points, reorder(player, points), color = factor(tier))) +
-        geom_text(aes(label = round(points)), size = 4) +
-        geom_segment(aes(yend = player, x = floor, xend = ceiling)) +
-        theme_light() +
-        labs(x = "Points", y = "Player") +
-        guides(color = FALSE)
+    if(pstn == "FLEX") {
+        
+        projections %>%
+            filter(pos %in% c("RB", "WR", "TE"),
+                   !str_detect(team, "FA"),
+                   avg_type == "average") %>%
+            top_n(n_players, points) %>%
+            arrange(-pos_rank) %>%
+            mutate(player = str_glue("{first_name} {last_name} ({team})")) %>%
+            ggplot(aes(points, reorder(player, points), color = factor(tier))) +
+            geom_text(aes(label = round(points)), size = 4) +
+            geom_segment(aes(yend = player, x = floor, xend = ceiling)) +
+            theme_light() +
+            labs(x = "Points", y = "Player") +
+            guides(color = FALSE)
+        
+    } else if (pstn == "RB/WR") {
+        
+        projections %>%
+            filter(pos %in% c("RB", "WR"),
+                   !str_detect(team, "FA"),
+                   avg_type == "average") %>%
+            top_n(n_players, points) %>%
+            arrange(-pos_rank) %>%
+            mutate(player = str_glue("{first_name} {last_name} ({team})")) %>%
+            ggplot(aes(points, reorder(player, points), color = factor(tier))) +
+            geom_text(aes(label = round(points)), size = 4) +
+            geom_segment(aes(yend = player, x = floor, xend = ceiling)) +
+            theme_light() +
+            labs(x = "Points", y = "Player") +
+            guides(color = FALSE)
+        
+    } else {
+        
+        projections %>%
+            filter(pos == {{pstn}},
+                   !str_detect(team, "FA"),
+                   avg_type == "average") %>%
+            top_n(n_players, points) %>%
+            arrange(-pos_rank) %>%
+            mutate(player = str_glue("{first_name} {last_name} ({team})")) %>%
+            ggplot(aes(points, reorder(player, points), color = factor(tier))) +
+            geom_text(aes(label = round(points)), size = 4) +
+            geom_segment(aes(yend = player, x = floor, xend = ceiling)) +
+            theme_light() +
+            labs(x = "Points", y = "Player") +
+            guides(color = FALSE)
+    }
     
 }
 
@@ -36,14 +71,20 @@ ui <- fluidPage(
             selectInput("position", 
                         "Select Position:",
                         choices = c("QB", "RB", "WR", "TE", 
+                                    "FLEX", "RB/WR",
                                     "DST", "K", "DE", "CB"),
                         selected = "QB"
                         ),
             numericInput("n_players",
-                        "Number of Players:",
-                        min = 1,
-                        max = 70,
-                        value = 30)
+                         "Number of Players:",
+                         min = 1,
+                         max = 70,
+                         value = 30),
+            checkboxGroupInput("groups",
+                               "Availability*",
+                               choices = c("Roster", "Available", "Taken"),
+                               selected = c("Roster", "Available")),
+            p("*Only available for SX League (ESPN) for now")
         ),
 
         mainPanel(
@@ -59,7 +100,33 @@ server <- function(input, output) {
         if(input$league == "CLT") {
             clt_projections
         } else {
-            sx_projections
+            
+            if("Roster" %in% c(input$groups)) {
+                roster <- sx_projections %>% 
+                    filter(teamID == 2) %>% 
+                    mutate(first_name = str_c("*", first_name),
+                           last_name = str_c(last_name, "*"))
+            } else {
+                roster <- NULL
+            }
+            
+            if("Available" %in% input$groups) {
+                available <- sx_projections %>% filter(teamID == 0)
+            } else {
+                available <- NULL
+            }
+            
+            if("Taken" %in% input$groups) {
+                taken <- sx_projections %>% filter(!teamID %in% c(0, 2))
+            } else {
+                taken <- NULL
+            }
+            
+            if(is.null(input$groups)) {
+                roster <- sx_projections
+            }
+            
+            bind_rows(roster, available, taken)
         }
         
     })

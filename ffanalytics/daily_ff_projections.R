@@ -1,14 +1,18 @@
+
+# Setup -------------------------------------------------------------------
+
 library(ffanalytics)
 library(tidyverse)
 library(lubridate)
-
-# Scrape Data -------------------------------------------------------------
+library(jsonlite)
 
 today_week <- today() %>%
   floor_date(unit = "week", week_start = 2) %>%
   week()
 start_week <- 35
 current_week <- today_week - start_week
+
+# Scrape Data -------------------------------------------------------------
 
 my_scrape <- tryCatch(
   scrape_data(src = c("CBS", "ESPN", "FantasyData", "FantasyPros",
@@ -142,6 +146,91 @@ sx_projections <-  projections_table(my_scrape, scoring_rules = sx_scoring) %>%
   add_player_info()
 
 
+# Player Data -------------------------------------------------------------
+
+scrape_espn_players <- function(seasonID = 2019, leagueID = 299999, week = 1) {
+  
+  if(seasonID == as.numeric(format(Sys.Date(),'%Y'))) {
+    
+    url <- str_glue("http://fantasy.espn.com/apis/v3/games/ffl/seasons/2019/segments/0/leagues/{leagueID}?view=kona_player_info&scoringPeriodId={week}")
+    
+    players <- fromJSON(url) %>%
+      .$players %>%
+      map_if(is.data.frame, list) %>%
+      as_tibble()
+    
+    players_tbl <- players$player[[1]] %>%
+      map_if(is.data.frame, list) %>%
+      as_tibble()
+    
+  } else {
+    
+    url <- str_glue("https://fantasy.espn.com/apis/v3/games/ffl/leagueHistory/{leagueID}?seasonId={seasonID}&view=kona_player_info&scoringPeriodId={week}")
+    
+    players <- fromJSON(url) %>%
+      .$players %>%
+      .[[1]] %>%
+      map_if(is.data.frame, list) %>%
+      as_tibble()
+    
+    players_tbl <- players$player[[1]] %>%
+      map_if(is.data.frame, list) %>%
+      as_tibble()
+    
+  }
+  
+  players_tbl %>%
+    left_join(players %>%
+                select(id, onTeamId),
+              by = "id") %>%
+    select(teamID = onTeamId,
+           playerID = id, player = fullName,
+           position = defaultPositionId, nfl_team = proTeamId,
+           injured, injuryStatus) %>%
+    bind_cols(players_tbl$ownership[[1]] %>%
+                select(pct_owned = percentOwned,
+                       pct_start = percentStarted,
+                       pct_change = percentChange)) %>%
+    mutate(week = week,
+           position = case_when(
+             position == 1 ~ "QB",
+             position == 2 ~ "RB",
+             position == 3 ~ "WR",
+             position == 4 ~ "TE",
+             position == 5 ~ "K",
+             position == 16 ~ "DST")) %>%
+    select(week, teamID, playerID, player, position,
+           nfl_team, injured, injuryStatus,
+           pct_owned, pct_start, pct_change)
+}
+
+sx_player_data <- scrape_espn_players(week = current_week)
+
+sx_player_data <- bind_rows(
+  sx_player_data %>% 
+    filter(position != "DST",
+           nfl_team > 0) %>% 
+    mutate(player = str_remove_all(player, " II$| III$| V$| IV$| Jr\\.$| I$")) %>% 
+    inner_join(player_table %>% 
+                 unite(player, first_name, last_name, sep = " ") %>% 
+                 mutate(player = if_else(player == "D.J. Moore", "
+                                      DJ Moore", player)) %>% 
+                 select(id, player),
+               by = "player"),
+  sx_player_data %>% 
+    filter(position == "DST") %>%
+    mutate(player = str_remove(player, " D/ST")) %>%
+    inner_join(ff_player_data %>%
+                 filter(position == "Def") %>% 
+                 mutate(player = str_extract(name, "\\w*$")) %>% 
+                 select(id, player), 
+               by = "player")
+)
+
+sx_projections <- sx_projections %>% 
+  left_join(sx_player_data %>% 
+              select(id, teamID),
+            by = "id")
 # Save Data ---------------------------------------------------------------
-save(clt_projections, sx_projections,
+save(clt_projections, sx_projections, sx_player_data,
      file = here::here("ffanalytics", "projection-data.RData"))
