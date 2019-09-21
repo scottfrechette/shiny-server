@@ -53,7 +53,7 @@ ffanalytics_plot <- function(projections, pstn, n_players) {
             geom_segment(aes(yend = player, x = floor, xend = ceiling)) +
             theme_light() +
             labs(x = "Points", y = "Player") +
-            guides(color = FALSE)
+            guides(color = FALSE) 
     }
     
 }
@@ -98,7 +98,34 @@ server <- function(input, output) {
     projections <- reactive({
         
         if(input$league == "CLT") {
-            clt_projections
+            
+            if("Roster" %in% c(input$groups)) {
+                roster <- clt_projections %>% 
+                    filter(teamID == "Big Ass TDs") %>% 
+                    mutate(first_name = str_c("*", first_name),
+                           last_name = str_c(last_name, "*"))
+            } else {
+                roster <- NULL
+            }
+            
+            if("Available" %in% input$groups) {
+                available <- clt_projections %>% filter(teamID == "FA")
+            } else {
+                available <- NULL
+            }
+            
+            if("Taken" %in% input$groups) {
+                taken <- clt_projections %>% filter(!teamID %in% c("FA", "Big Ass TDs"))
+            } else {
+                taken <- NULL
+            }
+            
+            if(is.null(input$groups)) {
+                roster <- clt_projections
+            }
+            
+            bind_rows(roster, available, taken)
+            
         } else {
             
             if("Roster" %in% c(input$groups)) {
