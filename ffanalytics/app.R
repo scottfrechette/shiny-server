@@ -59,9 +59,9 @@ ffanalytics_plot <- function(projections, pstn, n_players) {
 }
 
 ui <- fluidPage(
-
+    
     titlePanel("FF Analytics Rankings"),
-
+    
     sidebarLayout(
         sidebarPanel(
             selectInput("league",
@@ -74,34 +74,36 @@ ui <- fluidPage(
                                     "FLEX", "RB/WR",
                                     "DST", "K", "DE", "CB"),
                         selected = "QB"
-                        ),
+            ),
             numericInput("n_players",
                          "Number of Players:",
                          min = 1,
                          max = 70,
                          value = 30),
             checkboxGroupInput("groups",
-                               "Availability*",
+                               "Availability",
                                choices = c("Roster", "Available", "Taken"),
                                selected = c("Roster", "Available")),
-            p("*Only available for SX League (ESPN) for now")
+            p("Roster players indicated with asterisks")
         ),
-
+        
         mainPanel(
-           plotOutput("ranking_plot", height = "600px")
+            plotOutput("ranking_plot", height = "600px")
         )
     )
 )
 
 server <- function(input, output) {
-
+    
     projections <- reactive({
         
         if(input$league == "CLT") {
             
+            # roster <- clt_projections
+            
             if("Roster" %in% c(input$groups)) {
-                roster <- clt_projections %>% 
-                    filter(teamID == "Big Ass TDs") %>% 
+                roster <- clt_projections %>%
+                    filter(teamID == "Big Ass TDs") %>%
                     mutate(first_name = str_c("*", first_name),
                            last_name = str_c(last_name, "*"))
             } else {

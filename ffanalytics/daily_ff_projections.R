@@ -5,6 +5,7 @@ library(ffanalytics)
 library(tidyverse)
 library(lubridate)
 library(jsonlite)
+library(rvest)
 
 today_week <- today() %>%
   floor_date(unit = "week", week_start = 2) %>%
@@ -70,7 +71,14 @@ clt_player_data <- crossing(position = c("QB", "RB", "WR", "TE",
   mutate(data = map2(position, page, 
                      ~ scrape_yahoo_players(96662, current_week, .x, .y))) %>% 
   unnest(data) %>% 
-  select(-page)
+  select(-page) %>% 
+  mutate(player = str_remove_all(player, " II$| III$| V$| IV$| Jr\\.$| I$")) %>%
+  inner_join(player_table %>% 
+               unite(player, first_name, last_name, sep = " ") %>% 
+               mutate(player = if_else(player == "D.J. Moore", "
+                                      DJ Moore", player)) %>% 
+               select(id, player),
+             by = "player")
 
 # SX Player Data ----------------------------------------------------------
 
@@ -146,10 +154,10 @@ sx_player_data <- bind_rows(
   sx_player_data %>% 
     filter(position == "DST") %>%
     mutate(player = str_remove(player, " D/ST")) %>%
-    inner_join(ff_player_data %>%
-                 filter(position == "Def") %>% 
-                 mutate(player = str_extract(name, "\\w*$")) %>% 
-                 select(id, player), 
+    inner_join(player_table %>%
+                 filter(position == "DST") %>% 
+                 # mutate(player = str_extract(name, "\\w*$")) %>% 
+                 select(id, player = last_name), 
                by = "player")
 )
 
@@ -289,8 +297,8 @@ sx_projections <-  projections_table(my_scrape, scoring_rules = sx_scoring) %>%
 
 # Join Data ---------------------------------------------------------------
 
-clt_projections <- clt_projections %>% 
-  left_join(clt_player_data %>% 
+clt_projections <- clt_projections %>%
+  left_join(clt_player_data %>%
               select(id, teamID),
             by = "id")
 
