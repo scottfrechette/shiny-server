@@ -20,7 +20,8 @@ ffanalytics_plot <- function(projections, pstn, n_players) {
             geom_text(aes(label = round(points)), size = 4) +
             geom_segment(aes(yend = player, x = floor, xend = ceiling)) +
             theme_light() +
-            labs(x = "Points", y = "Player") +
+            labs(x = "Points", y = "Player",
+                 caption = str_glue("Last Updated: {last_updated}")) +
             guides(color = FALSE)
         
     } else if (pstn == "RB/WR") {
@@ -36,7 +37,8 @@ ffanalytics_plot <- function(projections, pstn, n_players) {
             geom_text(aes(label = round(points)), size = 4) +
             geom_segment(aes(yend = player, x = floor, xend = ceiling)) +
             theme_light() +
-            labs(x = "Points", y = "Player") +
+            labs(x = "Points", y = "Player",
+                 caption = str_glue("Last Updated: {last_updated}")) +
             guides(color = FALSE)
         
     } else {
@@ -52,7 +54,8 @@ ffanalytics_plot <- function(projections, pstn, n_players) {
             geom_text(aes(label = round(points)), size = 4) +
             geom_segment(aes(yend = player, x = floor, xend = ceiling)) +
             theme_light() +
-            labs(x = "Points", y = "Player") +
+            labs(x = "Points", y = "Player",
+                 caption = str_glue("Last Updated: {last_updated}")) +
             guides(color = FALSE) 
     }
     

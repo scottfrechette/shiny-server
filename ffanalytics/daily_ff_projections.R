@@ -308,6 +308,9 @@ sx_projections <- sx_projections %>%
             by = "id")
 
 # Save Data ---------------------------------------------------------------
+last_updated <- now()
+
 save(clt_projections, sx_projections, 
      clt_player_data, sx_player_data,
+     last_updated,
      file = here::here("ffanalytics", "projection-data.RData"))
