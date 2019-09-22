@@ -67,7 +67,7 @@ scrape_yahoo_players <- function(leagueID, week, position, page) {
 
 clt_player_data <- crossing(position = c("QB", "RB", "WR", "TE", 
                                          "K", "DEF", "DB", "DL"),
-                            page = seq(0, 200, by = 25)) %>% 
+                            page = seq(0, 100, by = 25)) %>% 
   mutate(data = map2(position, page, 
                      ~ scrape_yahoo_players(96662, current_week, .x, .y))) %>% 
   unnest(data) %>% 
