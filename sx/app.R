@@ -31,7 +31,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 2
+frech_stats <- 3
 
 # Load Data ---------------------------------------------------------------
 
@@ -71,21 +71,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "We're back baby - though now we've added some serious shit talkers to the mix."
+               "After three weeks we only have one undefeated team with the best shot of making the playoffs - Jersey"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "It seems like we already have a top tier forming of Bethany, Jangaard, and Wikle, with Ford and Jersey right behind them."
+               "That said FVOA still thinks Bethany's team is stronger, she just has a harder schedule and one less win"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "There's still a lot of time, but maybe that's just me selfishly hoping my 1.8% chance of making the playoffs goes up dramatically."
+               "So far it seems Brazil is lucky to be 2-1 and Wikle's team is stronger than his 1-2 record"
+             } else {
+               "TBD"
+             }
+           ),
+           tags$li(
+             if(weeks_played == frech_stats) {
+               "Sadly for me my team is considered bad even after a strong win alongside the two winless teams - Burg and Becs"
              } else {
                "TBD"
              }

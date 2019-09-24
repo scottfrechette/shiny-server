@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 2
+frech_stats <- 3
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -70,21 +70,21 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "We're back baby. Everyone's on the board with at least a small chance of making the playoffs, so let the fun begin."
+               "David's team remains undefeated yet is ranked 7th by FVOA with a 31% chance to make the playoffs"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Looks like we have 4 teams that are fighting to keep us ruffians out of the playoffs for now - German, Diaz, Barrett, and Bobby"
+               "Looks like after three weeks we have three bad teams (Eric, Justin, and Brian), one lucky team (German - though that's only because of the ass-whooping last week), and the rest are good"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "It's interesting that we already have 2 teams with less than a 1% chance to make the playoffs as of now. It's still early so I wouldn't trust that too much yet though."
+               "Goes to show you how volatile this stuff is so early - one big game and my team vaulted from 14% to 71% chance to make playoffs. And Diaz dropped from 95% to 25%."
              } else {
                "TBD"
              }

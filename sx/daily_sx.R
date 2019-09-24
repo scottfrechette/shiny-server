@@ -224,7 +224,7 @@ sx_team <- tibble(Week = 1:weeks_played) %>%
          Position = position, Lineup = roster, 
          Proj = proj, Points = act)
 
-sx# Extract scores
+# Extract scores
 sx_scores <- bind_rows(sx_league %>% 
                          select(Week = week, teamID = team1, Score = team1_points),
                        sx_league %>% 
