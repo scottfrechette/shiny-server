@@ -57,7 +57,8 @@ scrape_yahoo_players <- function(leagueID, week, position, page) {
            teamID = page %>% 
              html_nodes("table") %>% 
              .[[2]] %>% 
-             html_nodes(xpath = '//*[@class="Alt Ta-start Nowrap Bdrend"]') %>% 
+             # html_nodes(xpath = '//*[@class="Alt Ta-start Nowrap Bdrend"]') %>% 
+             html_nodes(xpath = '//*[@class="Ta-start Nowrap Bdrend"]') %>% 
              html_text() %>% 
              .[-1]) 
     
