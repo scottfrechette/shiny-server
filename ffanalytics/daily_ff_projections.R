@@ -73,7 +73,8 @@ clt_player_data <- crossing(position = c("QB", "RB", "WR", "TE",
                      ~ scrape_yahoo_players(96662, current_week, .x, .y))) %>% 
   unnest(data) %>% 
   select(-page) %>% 
-  mutate(player = str_remove_all(player, " II$| III$| V$| IV$| Jr\\.$| I$")) %>%
+  mutate(player = str_remove_all(player, " II$| III$| V$| IV$| Jr\\.$| I$"),
+         teamID = if_else(str_detect(teamID, "^[A-Z] [()]"), "FA", teamID)) %>%
   inner_join(player_table %>% 
                unite(player, first_name, last_name, sep = " ") %>% 
                mutate(player = if_else(player == "D.J. Moore", "
