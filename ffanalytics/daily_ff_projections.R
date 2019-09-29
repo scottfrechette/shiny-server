@@ -304,8 +304,9 @@ clt_projections <- clt_projections %>%
 
 sx_projections <- sx_projections %>% 
   left_join(sx_player_data %>% 
-              select(id, teamID),
-            by = "id")
+              select(id, teamID, injuryStatus),
+            by = "id") %>% 
+  filter(!injuryStatus %in% c("OUT", "INJURY RESERVE", "SUSPENSION"))
 
 # Save Data ---------------------------------------------------------------
 last_updated <- now()

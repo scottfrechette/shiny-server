@@ -162,7 +162,8 @@ server <- function(input, output) {
         }
         
         bind_rows(roster, available, taken,
-                  .id = "availability")
+                  .id = "availability") %>% 
+            filter(!is.na(pos_ecr)|position == "DST")
         
     })
     
