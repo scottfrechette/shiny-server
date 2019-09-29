@@ -43,6 +43,7 @@ ffanalytics_plot <- function(projections, pstn, n_players) {
         
     } else {
         
+
         projections %>%
             filter(pos == {{pstn}},
                    !str_detect(team, "FA"),
@@ -56,7 +57,7 @@ ffanalytics_plot <- function(projections, pstn, n_players) {
             theme_light() +
             labs(x = "Points", y = "Player",
                  caption = str_glue("Last Updated: {last_updated}")) +
-            guides(color = FALSE) 
+            guides(color = FALSE)
     }
     
 }
@@ -75,7 +76,7 @@ ui <- fluidPage(
                         "Select Position:",
                         choices = c("QB", "RB", "WR", "TE", 
                                     "FLEX", "RB/WR",
-                                    "DST", "K", "DE", "CB"),
+                                    "DST", "K", "DL", "DB"),
                         selected = "QB"
             ),
             numericInput("n_players",
@@ -114,13 +115,14 @@ server <- function(input, output) {
             }
             
             if("Available" %in% input$groups) {
-                available <- clt_projections %>% filter(teamID == "FA")
+                available <- clt_projections %>% filter(teamID == "FA"|is.na(teamID))
             } else {
                 available <- NULL
             }
             
             if("Taken" %in% input$groups) {
-                taken <- clt_projections %>% filter(!teamID %in% c("FA", "Big Ass TDs"))
+                taken <- clt_projections %>% filter(!teamID %in% c("FA", "Big Ass TDs"),
+                                                    !is.na(teamID))
             } else {
                 taken <- NULL
             }
@@ -128,8 +130,6 @@ server <- function(input, output) {
             if(is.null(input$groups)) {
                 roster <- clt_projections
             }
-            
-            bind_rows(roster, available, taken)
             
         } else {
             
@@ -143,13 +143,14 @@ server <- function(input, output) {
             }
             
             if("Available" %in% input$groups) {
-                available <- sx_projections %>% filter(teamID == 0)
+                available <- sx_projections %>% filter(teamID == 0|is.na(teamID))
             } else {
                 available <- NULL
             }
             
             if("Taken" %in% input$groups) {
-                taken <- sx_projections %>% filter(!teamID %in% c(0, 2))
+                taken <- sx_projections %>% filter(!teamID %in% c(0, 2),
+                                                   !is.na(teamID))
             } else {
                 taken <- NULL
             }
@@ -158,8 +159,10 @@ server <- function(input, output) {
                 roster <- sx_projections
             }
             
-            bind_rows(roster, available, taken)
         }
+        
+        bind_rows(roster, available, taken,
+                  .id = "availability")
         
     })
     

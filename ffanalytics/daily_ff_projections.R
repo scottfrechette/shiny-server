@@ -57,8 +57,8 @@ scrape_yahoo_players <- function(leagueID, week, position, page) {
            teamID = page %>% 
              html_nodes("table") %>% 
              .[[2]] %>% 
-             # html_nodes(xpath = '//*[@class="Alt Ta-start Nowrap Bdrend"]') %>% 
-             html_nodes(xpath = '//*[@class="Ta-start Nowrap Bdrend"]') %>% 
+             html_nodes(xpath = '//*[@class="Alt Ta-start Nowrap Bdrend"]') %>%
+             # html_nodes(xpath = '//*[@class="Ta-start Nowrap Bdrend"]') %>% 
              html_text() %>% 
              .[-1]) 
     
@@ -68,7 +68,7 @@ scrape_yahoo_players <- function(leagueID, week, position, page) {
 
 clt_player_data <- crossing(position = c("QB", "RB", "WR", "TE", 
                                          "K", "DEF", "DB", "DL"),
-                            page = seq(0, 100, by = 25)) %>% 
+                            page = seq(0, 75, by = 25)) %>% 
   mutate(data = map2(position, page, 
                      ~ scrape_yahoo_players(96662, current_week, .x, .y))) %>% 
   unnest(data) %>% 
@@ -165,18 +165,11 @@ sx_player_data <- bind_rows(
 
 # Scrape Projections -------------------------------------------------------------
 
-my_scrape <- tryCatch(
-  scrape_data(src = c("CBS", "ESPN", "FantasyData", "FantasyPros",
-                      "FantasySharks", "FFToday", "FleaFlicker", "NumberFire", "Yahoo",
-                      "FantasyFootballNerd", "NFL", "RTSports", "Walterfootball"),
-              pos = c("QB", "RB", "WR", "TE", "K", "DST", "DL", "DB"),
-              season = 2019, week = current_week),
-  finally = scrape_data(src = c("CBS", "ESPN", "FantasyData", "FantasyPros",
-                                "FantasySharks", "FFToday", "FleaFlicker", "NumberFire", #"Yahoo",
-                                "FantasyFootballNerd", "NFL", "RTSports", "Walterfootball"),
-                        pos = c("QB", "RB", "WR", "TE", "K", "DST", "DL", "DB"),
-                        season = 2019, week = current_week)
-)
+my_scrape <- scrape_data(src = c("CBS", "ESPN", "FantasyData", "FantasyPros",
+                                 "FantasySharks", "FFToday", "FleaFlicker", "NumberFire", #"Yahoo",
+                                 "FantasyFootballNerd", "NFL", "RTSports", "Walterfootball"),
+                         pos = c("QB", "RB", "WR", "TE", "K", "DST", "DL", "DB"),
+                         season = 2019, week = current_week)
 
 # CLT Projections ------------------------------------------------------------
 
@@ -302,7 +295,12 @@ sx_projections <-  projections_table(my_scrape, scoring_rules = sx_scoring) %>%
 clt_projections <- clt_projections %>%
   left_join(clt_player_data %>%
               select(id, teamID),
-            by = "id")
+            by = "id") %>% 
+  mutate(position = case_when(
+    position %in% c("CB", "S") ~ "DB",
+    position %in% c("DT", "DE") ~ "DL",
+    TRUE ~ position
+  ))
 
 sx_projections <- sx_projections %>% 
   left_join(sx_player_data %>% 
