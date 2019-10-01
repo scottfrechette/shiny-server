@@ -31,7 +31,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 3
+frech_stats <- 4
 
 # Load Data ---------------------------------------------------------------
 
@@ -71,28 +71,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "After three weeks we only have one undefeated team with the best shot of making the playoffs - Jersey"
+               "Ford's team is proving to be the team to beat"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "That said FVOA still thinks Bethany's team is stronger, she just has a harder schedule and one less win"
+               "And down goes Burgess. 0% chance to make playoffs by week 5 might be a new record? I mean FVOA says the most favorable line he'd get is +12 against Rebecca"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "So far it seems Brazil is lucky to be 2-1 and Wikle's team is stronger than his 1-2 record"
+               "We also seem to have a strong tier 2 of Bethany, Kral, Brazil, and Jersey, followed by myself and Jangaard with decent chances to move up with more dominant games."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Sadly for me my team is considered bad even after a strong win alongside the two winless teams - Burg and Becs"
+               "Also interesting to note that after 4 weeks we don't have any lucky/unlucky teams based on record and point differential - just good and bad teams. Fun to see how that changes in a few weeks."
              } else {
                "TBD"
              }
