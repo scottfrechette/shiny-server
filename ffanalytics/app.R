@@ -5,60 +5,55 @@ library(tidyverse)
 
 load(here::here("ffanalytics", "projection-data.RData"))
 
-ffanalytics_plot <- function(projections, pstn, n_players) {
+ffanalytics_plot <- function(projections, pstn, n_players, plot_order) {
     
-    if(pstn == "FLEX") {
+    if (pstn == "FLEX") {
         
-        projections %>%
+        p <- projections %>%
             filter(pos %in% c("RB", "WR", "TE"),
                    !str_detect(team, "FA"),
-                   avg_type == "average") %>%
-            top_n(n_players, points) %>%
-            arrange(-pos_rank) %>%
-            mutate(player = str_glue("{first_name} {last_name} ({team})")) %>%
-            ggplot(aes(points, reorder(player, points), color = factor(tier))) +
-            geom_text(aes(label = round(points)), size = 4) +
-            geom_segment(aes(yend = player, x = floor, xend = ceiling)) +
-            theme_light() +
-            labs(x = "Points", y = "Player",
-                 caption = str_glue("Last Updated: {last_updated}")) +
-            guides(color = FALSE)
+                   avg_type == "average")
         
     } else if (pstn == "RB/WR") {
         
-        projections %>%
+        p <- projections %>%
             filter(pos %in% c("RB", "WR"),
                    !str_detect(team, "FA"),
-                   avg_type == "average") %>%
-            top_n(n_players, points) %>%
-            arrange(-pos_rank) %>%
-            mutate(player = str_glue("{first_name} {last_name} ({team})")) %>%
-            ggplot(aes(points, reorder(player, points), color = factor(tier))) +
-            geom_text(aes(label = round(points)), size = 4) +
-            geom_segment(aes(yend = player, x = floor, xend = ceiling)) +
-            theme_light() +
-            labs(x = "Points", y = "Player",
-                 caption = str_glue("Last Updated: {last_updated}")) +
-            guides(color = FALSE)
+                   avg_type == "average")
         
     } else {
         
-
-        projections %>%
+        
+        p <-  projections %>%
             filter(pos == {{pstn}},
                    !str_detect(team, "FA"),
-                   avg_type == "average") %>%
-            top_n(n_players, points) %>%
-            arrange(-pos_rank) %>%
-            mutate(player = str_glue("{first_name} {last_name} ({team})")) %>%
-            ggplot(aes(points, reorder(player, points), color = factor(tier))) +
-            geom_text(aes(label = round(points)), size = 4) +
-            geom_segment(aes(yend = player, x = floor, xend = ceiling)) +
-            theme_light() +
-            labs(x = "Points", y = "Player",
-                 caption = str_glue("Last Updated: {last_updated}")) +
-            guides(color = FALSE)
+                   avg_type == "average")
     }
+    
+    if (plot_order == "ECR") {
+        
+        p <- p %>% 
+            top_n(n_players, -pos_ecr) %>%
+            mutate(player = str_glue("{first_name} {last_name} ({team})") %>% 
+                       fct_reorder(-pos_ecr))
+        
+    } else {
+        
+        p <- p %>% 
+            top_n(n_players, points) %>%
+            mutate(player = str_glue("{first_name} {last_name} ({team})") %>% 
+                       fct_reorder(points))
+        
+    } 
+    
+    p %>% 
+        ggplot(aes(points, player, color = factor(tier))) +
+        geom_text(aes(label = round(points)), size = 4) +
+        geom_segment(aes(yend = player, x = floor, xend = ceiling)) +
+        theme_light() +
+        labs(x = "Points", y = "Player",
+             caption = str_glue("Last Updated: {last_updated}")) +
+        guides(color = FALSE)
     
 }
 
@@ -84,6 +79,11 @@ ui <- fluidPage(
                          min = 1,
                          max = 70,
                          value = 30),
+            selectInput("order", 
+                        "Order Players By:",
+                        choices = c("Points", "ECR"),
+                        selected = "Points"
+            ),
             checkboxGroupInput("groups",
                                "Availability",
                                choices = c("Roster", "Available", "Taken"),
@@ -170,7 +170,8 @@ server <- function(input, output) {
     output$ranking_plot <- renderPlot({
         ffanalytics_plot(projections(), 
                          pstn = input$position, 
-                         n_players = input$n_players)
+                         n_players = input$n_players,
+                         plot_order = input$order)
     })
 }
 
