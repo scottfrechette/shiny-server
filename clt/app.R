@@ -340,7 +340,8 @@ server <- function(input, output, session) {
   output$simulation <- renderTable({
     clt_simulated_season %>% 
       filter(Week == max(Week)) %>% 
-      mutate(Playoffs = paste0(Percent, "%")) %>% 
+      mutate(Points = as.integer(Points),
+             Playoffs = paste0(round(Percent, 0), "%")) %>% 
       select(Team:Wins, Playoffs)
   }, align = 'c', digits = 1)
   
