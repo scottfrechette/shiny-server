@@ -7,7 +7,7 @@ library(lubridate)
 library(jsonlite)
 library(rvest)
 
-today_week <- today() %>%
+today_week <- Sys.Date() %>%
   floor_date(unit = "week", week_start = 2) %>%
   week()
 start_week <- 35
