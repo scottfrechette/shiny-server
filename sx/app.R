@@ -71,28 +71,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Ford's team is proving to be the team to beat"
+               "Well, well, well. Looks like Burgess snuck himself a victory and is now back on the board for the playoffs."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "And down goes Burgess. 0% chance to make playoffs by week 5 might be a new record? I mean FVOA says the most favorable line he'd get is +12 against Rebecca"
+               "FVOA also thinks Kral and Wikle should make the playoffs despite being 6th and 7th in the rankings."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "We also seem to have a strong tier 2 of Bethany, Kral, Brazil, and Jersey, followed by myself and Jangaard with decent chances to move up with more dominant games."
+               ""
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Also interesting to note that after 4 weeks we don't have any lucky/unlucky teams based on record and point differential - just good and bad teams. Fun to see how that changes in a few weeks."
+               ""
              } else {
                "TBD"
              }
