@@ -31,7 +31,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 4
+frech_stats <- 5
 
 # Load Data ---------------------------------------------------------------
 
@@ -78,21 +78,14 @@ ui  <- navbarPage(
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "FVOA also thinks Kral and Wikle should make the playoffs despite being 6th and 7th in the rankings."
+               "FVOA also thinks Kral and Wikle should make the playoffs despite being 6th and 7th in the rankings. Guess it's a good thing they're battling this week."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               ""
-             } else {
-               "TBD"
-             }
-           ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               ""
+               "This probably explains why Wikle is listed as unlucky (and Brazil has gotten lucky)"
              } else {
                "TBD"
              }
