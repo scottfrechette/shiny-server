@@ -52,7 +52,7 @@ ffanalytics_plot <- function(projections, pstn, n_players, plot_order) {
         geom_segment(aes(yend = player, x = floor, xend = ceiling)) +
         theme_light() +
         labs(x = "Points", y = "Player",
-             caption = str_glue("Last Updated: {last_updated}")) +
+             caption = str_glue("Last Updated: {lubridate::with_tz(last_updated, tzone = 'America/Chicago')}")) +
         guides(color = FALSE)
     
 }
