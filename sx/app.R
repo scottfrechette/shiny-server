@@ -31,7 +31,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 6
+frech_stats <- 7
 
 # Load Data ---------------------------------------------------------------
 
@@ -71,28 +71,21 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Turns out Kral's team is still considered bad based on point differential. But FVOA still has him as the 4th best team because it turns out his opponents just play their best games against him for some reason."
+               "I can't believe I was up 20 points going into MNF and Ford's DST pulled out a win for him. Unreal."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Funny Brazil brings that up though given how lucky his team is based on that same chart. But he's also making moves to get back up to 2nd best chance to make playoffs."
+               "Looks like the rankings match up pretty closely with FVOA, even if Kral is getting shafted a bit."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Speaking of making moves, Jangaard over here throwing the mother of his child under the bus for a chance at glory."
-             } else {
-               "TBD"
-             }
-           ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "What's really crazy is every team is at worst 2 games back from the lead, so realistically it's still anyone's league at this point if there's an injury or two."
+               "Speaking of Kral, what a great wedding present to Jersey to just bench his entire team and hand over a win."
              } else {
                "TBD"
              }

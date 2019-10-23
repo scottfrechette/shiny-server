@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 6
+frech_stats <- 7
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -70,27 +70,27 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Congrats to PFinn on being off the chart good at this point"
+               "Bobby with some incredible ability to be 8th yet the 2nd strongest team in the league."
              } else {
                "TBD"
              }
            ),tags$li(
              if(weeks_played == frech_stats) {
-               "And damn does FVOA like Bobby's team so much more than his record (2nd vs 8th). Diaz on the opposite side with 9th in FVOA despite being in 4th."
+               "Looks like I have officially moved into the unlucky category, though that's really because of that monster game in week 2 before my team decided to quit on me."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Justin had a good week that gave him another glimmer of hope for playoffs that has faded away again."
+               "Evergreen statement of PFinn's team being off the charts good. He's almost a TD favorite on the 2nd strongest team. He also appears to be a lock for the playoffs according to FVOA."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Brian's two strong weeks have vaulted him into a second tier with Barrett behind PFinn."
+               "Justin on the other hand riding that 0% playoff chances and at best is +9."
              } else {
                "TBD"
              }
