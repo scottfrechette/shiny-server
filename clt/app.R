@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 7
+frech_stats <- 8
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -70,27 +70,20 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Bobby with some incredible ability to be 8th yet the 2nd strongest team in the league."
+               "Looks like German and Diaz are overperforming their FVOA projections, whereas Bobby and Brian continue to get screwed."
              } else {
                "TBD"
              }
            ),tags$li(
              if(weeks_played == frech_stats) {
-               "Looks like I have officially moved into the unlucky category, though that's really because of that monster game in week 2 before my team decided to quit on me."
+               "It says Bobby and I are both unlucky, but I just don't think I really belong there with his team"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Evergreen statement of PFinn's team being off the charts good. He's almost a TD favorite on the 2nd strongest team. He also appears to be a lock for the playoffs according to FVOA."
-             } else {
-               "TBD"
-             }
-           ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "Justin on the other hand riding that 0% playoff chances and at best is +9."
+               "Barrett must have an easier schedule because despite only 5 wins he's got a really strong chance of making the playoffs"
              } else {
                "TBD"
              }

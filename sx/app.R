@@ -31,7 +31,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 7
+frech_stats <- 8
 
 # Load Data ---------------------------------------------------------------
 
@@ -71,21 +71,21 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "I can't believe I was up 20 points going into MNF and Ford's DST pulled out a win for him. Unreal."
+               "Well there you go Burg - after all your bitching you're no longer in last place in FVOA"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Looks like the rankings match up pretty closely with FVOA, even if Kral is getting shafted a bit."
+               "I find it interesting that every single team is ranked exactly the same by ESPN and FVOA standings except the Jangaards are flipped"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Speaking of Kral, what a great wedding present to Jersey to just bench his entire team and hand over a win."
+               "All this said the reality is even the last place team is only 2 games behind the first place so it's still really a wide open season"
              } else {
                "TBD"
              }
