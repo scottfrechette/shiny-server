@@ -11,6 +11,137 @@ suppressPackageStartupMessages(library(fvoa))
 
 # Temp Functions -----------------------------------------------------------
 
+scrape_weekly_team1 <- function (week, team_id, league, league_id, season = 2018) {
+  league <- tolower(league)
+  stopifnot(week %in% 1:17, team_id %in% 1:20, league %in% 
+              c("espn", "yahoo"), is.numeric(league_id), is.numeric(season))
+  if (league == "yahoo") {
+    url <- paste0("https://football.fantasysports.yahoo.com/f1/", 
+                  league_id, "/matchup?week=", week, "&mid1=", 13, "&mid2=", team_id)
+    page <- xml2::read_html(url)
+    # name <- page %>% rvest::html_nodes(".Ta-end .F-link") %>%
+    #   .[[1]] %>% rvest::html_text()
+    name <- page %>%
+      rvest::html_nodes(".F-link") %>%
+      .[[3]] %>%
+      rvest::html_text()
+    
+    if(team_id != 1) {
+      
+      starters <- page %>% 
+        html_table(fill = TRUE) %>%
+        .[[3]] %>%
+        as_tibble(.name_repair = "minimal") %>% 
+        janitor::clean_names() %>% 
+        select(11, 10, 9, 8, 7) %>% 
+        rename(Stats = 1, Player = 2, Proj = 3, `Fan Pts` = 4, Pos = 5) %>% 
+        mutate(`Fan Pts` = as.numeric(`Fan Pts`)) %>% 
+        replace_na(list(`Fan Pts` = 0)) %>%
+        filter(Pos != "Total")
+      bench <- page %>% 
+        rvest::html_nodes("#statTable2") %>% 
+        rvest::html_table(fill = T) %>% 
+        purrr::flatten_dfc() %>% 
+        select(11, 10, 9, 8, 7) %>% 
+        rename(Stats = 1, Player = 2, Proj = 3, `Fan Pts` = 4, Pos = 5) %>% 
+        mutate(Proj = as.numeric(Proj),
+               `Fan Pts` = as.numeric(`Fan Pts`)) %>% 
+        replace_na(list(`Fan Pts` = 0)) %>% 
+        filter(Pos != "Total")
+      
+    } else {
+      
+      starters <- page %>% 
+        html_table(fill = TRUE) %>%
+        .[[3]] %>%
+        as_tibble(.name_repair = "minimal") %>% 
+        janitor::clean_names() %>% 
+        select(1:5) %>% 
+        rename(Stats = 1, Player = 2, Proj = 3, `Fan Pts` = 4, Pos = 5) %>% 
+        mutate(`Fan Pts` = as.numeric(`Fan Pts`)) %>% 
+        replace_na(list(`Fan Pts` = 0)) %>%
+        filter(Pos != "Total")
+      bench <- page %>% 
+        rvest::html_nodes("#statTable2") %>% 
+        rvest::html_table(fill = T) %>% 
+        purrr::flatten_dfc() %>% 
+        select(1:5) %>% 
+        rename(Stats = 1, Player = 2, Proj = 3, `Fan Pts` = 4, Pos = 5) %>% 
+        mutate(Proj = as.numeric(Proj),
+               `Fan Pts` = as.numeric(`Fan Pts`)) %>% 
+        replace_na(list(`Fan Pts` = 0)) %>% 
+        filter(Pos != "Total")
+      
+    }
+    
+    
+    bind_rows(starters, bench) %>% 
+      mutate(Team = name) %>% 
+      rename(Points = `Fan Pts`, Lineup = Pos) %>% 
+      separate(Player, 
+               c("notes", "Player"), "Notes\\s+|Note\\s+") %>% 
+      separate(Player, 
+               c("Player", "result"), "Final|Bye") %>% separate(Player, 
+                                                                c("Player", "Position"), " - ") %>%
+      mutate(Player = str_replace(Player, 
+                                  "\\s[:alpha:]+$", ""), 
+             Position = str_extract(Position, "[:alpha:]+"), 
+             Score = sum(starters$`Fan Pts`, na.rm = T)) %>% 
+      drop_na(Player) %>% 
+      select(Team:Score, Player:Position, 
+             Lineup, Proj, Points) %>% 
+      ungroup
+  }
+  else if (league == "espn") {
+    url <- paste0("http://games.espn.com/ffl/boxscorequick?leagueId=", 
+                  league_id, "&teamId=", team_id, "&scoringPeriodId=", 
+                  week, "&seasonId=", season, "&view=scoringperiod&version=quick")
+    page <- xml2::read_html(url)
+    name <- page %>% rvest::html_nodes("#teamInfos div:nth-child(1) div .bodyCopy div b") %>% 
+      rvest::html_text()
+    starters <- page %>% rvest::html_nodes("#playertable_0") %>% 
+      rvest::html_table(fill = T) %>% purrr::flatten_dfc() %>% 
+      select(1, 2, 5) %>% slice(-c(1:3)) %>% set_names("Lineup", 
+                                                       "Player", "Points") %>% mutate(Points = as.numeric(Points), 
+                                                                                      Player = str_replace_all(Player, "\\s+Q$|\\s+IR$", 
+                                                                                                               ""), Position = str_extract(Player, "[:graph:]+$")) %>% 
+      separate(Player, c("Player", "Team_Pos"), ",") %>% 
+      mutate(Player = str_replace_all(Player, " D/ST", 
+                                      "")) %>% select(Player, Position, Lineup, Points)
+    bench <- page %>% rvest::html_nodes("#playertable_1") %>% 
+      rvest::html_table() %>% purrr::flatten_dfc() %>% 
+      select(1, 2, 5) %>% slice(-1) %>% set_names("Lineup", 
+                                                  "Player", "Points") %>% mutate(Points = as.numeric(Points), 
+                                                                                 Player = str_replace_all(Player, "\\s+Q$|\\s+IR$", 
+                                                                                                          ""), Position = str_extract(Player, "[:graph:]+$")) %>% 
+      separate(Player, c("Player", "Team_Pos"), ",") %>% 
+      mutate(Player = str_replace_all(Player, " D/ST", 
+                                      "")) %>% select(Player, Position, Lineup, Points)
+    bind_rows(starters, bench) %>% replace_na(list(Points = 0)) %>% 
+      mutate(Team = name, Score = sum(starters$Points, 
+                                      na.rm = T)) %>% select(Team, Score, everything())
+  }
+}
+scrape_team1 <- function (weeks, league, league_id, season = 2018) {
+  league <- tolower(league)
+  stopifnot(weeks %in% 1:17, league %in% c("espn", "yahoo"), 
+            is.numeric(league_id), is.numeric(season))
+  if (league == "yahoo") {
+    yahoo_teamIDs(league_id) %>% crossing(Week = 1:weeks) %>% 
+      mutate(league = league, league_id = league_id, 
+             team = pmap(list(Week, team_id, league, league_id), 
+                         scrape_weekly_team1)) %>% 
+      select(-league, -league_id, -Team)
+  }
+  else {
+    espn_teamIDs(league_id) %>% crossing(Week = 1:weeks) %>% 
+      mutate(league = league, league_id = league_id, 
+             team = pmap(list(Week, team_id, league, league_id), 
+                         scrape_weekly_team1)) %>% 
+      select(-league, -league_id, -Team)
+  }
+}
+
 all_matchups1 <- function (scores, type = "prob", reg_games = 6, reps = 1e+06, 
                            matrix = FALSE) 
 {
@@ -153,7 +284,7 @@ weeks_played <- current_week - 1
 
 # Scrape data
 clt_schedule <- scrape_schedule("yahoo", 96662)
-clt_team <- scrape_team(weeks_played, "yahoo", 96662) %>% 
+clt_team <- scrape_team1(weeks_played, "yahoo", 96662) %>% 
   unnest()
 clt_yahoo_win_prob <- scrape_win_prob(current_week, "yahoo", 96662)
 
