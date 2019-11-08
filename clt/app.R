@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 8
+frech_stats <- 9
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -70,20 +70,20 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Looks like German and Diaz are overperforming their FVOA projections, whereas Bobby and Brian continue to get screwed."
+               "PFinn is such a lock that his playoff chances don't even change if he loses this week in the second biggest game this weekend"
              } else {
                "TBD"
              }
            ),tags$li(
              if(weeks_played == frech_stats) {
-               "It says Bobby and I are both unlucky, but I just don't think I really belong there with his team"
+               "Glad this confirms what we all know - German is lucky (except on the waiver wire)"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Barrett must have an easier schedule because despite only 5 wins he's got a really strong chance of making the playoffs"
+               "Looks like Diaz And Brian are making some moves now, mostly at the expense of Bobby and Commish"
              } else {
                "TBD"
              }
@@ -333,7 +333,7 @@ server <- function(input, output, session) {
   }, align = "c")
 
   output$weekly <- renderTable({
-    clt_current_matchups
+    clt_current_matchups %>% select(-Yahoo)
   }, align = 'c', digits = 0)
   
   output$simulation <- renderTable({
