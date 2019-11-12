@@ -31,7 +31,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 9
+frech_stats <- 10
 
 # Load Data ---------------------------------------------------------------
 
@@ -71,21 +71,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Looks like every team is either good or bad no - no teams with any form of luck"
+               "Two teams appear to be back out of playoff contention (though Burgess might slip back to <1% chance if he wins this week)"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "That said - I was shocked to see Ford has fallen to 3rd. That was a huge loss for him."
+               "Looks like Kral's team is the one to watch these days. Jumped from 13% to 61% chance in 2 weeks."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "I also love that Rebecca just leveled up over Jangaard in the last week. Feels appropriate."
+               "That's mostly stolen from Ford, who was the team to beat and now has dropped to below even chance to make playoffs"
+             } else {
+               "TBD"
+             }
+           ),
+           tags$li(
+             if(weeks_played == frech_stats) {
+               "Jang and Bethany are in 3rd and 4th place but FVOA doesn't have faith in their teams"
              } else {
                "TBD"
              }
