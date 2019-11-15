@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 9
+frech_stats <- 10
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -70,20 +70,27 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "PFinn is such a lock that his playoff chances don't even change if he loses this week in the second biggest game this weekend"
+               "The matchup between Bobby and David has massive playoff implications - almost 60% total swing in playoff chances"
              } else {
                "TBD"
              }
            ),tags$li(
              if(weeks_played == frech_stats) {
-               "Glad this confirms what we all know - German is lucky (except on the waiver wire)"
+               "Diaz's team continues the meteoric rise all the way to 2nd now"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Looks like Diaz And Brian are making some moves now, mostly at the expense of Bobby and Commish"
+               "Looks like we have a really good race for 3rd and 4th place between Bobby, David, Barrett, and German, with myself and Brian tagging along behind trying to sneak in."
+             } else {
+               "TBD"
+             }
+           ),
+           tags$li(
+             if(weeks_played == frech_stats) {
+               "You may be wondering why Bobby is listed in that race despite being 7th now - it's because he just passed PFinn for the top team in FVOA"
              } else {
                "TBD"
              }

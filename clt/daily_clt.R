@@ -284,9 +284,9 @@ weeks_played <- current_week - 1
 
 # Scrape data
 clt_schedule <- scrape_schedule("yahoo", 96662)
-clt_team <- scrape_team1(weeks_played, "yahoo", 96662) %>% 
+clt_team <- scrape_team1(weeks_played, "yahoo", 96662, 2019) %>% 
   unnest()
-clt_yahoo_win_prob <- scrape_win_prob(current_week, "yahoo", 96662)
+clt_yahoo_win_prob <- scrape_win_prob(current_week, "yahoo", 96662, 2019)
 
 # Replace team names
 source(here::here("clt", "lookup_id.R"))
@@ -299,6 +299,17 @@ clt_schedule <- clt_schedule %>%
   left_join(team_ids, by = "Team") %>% 
   select(-Team) %>% 
   rename(Team = team)
+clt_schedule <- clt_schedule %>% 
+  mutate(Team = recode(Team,
+                        "Unmatched Wisdom" = "Barrett",
+                        "Bad Hombres" = "German",
+                        "Big Ass TDs" = "Scott",
+                        "Turd Sandwiches" = "Brian",
+                        "Deez Azor Ajayi" = "Diaz",
+                        "Trubiskuits & Gravy" = "Eric",
+                        "Don't Stop B Le'vin" = "Bobby",
+                        "Rons Transitn Lenses" = "David",
+                        "We Want More" = "Justin"))
 clt_team <- clt_team %>% 
   left_join(lookup_id, by = "team_id") %>% 
   select(team_id, Week, Team = team, Score:Points) 
