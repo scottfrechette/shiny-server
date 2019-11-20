@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 10
+frech_stats <- 11
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -70,27 +70,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "The matchup between Bobby and David has massive playoff implications - almost 60% total swing in playoff chances"
-             } else {
-               "TBD"
-             }
-           ),tags$li(
-             if(weeks_played == frech_stats) {
-               "Diaz's team continues the meteoric rise all the way to 2nd now"
+               "We've definitely got a close race for 2-4, with Bobby's team looking to challenge even PFinn's team. Winner of matchup between Diaz and Barrett will gain a strong edge over the other heading into the final weeks"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Looks like we have a really good race for 3rd and 4th place between Bobby, David, Barrett, and German, with myself and Brian tagging along behind trying to sneak in."
+               "FVOA also doesn't love what it's seeing out of Barrett lately and is afraid they're too distracted by the impeachment hearings"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "You may be wondering why Bobby is listed in that race despite being 7th now - it's because he just passed PFinn for the top team in FVOA"
+               "The matchup between German and I is about as close to a pickem as I've seen with FVOA."
+             } else {
+               "TBD"
+             }
+           ),
+           tags$li(
+             if(weeks_played == frech_stats) {
+               "The less said about Justin and Eric's team the better"
              } else {
                "TBD"
              }
