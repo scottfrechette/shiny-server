@@ -31,7 +31,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 11
+frech_stats <- 12
 
 # Load Data ---------------------------------------------------------------
 
@@ -71,21 +71,21 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Good chance we know our 4 playoff teams with a couple teams looking to sneak in somehow. Top 4 in rankings are top 4 in FVOA as well (and hello Rebecca at #5)"
+               "We have 5 teams with 7 wins yet FVOA only has confidence in 3 of them almost certainly making the playoffs, with Jersey and Wikle fighting for that last slot"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Pretty interesting we have 3 really bad teams, a couple really good teams, a lucky team, and the rest pretty good. Nobody is just kinda bad."
+               "The ladies still have a chance to sneak in, and FVOA actually thinks Rebecca is now the 4th best team"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Big matchup between Kral and Jangaard for chance to make the playoffs, with over 56% swing in chances based on who wins"
+               "Burgess and I are so bad we didn't show up for this weeks projections and it's not even worth me finding out what happened to us"
              } else {
                "TBD"
              }
