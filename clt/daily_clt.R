@@ -13,8 +13,12 @@ suppressPackageStartupMessages(library(fvoa))
 
 scrape_weekly_team1 <- function (week, team_id, league, league_id, season = 2018) {
   league <- tolower(league)
-  stopifnot(week %in% 1:17, team_id %in% 1:20, league %in% 
-              c("espn", "yahoo"), is.numeric(league_id), is.numeric(season))
+  stopifnot(week %in% 1:17, 
+            team_id %in% 1:20, 
+            league %in% 
+              c("espn", "yahoo"), 
+            is.numeric(league_id), 
+            is.numeric(season))
   if (league == "yahoo") {
     url <- paste0("https://football.fantasysports.yahoo.com/f1/", 
                   league_id, "/matchup?week=", week, "&mid1=", 13, "&mid2=", team_id)
@@ -124,10 +128,13 @@ scrape_weekly_team1 <- function (week, team_id, league, league_id, season = 2018
 }
 scrape_team1 <- function (weeks, league, league_id, season = 2018) {
   league <- tolower(league)
-  stopifnot(weeks %in% 1:17, league %in% c("espn", "yahoo"), 
-            is.numeric(league_id), is.numeric(season))
+  stopifnot(weeks %in% 1:17, 
+            league %in% c("espn", "yahoo"), 
+            is.numeric(league_id), 
+            is.numeric(season))
   if (league == "yahoo") {
-    yahoo_teamIDs(league_id) %>% crossing(Week = 1:weeks) %>% 
+    yahoo_teamIDs(league_id) %>% 
+      crossing(Week = 1:weeks) %>% 
       mutate(league = league, league_id = league_id, 
              team = pmap(list(Week, team_id, league, league_id), 
                          scrape_weekly_team1)) %>% 

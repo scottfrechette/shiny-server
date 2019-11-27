@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 11
+frech_stats <- 12
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -70,28 +70,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "We've definitely got a close race for 2-4, with Bobby's team looking to challenge even PFinn's team. Winner of matchup between Diaz and Barrett will gain a strong edge over the other heading into the final weeks"
+               "Looks like we have a good idea who the first 3 teams in the playoffs will be with a fun 3-way battle for 4th"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "FVOA also doesn't love what it's seeing out of Barrett lately and is afraid they're too distracted by the impeachment hearings"
+               "The matchups between Diaz v German and Brian v David in particular have a ton of playoff leverage"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "The matchup between German and I is about as close to a pickem as I've seen with FVOA."
+               "It's also unfortunate the waiver wire doesn't use FVOA because German is 6th there (and his record is reflected in how lucky he's been to be in 3rd)"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "The less said about Justin and Eric's team the better"
+               "And most importantly - there's still a chance for me so look out"
              } else {
                "TBD"
              }
@@ -341,7 +341,7 @@ server <- function(input, output, session) {
   }, align = "c")
 
   output$weekly <- renderTable({
-    clt_current_matchups %>% select(-Yahoo)
+    clt_current_matchups #%>% select(-Yahoo)
   }, align = 'c', digits = 0)
   
   output$simulation <- renderTable({
