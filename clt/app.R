@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 12
+frech_stats <- 13
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -70,28 +70,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Looks like we have a good idea who the first 3 teams in the playoffs will be with a fun 3-way battle for 4th"
+               "With two weeks to go it looks like we have a good handle on our playoff teams with some lurkers just waiting for one to stumble. All comes down to the waiver wire."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "The matchups between Diaz v German and Brian v David in particular have a ton of playoff leverage"
+               "Even better when you realize the two lurking teams are in the Lucky category for having a record as good as they do with their scoring margins"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "It's also unfortunate the waiver wire doesn't use FVOA because German is 6th there (and his record is reflected in how lucky he's been to be in 3rd)"
+               "Now we wait to see if David joins us losers in the bottom or continues to bottom feed on those playoff chances"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "And most importantly - there's still a chance for me so look out"
+               "Also looks like Diaz will seal his bid with a win over me this week, so all I'm saying is my Venmo isn't hard to find."
              } else {
                "TBD"
              }
