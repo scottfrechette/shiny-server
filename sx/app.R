@@ -31,7 +31,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 12
+frech_stats <- 13
 
 # Load Data ---------------------------------------------------------------
 
@@ -71,21 +71,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "We have 5 teams with 7 wins yet FVOA only has confidence in 3 of them almost certainly making the playoffs, with Jersey and Wikle fighting for that last slot"
+               "I'm not sure I've ever seen this much chaos heading into the final week. 6 teams are fighting for the last 3 spots because Brazil is all but guaranteed unless his team shits the bed with 50 points."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "The ladies still have a chance to sneak in, and FVOA actually thinks Rebecca is now the 4th best team"
+               "Ford v. Jersey and Rebecca v. Bethany are basically play-in games, with myself and Burgess possibly playing spoiler to Wikle and Kral."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Burgess and I are so bad we didn't show up for this weeks projections and it's not even worth me finding out what happened to us"
+               "Even though Wikle's team is the 6th best according to FVOA he has the highest chances of the 6 teams given his extra win and playing my terrible team. Or because he made a small donation to my Venmo and I'll be benching a few key starters, who knows."
+             } else {
+               "TBD"
+             }
+           ),
+           tags$li(
+             if(weeks_played == frech_stats) {
+               "But one thing we do know is Jangaard has joined Burgess and I as pure onlookers. My favorite part is Jang and Rebecca completed inverted starting week 8. What happened around then to make her stronger than him I wonder? "
              } else {
                "TBD"
              }
