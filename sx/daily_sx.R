@@ -314,7 +314,8 @@ save(sx_schedule, sx_team, sx_scores,
      sx_simulated_season, sx_model_eval, sx_fvoa_season,
      sx_matchups_prob, sx_matchups_spread,
      sx_rankings, sx_current_matchups,
-     sx_playoff_leverage_chart, sx_lineup_eval, 
+     # sx_playoff_leverage_chart, 
+     sx_lineup_eval, 
      file = here::here("sx", "sx-data.RData"))
 
 options(warn = oldw)

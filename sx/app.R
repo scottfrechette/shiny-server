@@ -31,7 +31,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 13
+frech_stats <- 14
 
 # Load Data ---------------------------------------------------------------
 
@@ -71,28 +71,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "I'm not sure I've ever seen this much chaos heading into the final week. 6 teams are fighting for the last 3 spots because Brazil is all but guaranteed unless his team shits the bed with 50 points."
+               "Well we made it through the season. Good job everyone."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Ford v. Jersey and Rebecca v. Bethany are basically play-in games, with myself and Burgess possibly playing spoiler to Wikle and Kral."
+               "I can't believe the 6th best team in our league has the #1 seed. Not to mention one of the strongest teams all season missed out entirely. That's some wild shit."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Even though Wikle's team is the 6th best according to FVOA he has the highest chances of the 6 teams given his extra win and playing my terrible team. Or because he made a small donation to my Venmo and I'll be benching a few key starters, who knows."
+               "I am glad to see one of the women make the playoffs, and actually considered a strong contender no less. Mamas representing this year (even if they essentially had a play-in game there at the end)."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "But one thing we do know is Jangaard has joined Burgess and I as pure onlookers. My favorite part is Jang and Rebecca completed inverted starting week 8. What happened around then to make her stronger than him I wonder? "
+               "But really I'm mostly pissed a Frechette didn't make it. We had a 64% chance that one of us would make it. But nope, we just couldn't do it."
              } else {
                "TBD"
              }
@@ -100,13 +100,14 @@ ui  <- navbarPage(
 
            
            hr(),
-           h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
+           h5("Playoff Projections", align = "center"),
+           # h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
            br(),
-           fluidRow(tableOutput("weekly"), align="center"),
+           fluidRow(tableOutput("playoffs"), align="center"),
            br(),
-           h5("Season Projections", align = "center"),
-           br(),
-           fluidRow(tableOutput("simulation"), align = "center"),
+           # h5("Season Projections", align = "center"),
+           # br(),
+           # fluidRow(tableOutput("simulation"), align = "center"),
            hr(),
            p("FVOA Assumptions:"),
            tags$ol(
@@ -248,18 +249,18 @@ ui  <- navbarPage(
                       )
              ),
              
-             tabPanel("Playoff Leverage",
-                      h5("How much will winning/losing your next game affect your playoff chances?"),
-                      plotOutput("playoff_leverage"),
-                      h5("Chart Notes:"),
-                      tags$ol(
-                        tags$li("Full bar is your chance of making playoffs with win"),
-                        tags$li("Darker portion is your chance of making playoffs with loss"),
-                        tags$li("The difference between these two, the light portion and number listed to the right,
-                                is the playoff leverage of this game"),
-                        tags$li("Note: these are all treated independently of the other teams winning/losing so it's not exact")
-                        )
-             ),
+             # tabPanel("Playoff Leverage",
+             #          h5("How much will winning/losing your next game affect your playoff chances?"),
+             #          plotOutput("playoff_leverage"),
+             #          h5("Chart Notes:"),
+             #          tags$ol(
+             #            tags$li("Full bar is your chance of making playoffs with win"),
+             #            tags$li("Darker portion is your chance of making playoffs with loss"),
+             #            tags$li("The difference between these two, the light portion and number listed to the right,
+             #                    is the playoff leverage of this game"),
+             #            tags$li("Note: these are all treated independently of the other teams winning/losing so it's not exact")
+             #            )
+             # ),
              
              tabPanel("Manager Evaluation",
                       h5("How well did you manage your team?"),
@@ -334,10 +335,10 @@ server <- function(input, output, session) {
   ### Weekly Projections ###
   
   output$playoffs <- renderTable({
-    data_frame(Winner = c("Brazil", "Scott", "Jersey", "Burg"),
-               Percent = c("57%", "20.3%", "11.6%", "8.5%"),
-               Odds = c("2:1", "5:1", "17:2", "12:1"),
-               BettingLine = c("-125", "+400", "+775", "+1075"))
+    data_frame(Winner = c("Brazil", "Rebecca", "Jersey", "Wikle"),
+               Percent = c("37%", "29%", "21%", "9%"),
+               Odds = c("5:2", "7:2", "9:2", "11:1"),
+               BettingLine = c("+175", "+250", "+375", "+1000"))
   }, align = "c")
   
   output$weekly <- renderTable({

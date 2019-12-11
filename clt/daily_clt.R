@@ -297,15 +297,15 @@ clt_yahoo_win_prob <- scrape_win_prob(current_week, "yahoo", 96662, 2019)
 
 # Replace team names
 source(here::here("clt", "lookup_id.R"))
-team_ids <- yahoo_teamIDs(96662) %>% 
-  left_join(lookup_id, by = "team_id") %>% 
-  mutate(team = factor(team)) %>% 
-  select(-team_id)
-
-clt_schedule <- clt_schedule %>% 
-  left_join(team_ids, by = "Team") %>% 
-  select(-Team) %>% 
-  rename(Team = team)
+# team_ids <- yahoo_teamIDs(96662) %>% 
+#   left_join(lookup_id, by = "team_id") %>% 
+#   mutate(team = factor(team)) %>% 
+#   select(-team_id)
+# 
+# clt_schedule <- clt_schedule %>% 
+#   left_join(team_ids, by = "Team") %>% 
+#   select(-Team) %>% 
+#   rename(Team = team)
 clt_schedule <- clt_schedule %>% 
   mutate(Team = recode(Team,
                         "Unmatched Wisdom" = "Barrett",

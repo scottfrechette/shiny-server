@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 13
+frech_stats <- 14
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -70,28 +70,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "With two weeks to go it looks like we have a good handle on our playoff teams with some lurkers just waiting for one to stumble. All comes down to the waiver wire."
+               "It's all come down to this. Final week and 3 spots all but wrapped up."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Even better when you realize the two lurking teams are in the Lucky category for having a record as good as they do with their scoring margins"
+               "I love that the season basically comes down to Mr. Ramirez. If he wins it basically sets off a play-in game between German and David with Barrett looking on."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Now we wait to see if David joins us losers in the bottom or continues to bottom feed on those playoff chances"
+               "If Brian does win it means teams ranked 1-4 in FVOA will make it in, so at least there's that. And David, German, and Barrett are 5, 6, and 8 so even that makes sense."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Also looks like Diaz will seal his bid with a win over me this week, so all I'm saying is my Venmo isn't hard to find."
+               "Also worth pointing our Eric has reason to fight - the Sacko is on the line with a win and a Justin loss."
              } else {
                "TBD"
              }
