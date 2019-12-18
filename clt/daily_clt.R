@@ -42,6 +42,9 @@ scrape_weekly_team1 <- function (week, team_id, league, league_id, season = 2018
         mutate(`Fan Pts` = as.numeric(`Fan Pts`)) %>% 
         replace_na(list(`Fan Pts` = 0)) %>%
         filter(Pos != "Total")
+      
+      Sys.sleep(10)
+      
       bench <- page %>% 
         rvest::html_nodes("#statTable2") %>% 
         rvest::html_table(fill = T) %>% 

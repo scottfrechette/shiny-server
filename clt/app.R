@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 14
+frech_stats <- 15
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -70,43 +70,51 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "It's all come down to this. Final week and 3 spots all but wrapped up."
+               "Looks like we have some relatively close matchups in round 1 (PFinn 52% chance to win, Bobby 59%) so it could all come down to waiver wires"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "I love that the season basically comes down to Mr. Ramirez. If he wins it basically sets off a play-in game between German and David with Barrett looking on."
+               "As FVOA predicted most the season Bobby's team is the favorite to win it all here. I also feel good FVOA predicted the top 4 teams that should make the playoffs. Not to mention they're the only 4 good teams with the rest of us considered bad and were the top 4 teams in terms of beating Yahoo projections."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "If Brian does win it means teams ranked 1-4 in FVOA will make it in, so at least there's that. And David, German, and Barrett are 5, 6, and 8 so even that makes sense."
+               "Even more fun is the spoiler himself moved up to 6th in FVOA despite remaining last in the league"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Also worth pointing our Eric has reason to fight - the Sacko is on the line with a win and a Justin loss."
+               "I can't believe I went from best team in regular season last year to missing the consolation bracket. What an embarrassment. Maybe next year I won't be handicapped by a 3-day old on draft day"
+             } else {
+               "TBD"
+             }
+           ),
+           tags$li(
+             if(weeks_played == frech_stats) {
+               "Aside from identifying the four strongest teams FVOA also predicted the winner in 58% of matchups. And that includes all possible matchups not just scheduled. I'd take those odds."
              } else {
                "TBD"
              }
            ),
 
+
            hr(),
-           # h5("Playoff Projections", align = "center"),
-           # fluidRow(tableOutput("playoffs"), align = "center"),
-           h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
-           br(),
-           fluidRow(tableOutput("weekly"), align="center"),
-           br(),
-           h5("Season Projections", align = "center"),
-           br(),
-           fluidRow(tableOutput("simulation"), align = "center"),
+           h5("Playoff Projections", align = "center"),
+           fluidRow(tableOutput("playoffs"), align = "center"),
+           # h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
+           # br(),
+           # fluidRow(tableOutput("weekly"), align="center"),
+           # br(),
+           # h5("Season Projections", align = "center"),
+           # br(),
+           # fluidRow(tableOutput("simulation"), align = "center"),
            hr(),
            p("FVOA Assumptions:"),
            tags$ol(
@@ -248,18 +256,18 @@ ui  <- navbarPage(
                       )
                       ),
              
-             tabPanel("Playoff Leverage",
-                      h5("How much will winning/losing your next game affect your playoff chances?"),
-                      plotOutput("playoff_leverage"),
-                      h5("Chart Notes:"),
-                      tags$ol(
-                        tags$li("Full bar is your chance of making playoffs with win"),
-                        tags$li("Darker portion is your chance of making playoffs with loss"),
-                        tags$li("The difference between these two, the light portion and number listed to the right,
-                                is the playoff leverage of this game"),
-                        tags$li("Note: these are all treated independently of the other teams winning/losing so it's not exact")
-                        )
-             ),
+             # tabPanel("Playoff Leverage",
+             #          h5("How much will winning/losing your next game affect your playoff chances?"),
+             #          plotOutput("playoff_leverage"),
+             #          h5("Chart Notes:"),
+             #          tags$ol(
+             #            tags$li("Full bar is your chance of making playoffs with win"),
+             #            tags$li("Darker portion is your chance of making playoffs with loss"),
+             #            tags$li("The difference between these two, the light portion and number listed to the right,
+             #                    is the playoff leverage of this game"),
+             #            tags$li("Note: these are all treated independently of the other teams winning/losing so it's not exact")
+             #            )
+             # ),
              
              tabPanel("Manager Evaluation",
                       h5("How well did you manage your team?"),
@@ -334,10 +342,10 @@ server <- function(input, output, session) {
   ### Weekly Projections ###
   
   output$playoffs <- renderTable({
-    tibble(Winner = c("Scott", "Eric", "Justin", "PFinn"),
-               Percent = c("40%", "31%", "27%", "2%"),
-               Odds = c("5:2", "7:2", "4:1", "59:1"),
-               BettingLine = c("+150", "+225", "+300", "+5775"))
+    tibble(Winner = c("Bobby", "PFinn", "Diaz", "David"),
+           Percent = c("37%", "21%", "20%", "18%"),
+           Odds = c("5:2", "9:2", "5:1", "11:2"),
+           BettingLine = c("+175", "+375", "+400", "+450"))
   }, align = "c")
 
   output$weekly <- renderTable({
