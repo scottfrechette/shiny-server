@@ -103,11 +103,11 @@ server <- function(input, output) {
         
         if(input$league == "CLT") {
             
-            # roster <- clt_projections
+            # roster <- clt_projections_df
             
             if("Roster" %in% c(input$groups)) {
-                roster <- clt_projections %>%
-                    filter(teamID == "Big Ass TDs") %>%
+                roster <- clt_projections_df %>%
+                    filter(teamID == "Frech Prince Helaire") %>%
                     mutate(first_name = str_c("*", first_name),
                            last_name = str_c(last_name, "*"))
             } else {
@@ -115,26 +115,26 @@ server <- function(input, output) {
             }
             
             if("Available" %in% input$groups) {
-                available <- clt_projections %>% filter(teamID == "FA"|is.na(teamID))
+                available <- clt_projections_df %>% filter(teamID == "FA"|is.na(teamID))
             } else {
                 available <- NULL
             }
             
             if("Taken" %in% input$groups) {
-                taken <- clt_projections %>% filter(!teamID %in% c("FA", "Big Ass TDs"),
+                taken <- clt_projections_df %>% filter(!teamID %in% c("FA", "Frech Prince Helaire"),
                                                     !is.na(teamID))
             } else {
                 taken <- NULL
             }
             
             if(is.null(input$groups)) {
-                roster <- clt_projections
+                roster <- clt_projections_df
             }
             
         } else {
             
             if("Roster" %in% c(input$groups)) {
-                roster <- sx_projections %>% 
+                roster <- sx_projections_df %>% 
                     filter(teamID == 2) %>% 
                     mutate(first_name = str_c("*", first_name),
                            last_name = str_c(last_name, "*"))
@@ -143,20 +143,20 @@ server <- function(input, output) {
             }
             
             if("Available" %in% input$groups) {
-                available <- sx_projections %>% filter(teamID == 0|is.na(teamID))
+                available <- sx_projections_df %>% filter(teamID == 0|is.na(teamID))
             } else {
                 available <- NULL
             }
             
             if("Taken" %in% input$groups) {
-                taken <- sx_projections %>% filter(!teamID %in% c(0, 2),
+                taken <- sx_projections_df %>% filter(!teamID %in% c(0, 2),
                                                    !is.na(teamID))
             } else {
                 taken <- NULL
             }
             
             if(is.null(input$groups)) {
-                roster <- sx_projections
+                roster <- sx_projections_df
             }
             
         }
@@ -167,12 +167,13 @@ server <- function(input, output) {
         
     })
     
-    output$ranking_plot <- renderPlot({
+    output$ranking_plot <- renderPlot(
         ffanalytics_plot(projections(), 
                          pstn = input$position, 
                          n_players = input$n_players,
-                         plot_order = input$order)
-    })
+                         plot_order = input$order),
+        res = 96
+    )
 }
 
 shinyApp(ui = ui, server = server)

@@ -30,42 +30,44 @@ scrape_weekly_team1 <- function (week, team_id, league, league_id, season = 2018
       .[[3]] %>%
       rvest::html_text()
     
-    if(team_id != 1) {
+    if(team_id != 11) {
       
       starters <- page %>% 
         html_table(fill = TRUE) %>%
-        .[[3]] %>%
+        .[[2]] %>%
         as_tibble(.name_repair = "minimal") %>% 
         janitor::clean_names() %>% 
-        select(11, 10, 9, 8, 7) %>% 
-        rename(Stats = 1, Player = 2, Proj = 3, `Fan Pts` = 4, Pos = 5) %>% 
-        mutate(`Fan Pts` = as.numeric(`Fan Pts`)) %>% 
-        replace_na(list(`Fan Pts` = 0)) %>%
-        filter(Pos != "Total")
+        select(Stats = 11, Player = 10, Proj = 9,
+               `Fan Pts` = 8, Pos = 7) %>%
+        filter(Pos != "Total") %>% 
+        mutate(Proj = as.numeric(Proj),
+               `Fan Pts` = as.numeric(`Fan Pts`)) %>% 
+        replace_na(list(`Fan Pts` = 0))
       
       Sys.sleep(10)
       
       bench <- page %>% 
         rvest::html_nodes("#statTable2") %>% 
         rvest::html_table(fill = T) %>% 
-        purrr::flatten_dfc() %>% 
-        select(11, 10, 9, 8, 7) %>% 
-        rename(Stats = 1, Player = 2, Proj = 3, `Fan Pts` = 4, Pos = 5) %>% 
+        purrr::flatten_dfc() %>%
+        select(Stats = 10, Player = 9, Proj = 8,
+               `Fan Pts` = 7, Pos = 6) %>% 
+        filter(!Pos %in% c("TOTAL", "Total")) %>% 
         mutate(Proj = as.numeric(Proj),
                `Fan Pts` = as.numeric(`Fan Pts`)) %>% 
-        replace_na(list(`Fan Pts` = 0)) %>% 
-        filter(Pos != "Total")
+        replace_na(list(`Fan Pts` = 0))
       
     } else {
       
       starters <- page %>% 
         html_table(fill = TRUE) %>%
-        .[[3]] %>%
+        .[[2]] %>%
         as_tibble(.name_repair = "minimal") %>% 
         janitor::clean_names() %>% 
         select(1:5) %>% 
         rename(Stats = 1, Player = 2, Proj = 3, `Fan Pts` = 4, Pos = 5) %>% 
-        mutate(`Fan Pts` = as.numeric(`Fan Pts`)) %>% 
+        mutate(Proj = as.numeric(Proj),
+               `Fan Pts` = as.numeric(`Fan Pts`)) %>% 
         replace_na(list(`Fan Pts` = 0)) %>%
         filter(Pos != "Total")
       bench <- page %>% 
@@ -97,7 +99,7 @@ scrape_weekly_team1 <- function (week, team_id, league, league_id, season = 2018
       drop_na(Player) %>% 
       select(Team:Score, Player:Position, 
              Lineup, Proj, Points) %>% 
-      ungroup
+      ungroup()
   }
   else if (league == "espn") {
     url <- paste0("http://games.espn.com/ffl/boxscorequick?leagueId=", 
@@ -126,7 +128,8 @@ scrape_weekly_team1 <- function (week, team_id, league, league_id, season = 2018
                                       "")) %>% select(Player, Position, Lineup, Points)
     bind_rows(starters, bench) %>% replace_na(list(Points = 0)) %>% 
       mutate(Team = name, Score = sum(starters$Points, 
-                                      na.rm = T)) %>% select(Team, Score, everything())
+                                      na.rm = T)) %>% 
+      select(Team, Score, everything())
   }
 }
 scrape_team1 <- function (weeks, league, league_id, season = 2018) {
@@ -136,12 +139,13 @@ scrape_team1 <- function (weeks, league, league_id, season = 2018) {
             is.numeric(league_id), 
             is.numeric(season))
   if (league == "yahoo") {
-    yahoo_teamIDs(league_id) %>% 
-      crossing(Week = 1:weeks) %>% 
+    # yahoo_teamIDs(league_id) %>% 
+      crossing(team_id = 1:10,
+               Week = 1:weeks) %>% 
       mutate(league = league, league_id = league_id, 
              team = pmap(list(Week, team_id, league, league_id), 
                          scrape_weekly_team1)) %>% 
-      select(-league, -league_id, -Team)
+      select(-league, -league_id)#, -Team)
   }
   else {
     espn_teamIDs(league_id) %>% crossing(Week = 1:weeks) %>% 
@@ -280,6 +284,37 @@ playoff_leverage_plot1 <- function (scores, schedule, playoff_leverage_df)
           strip.text = element_text(size = 12))
 }
 
+current_matchups1 <- function (week, schedule, scores, win_prob = NULL) 
+{
+  if ("Team" %in% names(schedule)) {
+    schedule <- spread_schedule(schedule) %>% doublewide_schedule()
+  }
+  current_matchups <- schedule %>% 
+    filter(Week == week) %>% 
+    mutate_if(is.factor, as.character) %>%
+    mutate(data = list(scores), 
+           fvoa_wp = pmap_dbl(list(data, Team1, Team2), matchup)) %>% 
+    group_by(Game_id) %>% 
+    filter(fvoa_wp == max(fvoa_wp)) %>%
+    ungroup() %>% 
+    arrange(-fvoa_wp) %>% 
+    mutate(Line = map_chr(fvoa_wp, prob_to_odds), 
+           fvoa_wp = round(fvoa_wp/100, 2) %>% 
+             format_pct, 
+           Spread = pmap_chr(list(data, Team1, Team2, type = "spread"), 
+                             matchup)) %>% 
+    select(Winner = Team1, Loser = Team2, 
+           FVOA = fvoa_wp, Spread, Line)
+  if (!is.null(win_prob)) {
+    current_matchups <- current_matchups %>% 
+      left_join(win_prob %>% 
+                  rename(yahoo_wp = win_prob), 
+                by = c(Winner = "Team")) %>% 
+      select(Winner, Loser, FVOA, 
+             Yahoo = yahoo_wp, Spread, Line)
+  }
+  current_matchups
+}
 
 # Script ------------------------------------------------------------------
 
@@ -293,33 +328,36 @@ current_week <- today_week - start_week
 weeks_played <- current_week - 1
 
 # Scrape data
-clt_schedule <- scrape_schedule("yahoo", 96662)
-clt_team <- scrape_team1(weeks_played, "yahoo", 96662, 2019) %>% 
+clt_schedule <- scrape_schedule("yahoo", 479084)
+Sys.sleep(20)
+clt_team <- scrape_team1(weeks_played, "yahoo", 479084, 2020) %>% 
   unnest()
-clt_yahoo_win_prob <- scrape_win_prob(current_week, "yahoo", 96662, 2019)
+Sys.sleep(20)
+clt_yahoo_win_prob <- scrape_win_prob(current_week, "yahoo", 479084, 2020)
+Sys.sleep(20)
 
 # Replace team names
 source(here::here("clt", "lookup_id.R"))
-# team_ids <- yahoo_teamIDs(96662) %>% 
-#   left_join(lookup_id, by = "team_id") %>% 
-#   mutate(team = factor(team)) %>% 
-#   select(-team_id)
-# 
+team_ids <- yahoo_teamIDs(479084) %>%
+  left_join(lookup_id, by = "team_id") %>%
+  mutate(team = factor(team)) %>%
+  select(-team_id)
+
+clt_schedule <- clt_schedule %>%
+  left_join(team_ids, by = "Team") %>%
+  select(-Team) %>%
+  rename(Team = team)
 # clt_schedule <- clt_schedule %>% 
-#   left_join(team_ids, by = "Team") %>% 
-#   select(-Team) %>% 
-#   rename(Team = team)
-clt_schedule <- clt_schedule %>% 
-  mutate(Team = recode(Team,
-                        "Unmatched Wisdom" = "Barrett",
-                        "Bad Hombres" = "German",
-                        "Big Ass TDs" = "Scott",
-                        "Turd Sandwiches" = "Brian",
-                        "Deez Azor Ajayi" = "Diaz",
-                        "Trubiskuits & Gravy" = "Eric",
-                        "Don't Stop B Le'vin" = "Bobby",
-                        "Rons Transitn Lenses" = "David",
-                        "We Want More" = "Justin"))
+#   mutate(Team = recode(Team,
+#                        "Unmatched Wisdom" = "Barrett",
+#                        "Super Spreaders" = "German",
+#                        "Frech Prince Helaire" = "Scott",
+#                        "Reidbetweenthelines" = "Josh",
+#                        "CeeDeez" = "Diaz",
+#                        "Trubiskuits & Gravy" = "Eric",
+#                        "CMac Daddy" = "Bobby",
+#                        "Rons Transitn Lenses" = "David",
+#                        "We Want More" = "Justin"))
 clt_team <- clt_team %>% 
   left_join(lookup_id, by = "team_id") %>% 
   select(team_id, Week, Team = team, Score:Points) 
@@ -334,22 +372,24 @@ clt_scores <- clt_proj %>%
 
 
 # Run FVOA analysis
+#update unnest functions for cols = 
 clt_simulated_season <- simulate_season(clt_schedule, clt_scores, "clt") 
 playoff_leverage <- read_csv(here::here("clt", "playoff_leverage.csv"))
-clt_model_eval <- evaluate_model(clt_scores, output = "shiny")
+# clt_model_eval <- evaluate_model(clt_scores, output = "shiny") #doesn't work week 1 (add catch in function)
 clt_fvoa_season <- calculate_fvoa_season1(clt_scores)
 clt_matchups_prob <- all_matchups(clt_scores, type = "prob")
 clt_matchups_spread <- all_matchups(clt_scores, type = "spread")
 clt_rankings <- calculate_rankings1(clt_schedule, clt_scores)
-clt_current_matchups <- current_matchups(current_week, clt_schedule, 
+clt_current_matchups <- current_matchups1(current_week, clt_schedule,
                                          clt_scores, clt_yahoo_win_prob)
 clt_playoff_leverage_chart <- playoff_leverage_plot1(clt_scores, clt_schedule, 
-                                                    playoff_leverage)
+                                                     playoff_leverage)
 clt_lineup_eval <- evaluate_lineup(clt_team, flex = 0, plot = T)
 
 # Save data for Shiny app
 save(clt_schedule, clt_team, clt_proj, clt_scores,
-     clt_simulated_season, clt_model_eval, clt_fvoa_season,
+     clt_simulated_season, #clt_model_eval, 
+     clt_fvoa_season,
      clt_matchups_prob, clt_matchups_spread,
      clt_rankings, clt_current_matchups,
      clt_playoff_leverage_chart, clt_lineup_eval, 

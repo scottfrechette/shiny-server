@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 15
+frech_stats <- 1
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -70,35 +70,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Looks like we have some relatively close matchups in round 1 (PFinn 52% chance to win, Bobby 59%) so it could all come down to waiver wires"
+               "We're back baby. Honestly didn't think we'd even see the start, but who knows if we'll make it all the way. Maybe I'll just simulate the season so someone can still get paid."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "As FVOA predicted most the season Bobby's team is the favorite to win it all here. I also feel good FVOA predicted the top 4 teams that should make the playoffs. Not to mention they're the only 4 good teams with the rest of us considered bad and were the top 4 teams in terms of beating Yahoo projections."
+               "Also feels good to start at the top, not that I think week 1 is really predictive of the full season most the time. Too bad our newest member had the 2nd best week but drew the short straw in his first matchup."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Even more fun is the spoiler himself moved up to 6th in FVOA despite remaining last in the league"
+               "In interesting model outcomes, neither Eric nor PFinn are predicted to win their matchup because they have such a high chance of tying. They essentially tied in week 1 so really it's a testament to amount of randomness I add that it's not just predicting a tie to begin with."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "I can't believe I went from best team in regular season last year to missing the consolation bracket. What an embarrassment. Maybe next year I won't be handicapped by a 3-day old on draft day"
-             } else {
-               "TBD"
-             }
-           ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "Aside from identifying the four strongest teams FVOA also predicted the winner in 58% of matchups. And that includes all possible matchups not just scheduled. I'd take those odds."
+               "I had hoped to make some improvements over the summer leading up to this season, but then ya know the world ended. So stay tuned."
              } else {
                "TBD"
              }
@@ -106,15 +99,15 @@ ui  <- navbarPage(
 
 
            hr(),
-           h5("Playoff Projections", align = "center"),
-           fluidRow(tableOutput("playoffs"), align = "center"),
-           # h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
-           # br(),
-           # fluidRow(tableOutput("weekly"), align="center"),
-           # br(),
-           # h5("Season Projections", align = "center"),
-           # br(),
-           # fluidRow(tableOutput("simulation"), align = "center"),
+           # h5("Playoff Projections", align = "center"),
+           # fluidRow(tableOutput("playoffs"), align = "center"),
+           h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
+           br(),
+           fluidRow(tableOutput("weekly"), align="center"),
+           br(),
+           h5("Season Projections", align = "center"),
+           br(),
+           fluidRow(tableOutput("simulation"), align = "center"),
            hr(),
            p("FVOA Assumptions:"),
            tags$ol(
@@ -317,23 +310,23 @@ ui  <- navbarPage(
                         tags$li("Zoom in on any part of the chart by dragging box over that area (double-click to return)")
                       )
              )
-             ),
+             )#,
   
   # Model Evaluation Tab-----------------------------------------------------
   
-  tabPanel("FVOA Evaluation",
-           h4("FVOA Accuracy by Week"),
-           hr(),
-           fluidRow(textOutput("eval_accuracy"), align = "center"),
-           br(),
-           fluidRow(column(8, offset = 2, plotOutput("eval_plot")), align = "center"),
-           br(),
-           p("Which teams screwed my model last week?", align = "center"),
-           fluidRow(tableOutput("eval_team"), align = "center")
-  )
+  # tabPanel("FVOA Evaluation",
+  #          h4("FVOA Accuracy by Week"),
+  #          hr(),
+  #          fluidRow(textOutput("eval_accuracy"), align = "center"),
+  #          br(),
+  #          fluidRow(column(8, offset = 2, plotOutput("eval_plot")), align = "center"),
+  #          br(),
+  #          p("Which teams screwed my model last week?", align = "center"),
+  #          fluidRow(tableOutput("eval_team"), align = "center")
+  # )
 
   # End of navbarPage
-             )
+)
 
 # Server ------------------------------------------------------------------
 
@@ -669,8 +662,10 @@ server <- function(input, output, session) {
       if (is.null(input$team_sims)) {
         x <- clt_simulated_season %>% 
           ggplot(aes(Week, Wins)) +
-          geom_line(alpha = 0.5, aes(group=Team, color=Team), size = 1.5) +
-          geom_point(aes(group=Team, color=Team)) +
+          geom_line(alpha = 0.5, aes(color=Team), size = 1.5) +
+          geom_point(aes(color=Team)) +
+          # geom_line(alpha = 0.5, aes(group=Team, color=Team), size = 1.5) +
+          # geom_point(aes(group=Team, color=Team)) +
           geom_segment(x = 1, y = 7.5, xend = 15, yend = 7.5, color = "darkgrey", linetype = 2) +
           scale_y_continuous(breaks = c(0, 2, 4, 6, 8, 10, 12, 14), limits = c(0, 15)) +
           scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
