@@ -20,7 +20,7 @@ weeks_played <- current_week - 1
 source(here::here("sx", "sx_lookupIDs.R"))
 
 # Scrape data
-scrape_schedule_espn <- function(seasonID = 2019, leagueID = 299999) {
+scrape_schedule_espn <- function(seasonID = 2020, leagueID = 299999) {
   
   if(seasonID == as.numeric(format(Sys.Date(),'%Y'))) {
     
@@ -73,7 +73,7 @@ sx_schedule <- sx_league %>%
   left_join(sx_lookup_ids, by = "teamID") %>% 
   select(Week, Game_id, Team = team)
 
-scrape_weekly <- function(seasonID = 2019, leagueID = 299999, week = 1) {
+scrape_weekly <- function(seasonID = 2020, leagueID = 299999, week = 1) {
   
   if(seasonID == as.numeric(format(Sys.Date(),'%Y'))) {
     
@@ -238,7 +238,7 @@ sx_scores <- bind_rows(sx_league %>%
 # Run FVOA analysis
 sx_simulated_season <- simulate_season(sx_schedule, sx_scores, "sx")
 playoff_leverage <- read_csv(here::here("sx", "playoff_leverage.csv"))
-sx_model_eval <- evaluate_model(sx_scores, output = "shiny")
+# sx_model_eval <- evaluate_model(sx_scores, output = "shiny")
 sx_fvoa_season <- calculate_fvoa_season(sx_scores)
 sx_matchups_prob <- all_matchups(sx_scores, type = "prob")
 sx_matchups_spread <- all_matchups(sx_scores, type = "spread")
@@ -294,7 +294,9 @@ playoff_leverage_plot1 <- function (scores, schedule, playoff_leverage_df)
     geom_bar(stat = "identity", aes(y = Lose, fill = Team)) +
     geom_text(aes(y = Total + 0.5, label = paste0(Delta, "%")), 
               color = "grey30", hjust = 0) + 
-    scale_y_continuous(limits = c(0, 105), breaks = c(0, 25, 50, 75, 100)) + 
+    scale_y_continuous(limits = c(0, 105), 
+                       breaks = c(0, 25, 50, 75, 100),
+                       expand = expansion(mult = c(0, 0.1))) + 
     guides(fill = FALSE) +
     labs(x = "",  y = "Chance to Make Playoffs", 
          title = str_glue("Playoff Probability Leverage (Week {max(scores$Week) + 1})")) + 
@@ -309,12 +311,15 @@ sx_playoff_leverage_chart <- playoff_leverage_plot1(sx_scores, sx_schedule,
                                                     playoff_leverage)
 sx_lineup_eval <- evaluate_lineup(sx_team, wr = 2, dl = 0, db = 0, plot = T)
 
+sx_simulated_season <- sx_simulated_season %>% filter(Week != 0)
+
 # Save data for Shiny app
 save(sx_schedule, sx_team, sx_scores,
-     sx_simulated_season, sx_model_eval, sx_fvoa_season,
+     sx_simulated_season, #sx_model_eval,
+     sx_fvoa_season,
      sx_matchups_prob, sx_matchups_spread,
-     sx_rankings, #sx_current_matchups,
-     # sx_playoff_leverage_chart, 
+     sx_rankings, sx_current_matchups,
+      sx_playoff_leverage_chart, 
      sx_lineup_eval, 
      file = here::here("sx", "sx-data.RData"))
 

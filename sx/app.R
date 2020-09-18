@@ -31,7 +31,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 14
+frech_stats <- 1
 
 # Load Data ---------------------------------------------------------------
 
@@ -71,28 +71,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Well we made it through the season. Good job everyone."
+               "We're back baby. For the new folks, this is a dumb thing I've built to help us talk more shit."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "I can't believe the 6th best team in our league has the #1 seed. Not to mention one of the strongest teams all season missed out entirely. That's some wild shit."
+               "Probably not a good look that 3 of the top 4 teams are new folks. Even worse that the bottom 4 are OGs in the league."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "I am glad to see one of the women make the playoffs, and actually considered a strong contender no less. Mamas representing this year (even if they essentially had a play-in game there at the end)."
+               "Pray for the Frechette household. Could be a tense weekend."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "But really I'm mostly pissed a Frechette didn't make it. We had a 64% chance that one of us would make it. But nope, we just couldn't do it."
+               "I had intended to do some work on this site over the summer to spruce it up and ya know, COVID. Give me a few weeks and I'll see what I can do."
              } else {
                "TBD"
              }
@@ -100,14 +100,13 @@ ui  <- navbarPage(
 
            
            hr(),
-           h5("Playoff Projections", align = "center"),
-           # h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
+           h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
            br(),
-           fluidRow(tableOutput("playoffs"), align="center"),
+           fluidRow(tableOutput("weekly"), align="center"),
            br(),
-           # h5("Season Projections", align = "center"),
-           # br(),
-           # fluidRow(tableOutput("simulation"), align = "center"),
+           h5("Season Projections", align = "center"),
+           br(),
+           fluidRow(tableOutput("simulation"), align = "center"),
            hr(),
            p("FVOA Assumptions:"),
            tags$ol(
@@ -249,18 +248,18 @@ ui  <- navbarPage(
                       )
              ),
              
-             # tabPanel("Playoff Leverage",
-             #          h5("How much will winning/losing your next game affect your playoff chances?"),
-             #          plotOutput("playoff_leverage"),
-             #          h5("Chart Notes:"),
-             #          tags$ol(
-             #            tags$li("Full bar is your chance of making playoffs with win"),
-             #            tags$li("Darker portion is your chance of making playoffs with loss"),
-             #            tags$li("The difference between these two, the light portion and number listed to the right,
-             #                    is the playoff leverage of this game"),
-             #            tags$li("Note: these are all treated independently of the other teams winning/losing so it's not exact")
-             #            )
-             # ),
+             tabPanel("Playoff Leverage",
+                      h5("How much will winning/losing your next game affect your playoff chances?"),
+                      plotOutput("playoff_leverage"),
+                      h5("Chart Notes:"),
+                      tags$ol(
+                        tags$li("Full bar is your chance of making playoffs with win"),
+                        tags$li("Darker portion is your chance of making playoffs with loss"),
+                        tags$li("The difference between these two, the light portion and number listed to the right,
+                                is the playoff leverage of this game"),
+                        tags$li("Note: these are all treated independently of the other teams winning/losing so it's not exact")
+                        )
+             ),
              
              tabPanel("Manager Evaluation",
                       h5("How well did you manage your team?"),
@@ -310,20 +309,20 @@ ui  <- navbarPage(
                         tags$li("Zoom in on any part of the chart by dragging box over that area (double-click to return)")
                       )
              )
-             ),
+             )#,
   
   # Model Evaluation Tab-----------------------------------------------------
 
-  tabPanel("FVOA Evaluation",
-           h4("FVOA Accuracy by Week"),
-           hr(),
-           fluidRow(textOutput("eval_accuracy"), align = "center"),
-           br(),
-           fluidRow(column(8, offset = 2, plotOutput("eval_plot")), align = "center"),
-           br(),
-           p("Which teams screwed my model last week?", align = "center"),
-           fluidRow(tableOutput("eval_team"), align = "center")
-  )
+  # tabPanel("FVOA Evaluation",
+  #          h4("FVOA Accuracy by Week"),
+  #          hr(),
+  #          fluidRow(textOutput("eval_accuracy"), align = "center"),
+  #          br(),
+  #          fluidRow(column(8, offset = 2, plotOutput("eval_plot")), align = "center"),
+  #          br(),
+  #          p("Which teams screwed my model last week?", align = "center"),
+  #          fluidRow(tableOutput("eval_team"), align = "center")
+  # )
   
   # End of navbarPage
              )
@@ -379,7 +378,7 @@ server <- function(input, output, session) {
     for(r in ranking_methods) {
       if (r %in% input$rankings) {
         tmp <- eval_tidy(parse_quosure(r))
-        rankings <- rankings %>% left_join(tmp)
+        rankings <- rankings %>% left_join(tmp, by = "Team")
       } else next
     } 
     sort <- sorting[[input$sorting]]
@@ -507,7 +506,8 @@ server <- function(input, output, session) {
       theme(panel.background=element_rect(fill="white", colour="white")) +
       ylim(rev(levels(hm$loser))) +
       labs(x = "Team 2", y="Team 1", fill="% Chance", title="Chance Team 1 Beats Team 2")
-  })
+  },
+  res = 96)
   
   output$lines <- renderTable({
     matchups_spread()%>% 
@@ -775,23 +775,23 @@ server <- function(input, output, session) {
     
   })
   
-  output$playoff_leverage <- renderPlot({
+  output$playoff_leverage <- renderPlot(
     sx_playoff_leverage_chart + 
-      scale_fill_manual(values = fvoa_colors)
-  })
+      scale_fill_manual(values = fvoa_colors),
+    res = 96)
   
-  output$manager <- renderPlot({
-    sx_lineup_eval
-  })
+  output$manager <- renderPlot(
+    sx_lineup_eval,
+    res = 96)
   
-  output$quadrant <- renderPlot({
+  output$quadrant <- renderPlot(
     calculate_quadrants(sx_scores, sx_schedule,
                         start = input$quad_week[1],
                         end = input$quad_week[2]) %>% 
-      plot_quadrant() 
-    })
+      plot_quadrant(),
+    res = 96)
   
-  output$projected <- renderPlot({
+  output$projected <- renderPlot(
     sx_proj %>%
       filter(Week %in% input$proj_week[1]:input$proj_week[2]) %>%
       # spread(Type, Score) %>% 
@@ -808,10 +808,10 @@ server <- function(input, output, session) {
       labs(y = "Margin") +
       scale_fill_manual(values = c(equal = "#619CFF", negative = "#F8766D", positive = "#00BA38")) +
       theme_fvoa() + 
-      theme(panel.grid.major.y = element_blank())
-  })
+      theme(panel.grid.major.y = element_blank()),
+    res = 96)
   
-  output$boxplot <- renderPlot({
+  output$boxplot <- renderPlot(
     sx_scores %>% 
       filter(Week %in% input$boxplot_week[1]:input$boxplot_week[2]) %>%
       ggplot(aes(x=reorder(Team, -Score, fun=mean), y=Score, fill=Team)) + 
@@ -821,8 +821,8 @@ server <- function(input, output, session) {
       labs(y = "Score", x = "", title = "Team Boxplots") +
       theme_fvoa() + 
       theme(panel.border = element_blank()) + 
-      scale_fill_manual(values = fvoa_colors)
-  })
+      scale_fill_manual(values = fvoa_colors),
+    res = 96)
   
   observeEvent(input$clear_teams_density, {
     updateCheckboxGroupInput(session, "team_density", selected = character(0))
@@ -868,9 +868,9 @@ server <- function(input, output, session) {
     sx_model_eval[[1]]
   })
   
-  output$eval_plot <- renderPlot({
-    sx_model_eval[[2]]
-  })
+  output$eval_plot <- renderPlot(
+    sx_model_eval[[2]],
+    res = 96)
   
   output$eval_team = renderTable({
     sx_model_eval[[3]] %>% 
