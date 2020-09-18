@@ -660,9 +660,15 @@ sx_player_data <- bind_rows(
 
 # Scrape Projections -------------------------------------------------------------
 
-my_scrape <- scrape_data(src = c("CBS", "ESPN", "FantasyData", "FantasyPros",
-                                 "FantasySharks", "FFToday", "FleaFlicker", "NumberFire", "Yahoo",
-                                 "FantasyFootballNerd", "NFL", "RTSports", "Walterfootball"),
+my_scrape <- scrape_data(src = c("CBS", 
+                                 "FantasyPros",
+                                 "FantasySharks",
+                                 "FFToday",
+                                 "FleaFlicker",
+                                 "NumberFire",
+                                 "FantasyFootballNerd",
+                                 "ESPN", "FantasyData", "Yahoo",
+                                 "NFL", "RTSports", "Walterfootball"),
                          pos = c("QB", "RB", "WR", "TE", "K", "DST", "DL", "DB"),
                          season = 2020, week = current_week)
 
