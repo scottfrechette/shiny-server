@@ -238,7 +238,7 @@ sx_scores <- bind_rows(sx_league %>%
 # Run FVOA analysis
 sx_simulated_season <- simulate_season(sx_schedule, sx_scores, "sx")
 playoff_leverage <- read_csv(here::here("sx", "playoff_leverage.csv"))
-# sx_model_eval <- evaluate_model(sx_scores, output = "shiny")
+sx_model_eval <- evaluate_model(sx_scores, output = "shiny")
 sx_fvoa_season <- calculate_fvoa_season(sx_scores)
 sx_matchups_prob <- all_matchups(sx_scores, type = "prob")
 sx_matchups_spread <- all_matchups(sx_scores, type = "spread")
@@ -315,7 +315,7 @@ sx_simulated_season <- sx_simulated_season %>% filter(Week != 0)
 
 # Save data for Shiny app
 save(sx_schedule, sx_team, sx_scores,
-     sx_simulated_season, #sx_model_eval,
+     sx_simulated_season, sx_model_eval,
      sx_fvoa_season,
      sx_matchups_prob, sx_matchups_spread,
      sx_rankings, sx_current_matchups,

@@ -376,7 +376,7 @@ clt_scores <- clt_proj %>%
 #update unnest functions for cols = 
 clt_simulated_season <- simulate_season(clt_schedule, clt_scores, "clt") 
 playoff_leverage <- read_csv(here::here("clt", "playoff_leverage.csv"))
-# clt_model_eval <- evaluate_model(clt_scores, output = "shiny") #doesn't work week 1 (add catch in function)
+clt_model_eval <- evaluate_model(clt_scores, output = "shiny") #doesn't work week 1 (add catch in function)
 clt_fvoa_season <- calculate_fvoa_season1(clt_scores)
 clt_matchups_prob <- all_matchups(clt_scores, type = "prob")
 clt_matchups_spread <- all_matchups(clt_scores, type = "spread")
@@ -389,7 +389,7 @@ clt_lineup_eval <- evaluate_lineup(clt_team, flex = 0, plot = T)
 
 # Save data for Shiny app
 save(clt_schedule, clt_team, clt_proj, clt_scores,
-     clt_simulated_season, #clt_model_eval, 
+     clt_simulated_season, clt_model_eval, 
      clt_fvoa_season,
      clt_matchups_prob, clt_matchups_spread,
      clt_rankings, clt_current_matchups,
