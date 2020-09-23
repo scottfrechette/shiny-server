@@ -31,7 +31,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 1
+frech_stats <- 2
 
 # Load Data ---------------------------------------------------------------
 
@@ -71,28 +71,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "We're back baby. For the new folks, this is a dumb thing I've built to help us talk more shit."
+               ""
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Probably not a good look that 3 of the top 4 teams are new folks. Even worse that the bottom 4 are OGs in the league."
+               ""
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Pray for the Frechette household. Could be a tense weekend."
+               ""
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "I had intended to do some work on this site over the summer to spruce it up and ya know, COVID. Give me a few weeks and I'll see what I can do."
+               ""
              } else {
                "TBD"
              }

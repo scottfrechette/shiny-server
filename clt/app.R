@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 1
+frech_stats <- 2
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -70,28 +70,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "We're back baby. Honestly didn't think we'd even see the start, but who knows if we'll make it all the way. Maybe I'll just simulate the season so someone can still get paid."
+               ""
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Also feels good to start at the top, not that I think week 1 is really predictive of the full season most the time. Too bad our newest member had the 2nd best week but drew the short straw in his first matchup."
+               ""
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "In interesting model outcomes, neither Eric nor PFinn are predicted to win their matchup because they have such a high chance of tying. They essentially tied in week 1 so really it's a testament to amount of randomness I add that it's not just predicting a tie to begin with."
+               ""
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "I had hoped to make some improvements over the summer leading up to this season, but then ya know the world ended. So stay tuned."
+               ""
              } else {
                "TBD"
              }
