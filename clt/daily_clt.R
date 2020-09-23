@@ -274,13 +274,16 @@ playoff_leverage_plot1 <- function (scores, schedule, playoff_leverage_df)
               color = "grey30", hjust = 0) + 
     scale_y_continuous(limits = c(0, 105), 
                        breaks = c(0, 25, 50, 75, 100),
-                       expand = expansion(mult = c(0, 0.1))) +     guides(fill = FALSE) +
+                       expand = expand_scale(mult = c(0, 0.1))) +     
+    guides(fill = FALSE) +
     labs(x = "",  y = "Chance to Make Playoffs", 
          title = str_glue("Playoff Probability Leverage (Week {max(scores$Week) + 1})")) + 
     coord_flip() + 
     theme(plot.title = element_text(hjust = 0.5), 
-          panel.background = element_blank(), panel.border = element_blank(), 
-          strip.background = element_rect(color = "black"), panel.grid = element_blank(), 
+          panel.background = element_blank(), 
+          panel.border = element_blank(), 
+          strip.background = element_rect(color = "black"), 
+          panel.grid = element_blank(), 
           panel.grid.major.x = element_line(color = "grey90", size = 0.2), 
           strip.text = element_text(size = 12))
 }

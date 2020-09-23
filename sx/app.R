@@ -309,20 +309,20 @@ ui  <- navbarPage(
                         tags$li("Zoom in on any part of the chart by dragging box over that area (double-click to return)")
                       )
              )
-             )#,
+             ),
   
   # Model Evaluation Tab-----------------------------------------------------
 
-  # tabPanel("FVOA Evaluation",
-  #          h4("FVOA Accuracy by Week"),
-  #          hr(),
-  #          fluidRow(textOutput("eval_accuracy"), align = "center"),
-  #          br(),
-  #          fluidRow(column(8, offset = 2, plotOutput("eval_plot")), align = "center"),
-  #          br(),
-  #          p("Which teams screwed my model last week?", align = "center"),
-  #          fluidRow(tableOutput("eval_team"), align = "center")
-  # )
+  tabPanel("FVOA Evaluation",
+           h4("FVOA Accuracy by Week"),
+           hr(),
+           fluidRow(textOutput("eval_accuracy"), align = "center"),
+           br(),
+           fluidRow(column(8, offset = 2, plotOutput("eval_plot")), align = "center"),
+           br(),
+           p("Which teams screwed my model last week?", align = "center"),
+           fluidRow(tableOutput("eval_team"), align = "center")
+  )
   
   # End of navbarPage
              )
