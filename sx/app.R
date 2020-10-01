@@ -31,7 +31,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 2
+frech_stats <- 3
 
 # Load Data ---------------------------------------------------------------
 
@@ -71,28 +71,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               ""
+               "Nothing makes me happier than seeing FVOA has already written out Burgess' team"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               ""
+               "And at least now Herndon can be happy that FVOA quickly corrected its undervaluation and has him very likely to make playoffs right behind our commish"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               ""
+               "FVOA still thinks Obie's winless team is far better than his record, so there's hope for his Texans-like team yet"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               ""
+               "Conversely FVOA is down on Wikle's chances to maintain his playoff spot"
              } else {
                "TBD"
              }

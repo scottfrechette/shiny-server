@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 2
+frech_stats <- 3
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -70,28 +70,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               ""
+               "Looks like Josh is seemingly all but guaranteed a playoff spot already with Diaz right behind him"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               ""
+               "On the flip side FVOA has also written off ERam with me and German teetering in single-digits and PFinn staring at us longingly through the glass"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               ""
+               "And I see you Justin already hanging out in that lucky box, I'll be watching for you this week"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               ""
+               "Of course all this is to say 9 of 10 teams are 2-1 or 1-2 so anything could happen with this crazy season"
              } else {
                "TBD"
              }
