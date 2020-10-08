@@ -31,7 +31,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 3
+frech_stats <- 4
 
 # Load Data ---------------------------------------------------------------
 
@@ -71,32 +71,32 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Nothing makes me happier than seeing FVOA has already written out Burgess' team"
+               "I'd like to congratulate Burgess on his first win - he now has the honor of being joined by Jangaard in the 0% club"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "And at least now Herndon can be happy that FVOA quickly corrected its undervaluation and has him very likely to make playoffs right behind our commish"
+               "What's really interesting is FVOA is still really bullish on newcomers Obie and Hoop - despite being 1-3"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "FVOA still thinks Obie's winless team is far better than his record, so there's hope for his Texans-like team yet"
+               "I'm also hoping to make some updates here in next few weeks, including the Skill v Luck chart that always makes people so angry"
              } else {
                "TBD"
              }
            ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "Conversely FVOA is down on Wikle's chances to maintain his playoff spot"
-             } else {
-               "TBD"
-             }
-           ),
+           # tags$li(
+           #   if(weeks_played == frech_stats) {
+           #     ""
+           #   } else {
+           #     "TBD"
+           #   }
+           # ),
 
            
            hr(),
