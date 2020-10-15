@@ -720,8 +720,8 @@ clt_scoring <- list(
 
 clt_projections <-  my_scrape %>% 
   projections_table(scoring_rules = clt_scoring) %>%
-  add_ecr() %>%
-  add_risk() %>%
+  # add_ecr() %>%
+  # add_risk() %>%
   # add_adp() %>%
   add_player_info()
 
@@ -772,8 +772,8 @@ sx_scoring <- list(
 )
 
 sx_projections <-  projections_table(my_scrape, scoring_rules = sx_scoring) %>%
-  add_ecr() %>%
-  add_risk() %>%
+  # add_ecr() %>%
+  # add_risk() %>%
   # add_adp() %>%
   add_player_info()
 
@@ -785,6 +785,7 @@ clt_projections_df <- clt_projections %>%
               select(id, teamID),
             by = "id") %>% 
   mutate(position = case_when(
+    position == "DEF" ~ "DST",
     position %in% c("CB", "S") ~ "DB",
     position %in% c("DT", "DE") ~ "DL",
     TRUE ~ position
