@@ -52,7 +52,7 @@ ui  <- navbarPage(
   inverse = F,
   
   # footer = "Frech Takes",
-  title = "Charlotte's Finest",
+  title = "Seacows Football",
   
   # Frech Takes Tab----------------------------------------------------------
   
@@ -133,7 +133,7 @@ ui  <- navbarPage(
            hr(),
            h5("Ranking Notes:"),
            tags$ol(
-             tags$li(HTML("<u><strong>espn</strong></u>: our official ranking based on win percentage and total points")),
+             tags$li(HTML("<u><strong>ESPN</strong></u>: our official ranking based on win percentage and total points")),
              tags$li(HTML("<u><strong>FVOA</strong></u>: Frech-adjusted Value Over Average (similar to DVOA). 
                           This is your percent above/below the average team. 
                           This can also be used to get a rough percent of Team 1 beating Team 2 by
