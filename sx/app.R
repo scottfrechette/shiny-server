@@ -16,14 +16,10 @@ library(rlang)
 ### Initial Settings ###
 
 reps <-  1e6
-ranking_methods <- c("espn_rankings", "fvoa_rankings", "sos_rankings", "colley_rankings") %>%
+ranking_methods <- c("espn_rank", "fvoa_rank", "sos_rank", "colley_rank") %>%
   set_names(c("ESPN", "FVOA", "Strength of Schedule", "Colley (BCS)"))
 sorting <- c("ESPN Rank", "FVOA Rank", "SoS Rank", "Colley Rank", "Points") %>%
   set_names(ranking_methods, "Points")
-
-
-fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
-                 "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
 
 today_week <- today() %>%
   floor_date(unit = "week", week_start = 2) %>%
@@ -31,20 +27,17 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 4
+frech_stats <- 5
+
+fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
+                 "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
 
 # Load Data ---------------------------------------------------------------
 
 load(here::here("sx", "sx-data.RData"))
 
-weeks <- n_distinct(sx_scores$Week)
-teams <- unique(sx_scores$Team)
-
-espn_rankings <- sx_rankings %>% select(Team, "ESPN Rank" = "Yahoo Rank")
-fvoa_rankings <- sx_rankings %>% select(Team, contains("FVOA"))
-sos_rankings <- sx_rankings %>% select(Team, contains("SoS"))
-colley_rankings <- sx_rankings %>% select(Team, contains("Colley"))
-
+weeks <- n_distinct(sx_scores$week)
+teams <- pull(distinct(select(sx_scores, starts_with("team"))))
 
 # UI ----------------------------------------------------------------------
 
@@ -59,7 +52,7 @@ ui  <- navbarPage(
   inverse = F,
   
   # footer = "Frech Takes",
-  title = "Seacows Football",
+  title = "Charlotte's Finest",
   
   # Frech Takes Tab----------------------------------------------------------
   
@@ -67,39 +60,41 @@ ui  <- navbarPage(
            h3("The Frechest of Takes"),
            h5(""),
            hr(),
-
+           
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "I'd like to congratulate Burgess on his first win - he now has the honor of being joined by Jangaard in the 0% club"
+               "Hoop and Obie still getting FVOA playoff love despite being two games back from leaders"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "What's really interesting is FVOA is still really bullish on newcomers Obie and Hoop - despite being 1-3"
+               "I'm happy to tell Burgess he now did well enough in simulations to register above 0 again"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "I'm also hoping to make some updates here in next few weeks, including the Skill v Luck chart that always makes people so angry"
+               "Wikle on other hand sitting in 4th place but only made playoffs in 6.6% of simulations"
              } else {
                "TBD"
              }
            ),
-           # tags$li(
-           #   if(weeks_played == frech_stats) {
-           #     ""
-           #   } else {
-           #     "TBD"
-           #   }
-           # ),
-
+           tags$li(
+             if(weeks_played == frech_stats) {
+               "Based on feedback I've updated the Skill v Luck to show points for instead of margin"
+             } else {
+               "TBD"
+             }
+           ),
+           
            
            hr(),
+           # h5("Playoff Projections", align = "center"),
+           # fluidRow(tableOutput("playoffs"), align = "center"),
            h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
            br(),
            fluidRow(tableOutput("weekly"), align="center"),
@@ -120,16 +115,16 @@ ui  <- navbarPage(
              tags$li(HTML("<u><strong>Outliers</strong></u> - freak games by your WR3 are not very predictive so very 
                           high/low scores relative to your weekly average will be penalized slightly")),
              tags$li(HTML("Bye weeks cancel out so they're not directly factored in"))
-             )
-             ),
+           )
+  ),
   
   # Rankings Tab-------------------------------------------------------------
   
   tabPanel("Rankings",
            sidebarLayout(
              sidebarPanel(
-               checkboxGroupInput("rankings", "Choose Rankings:", 
-                                  ranking_methods, selected = c("espn_rankings")),
+               # checkboxGroupInput("rankings", "Choose Rankings:", 
+               #                    ranking_methods, selected = c("espn_rankings")),
                uiOutput("sorting")
              ), 
              # mainPanel("Rankings")
@@ -143,14 +138,14 @@ ui  <- navbarPage(
                           This is your percent above/below the average team. 
                           This can also be used to get a rough percent of Team 1 beating Team 2 by
                           calculating (Team 1 FVOA - Team 2 FVOA)/2 + 50")),
-             tags$li(HTML("<u><strong>SoS</strong></u>: strength of schedule based on FVOA scores")),
+             tags$li(HTML("<u><strong>SoS</strong></u>: strength of schedule based on FVOA scores (higher means harder schedule)")),
              tags$li(HTML("<u><strong>Colley</strong></u>: one of the models that was used in the BCS computer rankings
                           and is based on win-loss record adjusted for strength of schedule")),
              tags$li("So in other words, Colley ranks on record only, 
                      FVOA and SoS rank on points only,
-                     and ESPN ranks on record and points")
-             )
-             ),
+                     and espn ranks on record and points")
+           )
+  ),
   
   # League Tab---------------------------------------------------------------
   
@@ -258,7 +253,7 @@ ui  <- navbarPage(
                         tags$li("The difference between these two, the light portion and number listed to the right,
                                 is the playoff leverage of this game"),
                         tags$li("Note: these are all treated independently of the other teams winning/losing so it's not exact")
-                        )
+                      )
              ),
              
              tabPanel("Manager Evaluation",
@@ -277,13 +272,13 @@ ui  <- navbarPage(
                                                                            max(weeks), c(1, max), step = 1))))
              ),
              
-             # tabPanel("Projected v Actual Scores",
-             #          h5("How did your team perform against espn projections?"),
-             #          plotOutput("projected"),
-             #          hr(),
-             #          fluidRow(column(4, offset = 4, wellPanel(sliderInput("proj_week", "Weeks to Include:", 1,
-             #                                                               max(weeks), c(1, max), step = 1))))
-             # ),
+             tabPanel("Projected v Actual Scores",
+                      h5("How did your team perform against espn projections?"),
+                      plotOutput("projected"),
+                      hr(),
+                      fluidRow(column(4, offset = 4, wellPanel(sliderInput("proj_week", "Weeks to Include:", 1,
+                                                                           max(weeks), c(1, max), step = 1))))
+             ),
              
              tabPanel("Boxplots",
                       plotOutput("boxplot"),
@@ -309,10 +304,10 @@ ui  <- navbarPage(
                         tags$li("Zoom in on any part of the chart by dragging box over that area (double-click to return)")
                       )
              )
-             ),
+  ),
   
   # Model Evaluation Tab-----------------------------------------------------
-
+  
   tabPanel("FVOA Evaluation",
            h4("FVOA Accuracy by Week"),
            hr(),
@@ -325,7 +320,7 @@ ui  <- navbarPage(
   )
   
   # End of navbarPage
-             )
+)
 
 # Server ------------------------------------------------------------------
 
@@ -334,30 +329,30 @@ server <- function(input, output, session) {
   ### Weekly Projections ###
   
   output$playoffs <- renderTable({
-    data_frame(Winner = c("Brazil", "Rebecca", "Jersey", "Wikle"),
-               Percent = c("37%", "29%", "21%", "9%"),
-               Odds = c("5:2", "7:2", "9:2", "11:1"),
-               BettingLine = c("+175", "+250", "+375", "+1000"))
+    tibble(Winner = c("Bobby", "PFinn", "Diaz", "David"),
+           Percent = c("37%", "21%", "20%", "18%"),
+           Odds = c("5:2", "9:2", "5:1", "11:2"),
+           BettingLine = c("+175", "+375", "+400", "+450"))
   }, align = "c")
   
   output$weekly <- renderTable({
-    sx_current_matchups %>% 
-      rename("FVOA Win Pct" = FVOA)
+    sx_current_matchups #%>% select(-espn)
   }, align = 'c', digits = 0)
   
   output$simulation <- renderTable({
     sx_simulated_season %>% 
-      filter(Week == max(Week)) %>% 
-      mutate(Points = as.integer(Points),
-             Playoffs = paste0(round(Percent, 0), "%")) %>% 
-      select(Team:Wins, Playoffs)
+      filter(week == max(week)) %>% 
+      mutate(points = as.integer(points),
+             playoffs = paste0(round(percent, 0), "%")) %>% 
+      select(Team = team, Points = points,
+             Wins = wins, Percent = percent)
   }, align = 'c', digits = 1)
   
   ### Rankings Tab ###
   
   output$sorting <- renderUI({
     selectInput("sorting", "Sort Rankings By:", 
-                c(ranking_methods[ranking_methods %in% input$rankings], "Points"))
+                c(ranking_methods, "Points"))
   })
   
   ranking_selections <- function(rankings, ...) {
@@ -365,22 +360,19 @@ server <- function(input, output, session) {
     dots <- quos(...)
     
     rankings %>% 
+      rename_all(snakecase::to_sentence_case) %>% 
       select(Team:Percent, contains(paste(!!! dots, collapse = "|")))
   }
   
   output$rankings <- renderTable({
-    # rankings <- sx_rankings %>%
-    #   select(Team:Percent, matches(paste(ranking_methods[c(input$rankings)], collapse = "|")))
-    # rankings <- ranking_selections(rankings, input$rankings)
+    
     rankings <- sx_rankings %>%
-      select(Team:Percent)
-    # select(Team:Percent, matches(paste(input$rankings, sep = "|")))
-    for(r in ranking_methods) {
-      if (r %in% input$rankings) {
-        tmp <- eval_tidy(parse_quosure(r))
-        rankings <- rankings %>% left_join(tmp, by = "Team")
-      } else next
-    } 
+      rename_all(snakecase::to_title_case) %>% 
+      rename(`ESPN Rank` = `Espn Rank`,
+             FVOA = Fvoa, 
+             `FVOA Rank` = `Fvoa Rank`, 
+             SoS = Sos, 
+             `SoS Rank` = `Sos Rank`)
     sort <- sorting[[input$sorting]]
     rank_sort <- rankings %>%
       arrange(rankings[[sort]])
@@ -394,109 +386,29 @@ server <- function(input, output, session) {
   }, align = 'c', digits = 2)
   
   ### League Tab ###
-  matchups_prob <- reactive({
-    set.seed(42)
-    teams <- sx_scores %>% select(Team) %>% distinct()
-    reg_games <- 6
-    team.names <- teams[[1]]
-    df <- as.data.frame(matrix(nrow=nrow(teams), ncol=nrow(teams)))
-    rownames(df) <- team.names
-    colnames(df) <- team.names
-    if (input$league_week[2] - input$league_week[1] < 5) {
-      league <- sx_scores %>%
-        filter(Week %in% input$league_week[1]:input$league_week[2]) %>%
-        group_by(Team) %>%
-        mutate(team_mean = weighted.mean(c(Score, 115), weight_games(Score, reg_games)),
-               team_sd = sqrt(weighted_sd(c(Score, 115), weight_games(Score, reg_games), method="ML"))) %>%
-        select(Team, team_mean, team_sd) %>%
-        ungroup() %>%
-        distinct()
-    } else {
-      league <- sx_scores %>%
-        filter(Week %in% input$league_week[1]:input$league_week[2]) %>%
-        group_by(Team) %>%
-        mutate(team_mean = weighted.mean(Score, weight_games(Score, reg_games)),
-               team_sd = sqrt(weighted_sd(Score, weight_games(Score, reg_games), method="ML"))) %>%
-        select(Team, team_mean, team_sd) %>%
-        ungroup() %>%
-        distinct()
-    }
-    sims <- list()
-    sim_scores <- for(i in 1:nrow(teams)) {sims[[i]] <- rnorm(reps, league[[i, 2]], league[[i,3]])}
-    names(sims) <- teams[[1]]
-    matchup_season <- function(i, j) {
-      t1 <- rownames(df)[i] # index ID
-      t2 <- colnames(df)[j]
-      sim <- sims[[t1]] - sims[[t2]]
-      t1wins <- round(pnorm(0, mean(sim), sd(sim), lower.tail=FALSE)* 100, 2)
-    }
-    for(i in 1:dim(df)[1]) {
-      for(j in 1:dim(df)[2]) {
-        if (i == j) {NA} 
-        else if (is.na(df[i,j])==F) {next} 
-        else {
-          df[i,j] = matchup_season(i, j)
-          df[j,i] = 100 - df[i,j]
-        }
-      }
-    }
-    df
-  })
   
-  matchups_spread <- reactive({
-    set.seed(42)
-    teams <- sx_scores %>% select(Team) %>% distinct()
-    reg_games <- 6
-    team.names <- teams[[1]]
-    df <- as.data.frame(matrix(nrow=nrow(teams), ncol=nrow(teams)))
-    rownames(df) <- team.names
-    colnames(df) <- team.names
-    if (input$league_week[2] - input$league_week[1] < 5) {
-      league <- sx_scores %>% 
-        filter(Week %in% input$league_week[1]:input$league_week[2]) %>%
-        group_by(Team) %>% 
-        mutate(team_mean = weighted.mean(c(Score, 115), weight_games(Score, reg_games)),
-               team_sd = sqrt(weighted_sd(c(Score, 115), weight_games(Score, reg_games), method="ML"))) %>%
-        select(Team, team_mean, team_sd) %>% 
-        ungroup() %>% 
-        distinct()
-    } else {
-      league <- sx_scores %>% 
-        filter(Week %in% input$league_week[1]:input$league_week[2]) %>%
-        group_by(Team) %>% 
-        mutate(team_mean = weighted.mean(Score, weight_games(Score, reg_games)),
-               team_sd = sqrt(weighted_sd(Score, weight_games(Score, reg_games), method="ML"))) %>%
-        select(Team, team_mean, team_sd) %>% 
-        ungroup() %>% 
-        distinct()
-    }
-    sims <- list()
-    sim_scores <- for(i in 1:nrow(teams)) {sims[[i]] <- rnorm(reps, league[[i, 2]], league[[i,3]])}
-    names(sims) <- teams[[1]]
-    matchup_season <- function(i, j) {
-      t1 <- rownames(df)[i] # index ID
-      t2 <- colnames(df)[j]
-      sim <- sims[[t1]] - sims[[t2]]
-      spread <- -mean(sim)
-      spread <- round(spread * 2) / 2
-      if_else(spread > 0, paste0("+", spread), 
-              if_else(spread < 0, paste(spread), paste(0)))
-    }
-    for(i in 1:dim(df)[1]) {
-      for(j in 1:dim(df)[2]) {
-        if (i == j) {df[i, j] <- "0"} 
-        else if (is.na(df[i,j])==F) {next}
-        else {
-          df[i,j] = matchup_season(i, j)
-        }
-      }
-    }
-    df
-  })
+  matchups_prob <- reactive(
+    
+    sx_scores %>% 
+      filter(week %in% input$league_week[1]:input$league_week[2]) %>% 
+      compare_league(.reps = 1e6) %>% 
+      fvoa:::spread_league(.output = "wp")
+    
+  )
+  
+  matchups_spread <- reactive(
+    
+    sx_scores %>% 
+      filter(week %in% input$league_week[1]:input$league_week[2]) %>% 
+      compare_league(.reps = 1e6) %>% 
+      fvoa:::spread_league(.output = "spread")
+    
+  )
   
   output$heatmap <- renderPlot({
     hm <- matchups_prob() %>%
-      mutate(winner = rownames(.)) %>% 
+      rename(winner = team) %>% 
+      # mutate(winner = rownames(.)) %>% 
       gather(loser, score, -winner) %>% 
       mutate(loser = factor(loser, levels = sort(unique(loser))))
     hm %>% 
@@ -506,52 +418,23 @@ server <- function(input, output, session) {
       theme(panel.background=element_rect(fill="white", colour="white")) +
       ylim(rev(levels(hm$loser))) +
       labs(x = "Team 2", y="Team 1", fill="% Chance", title="Chance Team 1 Beats Team 2")
-  },
-  res = 96)
+  })
   
   output$lines <- renderTable({
-    matchups_spread()%>% 
-      add_column(Team = teams, .before = 1)
+    matchups_spread() %>% 
+      rename(Team = team)
+    # add_column(Team = teams, .before = 1)
   }, align = 'c')
   
   ### Matchups Tab ###
-  output$matchup_breakdown <- renderTable({
-    set.seed(42)
-    reg_games <- 6
-    reps <- 1e6
-    league <- sx_scores %>% filter(Week %in% input$matchup_week[1]:input$matchup_week[2])
-    t1.scores <- league %>% filter(Team == input$team1) %>% pull(Score)
-    t2.scores <- league %>% filter(Team == input$team2) %>% pull(Score)
-    if (input$matchup_week[2] - input$matchup_week[1] < 5) {
-      t1.mean <- weighted.mean(c(t1.scores, 115), weight_games(t1.scores, reg_games))
-      t1.sd <- sqrt(weighted_sd(c(t1.scores, 115), weight_games(t1.scores, reg_games), method="ML"))
-      t2.mean <- weighted.mean(c(t2.scores, 115), weight_games(t2.scores, reg_games))
-      t2.sd <- sqrt(weighted_sd(c(t2.scores, 115), weight_games(t2.scores, reg_games), method="ML"))
-      
-    } else {
-      t1.mean <- weighted.mean(t1.scores, weight_games(t1.scores, reg_games))
-      t1.sd <- sqrt(weighted_sd(t1.scores, weight_games(t1.scores, reg_games), method="ML"))
-      t2.mean <- weighted.mean(t2.scores, weight_games(t2.scores, reg_games))
-      t2.sd <- sqrt(weighted_sd(t2.scores, weight_games(t2.scores, reg_games), method="ML"))
-    }
+  output$matchup_breakdown <- renderTable(
     
-    t1.sim <- rnorm(reps, t1.mean, t1.sd)
-    t2.sim <- rnorm(reps, t2.mean, t2.sd)
-    sim <- t1.sim-t2.sim
-    tie <- round(dnorm(0, mean(sim), sd(sim)), 4)
-    t1wins <- round(pnorm(0, mean(sim), sd(sim), lower.tail=FALSE) - tie/2, 4)
-    t1squeak <- t1wins - round(pnorm(5, mean(sim), sd(sim), lower.tail=FALSE), 4)
-    t1blowout <- round(pnorm(20, mean(sim), sd(sim), lower.tail=FALSE), 4)
-    t1normal <- t1wins - t1squeak - t1blowout
-    t2wins <- round(pnorm(0, mean(sim), sd(sim)) - tie/2, 2)
-    t2squeak <- t2wins - round(pnorm(-5, mean(sim), sd(sim)), 4)
-    t2blowout <- round(pnorm(-20, mean(sim), sd(sim)), 4)
-    t2normal <- t2wins - t2squeak - t2blowout
-    data.frame(Winner = c(input$team1, input$team1, input$team1, "Tie", input$team2, input$team2, input$team2),
-               Type = c("Blowout", "Normal", "Squeaker", "Tie", "Squeaker", "Normal", "Blowout"),
-               Margin = c("20+ points", "5-20", "<5 points", "-", "<5 points", "5-20", "20+ points"),
-               Probability = format_pct(c(t1blowout, t1normal, t1squeak, tie, t2squeak, t2normal, t2blowout)))
-  }, align = 'c')
+    sx_scores %>% 
+      filter(week %in% input$matchup_week[1]:input$matchup_week[2]) %>% 
+      compare_teams(input$team1, input$team2, .reps = 1e6, .verbose = TRUE) %>% 
+      rename(Margin = MarginVictory,
+             Probability = PctChance), 
+    align = 'c')
   
   ### Team Charts ###
   
@@ -562,10 +445,10 @@ server <- function(input, output, session) {
   output$weekly_plot <- renderPlotly({
     
     if (is.null(input$team_week)) {
-      x <- ggplot(sx_scores, aes(Week, Score)) +
-        geom_smooth(se=F, color = "darkgrey", n = n_distinct(sx_scores$Week), linetype=2) +
-        geom_line(alpha = 0.5, aes(group=Team, color=Team), size = 1.5) +
-        geom_point(aes(group=Team, color=Team)) +
+      x <- ggplot(sx_scores, aes(week, score)) +
+        geom_smooth(se=F, color = "darkgrey", n = n_distinct(sx_scores$week), linetype=2) +
+        geom_line(alpha = 0.5, aes(group=team, color=team), size = 1.5) +
+        geom_point(aes(group=team, color=team)) +
         scale_y_continuous(breaks = pretty_breaks(n = 5)) +
         # scale_x_continuous(breaks = pretty_breaks(n = 7)) +
         scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
@@ -577,13 +460,13 @@ server <- function(input, output, session) {
       ggplotly(x, tooltip = c("group", "x", "y"))
       
     } else {
-      tm <- sx_scores %>% filter(Team %in% input$team_week)
+      tm <- sx_scores %>% filter(team %in% input$team_week)
       
-      x <- ggplot(sx_scores, aes(Week, Score)) +
-        geom_smooth(se=F, color = "darkgrey", n = n_distinct(sx_scores$Week), linetype=2) +
-        geom_line(alpha = 0.2, aes(group=Team, color=Team), size = 1.5) +
-        geom_line(data = tm, aes(group=Team, color=Team), size = 2) + 
-        geom_point(aes(group=Team, color=Team)) +
+      x <- ggplot(sx_scores, aes(week, score)) +
+        geom_smooth(se=F, color = "darkgrey", n = n_distinct(sx_scores$week), linetype=2) +
+        geom_line(alpha = 0.2, aes(group=team, color=team), size = 1.5) +
+        geom_line(data = tm, aes(group=team, color=team), size = 2) + 
+        geom_point(aes(group=team, color=team)) +
         scale_y_continuous(breaks = pretty_breaks(n = 5)) +
         scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
         labs(y = "Score", x = "Week", title = "Weekly Scores") +
@@ -603,10 +486,10 @@ server <- function(input, output, session) {
   output$fvoa_plot <- renderPlotly({
     
     if (is.null(input$team_fvoa)) {
-      x <- ggplot(sx_fvoa_season, aes(Week, FVOA)) +
+      x <- ggplot(sx_fvoa_season, aes(week, fvoa)) +
         # geom_smooth(se=F, color = "darkgrey", n = n_distinct(sx_scores$Week), linetype=2) +
-        geom_line(alpha = 0.5, aes(group=Team, color=Team), size = 1.5) +
-        geom_point(aes(group=Team, color=Team)) +
+        geom_line(alpha = 0.5, aes(group=team, color=team), size = 1.5) +
+        geom_point(aes(group=team, color=team)) +
         geom_segment(x = 1, y = 0, xend = 15, yend = 0, color = "darkgrey", linetype = 2) +
         scale_y_continuous(breaks = c(-100, -75, -50, -25, 0, 25, 50, 75, 100), limits = c(-100, 100)) +
         # scale_y_continuous(breaks = pretty_breaks(n = 5)) +
@@ -619,13 +502,13 @@ server <- function(input, output, session) {
       ggplotly(x, tooltip = c("group", "x", "y"))
       
     } else {
-      tm <- sx_fvoa_season %>% filter(Team %in% input$team_fvoa)
+      tm <- sx_fvoa_season %>% filter(team %in% input$team_fvoa)
       
-      x <- ggplot(sx_fvoa_season, aes(Week, FVOA)) +
+      x <- ggplot(sx_fvoa_season, aes(week, fvoa)) +
         # geom_smooth(se=F, color = "darkgrey", n = n_distinct(sx_scores$Week), linetype=2) +
-        geom_line(alpha = 0.2, aes(group=Team, color=Team), size = 1.5) +
-        geom_line(data = tm, aes(group=Team, color=Team), size = 2) + 
-        geom_point(aes(group=Team, color=Team)) +
+        geom_line(alpha = 0.2, aes(group=team, color=team), size = 1.5) +
+        geom_line(data = tm, aes(group=team, color=team), size = 2) + 
+        geom_point(aes(group=team, color=team)) +
         geom_segment(x = 1, y = 0, xend = 15, yend = 0, color = "darkgrey", linetype = 2) +
         scale_y_continuous(breaks = c(-100, -75, -50, -25, 0, 25, 50, 75, 100), limits = c(-100, 100)) +
         # scale_y_continuous(breaks = pretty_breaks(n = 5)) +
@@ -664,9 +547,11 @@ server <- function(input, output, session) {
       
       if (is.null(input$team_sims)) {
         x <- sx_simulated_season %>% 
-          ggplot(aes(Week, Wins)) +
-          geom_line(alpha = 0.5, aes(group=Team, color=Team), size = 1.5) +
-          geom_point(aes(group=Team, color=Team)) +
+          ggplot(aes(week, wins)) +
+          geom_line(alpha = 0.5, aes(color=team), size = 1.5) +
+          geom_point(aes(color=team)) +
+          # geom_line(alpha = 0.5, aes(group=Team, color=Team), size = 1.5) +
+          # geom_point(aes(group=Team, color=Team)) +
           geom_segment(x = 1, y = 7.5, xend = 15, yend = 7.5, color = "darkgrey", linetype = 2) +
           scale_y_continuous(breaks = c(0, 2, 4, 6, 8, 10, 12, 14), limits = c(0, 15)) +
           scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
@@ -678,13 +563,13 @@ server <- function(input, output, session) {
         ggplotly(x, tooltip = c("group", "x", "y"))
         
       } else {
-        tm <- sx_simulated_season %>% filter(Team %in% input$team_sims)
+        tm <- sx_simulated_season %>% filter(team %in% input$team_sims)
         
         x <- sx_simulated_season %>% 
-          ggplot(aes(Week, Wins)) +
-          geom_line(alpha = 0.2, aes(group=Team, color=Team), size = 1.5) +
-          geom_line(data = tm, aes(group=Team, color=Team), size = 2) + 
-          geom_point(aes(group=Team, color=Team)) +
+          ggplot(aes(week, wins)) +
+          geom_line(alpha = 0.2, aes(group=team, color=team), size = 1.5) +
+          geom_line(data = tm, aes(group=team, color=team), size = 2) + 
+          geom_point(aes(group=team, color=team)) +
           geom_segment(x = 1, y = 7.5, xend = 15, yend = 7.5, color = "darkgrey", linetype = 2) +
           scale_y_continuous(breaks = c(0, 2, 4, 6, 8, 10, 12, 14), limits = c(0, 15)) +
           scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
@@ -700,10 +585,10 @@ server <- function(input, output, session) {
       
       if (is.null(input$team_sims)) {
         x <- sx_simulated_season %>% 
-          ggplot(aes(Week, Points)) +
-          geom_smooth(se=F, color = "darkgrey", n = n_distinct(sx_scores$Week), linetype = 2) +
-          geom_line(alpha = 0.5, aes(group=Team, color=Team), size = 1.5) +
-          geom_point(aes(group=Team, color=Team)) +
+          ggplot(aes(week, points)) +
+          geom_smooth(se=F, color = "darkgrey", n = n_distinct(sx_scores$week), linetype = 2) +
+          geom_line(alpha = 0.5, aes(group=team, color=team), size = 1.5) +
+          geom_point(aes(group=team, color=team)) +
           scale_y_continuous(breaks = pretty_breaks(n = 5)) +
           scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
           labs(y = "Points", x = "Week", title = "Projected Total Points by Week") +
@@ -714,14 +599,14 @@ server <- function(input, output, session) {
         ggplotly(x, tooltip = c("group", "x", "y"))
         
       } else {
-        tm <- sx_simulated_season %>% filter(Team %in% input$team_sims)
+        tm <- sx_simulated_season %>% filter(team %in% input$team_sims)
         
         x <- sx_simulated_season %>% 
           ggplot(aes(Week, Points)) +
-          geom_smooth(se=F, color = "darkgrey", n = n_distinct(sx_scores$Week), linetype=2) +
-          geom_line(alpha = 0.2, aes(group=Team, color=Team), size = 1.5) +
-          geom_line(data = tm, aes(group=Team, color=Team), size = 2) + 
-          geom_point(aes(group=Team, color=Team)) +
+          geom_smooth(se=F, color = "darkgrey", n = n_distinct(sx_scores$week), linetype=2) +
+          geom_line(alpha = 0.2, aes(group=team, color=team), size = 1.5) +
+          geom_line(data = tm, aes(group=team, color=team), size = 2) + 
+          geom_point(aes(group=team, color=team)) +
           scale_y_continuous(breaks = pretty_breaks(n = 5)) +
           scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
           labs(y = "Points", x = "Week", title = "Projected Total Points by Week") +
@@ -736,9 +621,9 @@ server <- function(input, output, session) {
       
       if (is.null(input$team_sims)) {
         x <- sx_simulated_season %>% 
-          ggplot(aes(Week, Percent)) +
-          geom_line(alpha = 0.5, aes(group=Team, color=Team), size = 1.5) +
-          geom_point(aes(group=Team, color=Team)) +
+          ggplot(aes(week, percent)) +
+          geom_line(alpha = 0.5, aes(group=team, color=team), size = 1.5) +
+          geom_point(aes(group=team, color=team)) +
           geom_segment(x = 1, y = 40, xend = 15, yend = 40, color = "darkgrey", linetype = 2) +
           scale_y_continuous(breaks = c(0, 20, 40, 60, 80, 100), limits = c(0, 100)) +
           scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
@@ -750,13 +635,13 @@ server <- function(input, output, session) {
         ggplotly(x, tooltip = c("group", "x", "y"))
         
       } else {
-        tm <- sx_simulated_season %>% filter(Team %in% input$team_sims)
+        tm <- sx_simulated_season %>% filter(team %in% input$team_sims)
         
         x <- sx_simulated_season %>% 
-          ggplot(aes(Week, Percent)) +
-          geom_line(alpha = 0.2, aes(group=Team, color=Team), size = 1.5) +
-          geom_line(data = tm, aes(group=Team, color=Team), size = 2) + 
-          geom_point(aes(group=Team, color=Team)) +
+          ggplot(aes(week, percent)) +
+          geom_line(alpha = 0.2, aes(group=team, color=team), size = 1.5) +
+          geom_line(data = tm, aes(group=team, color=team), size = 2) + 
+          geom_point(aes(group=team, color=team)) +
           geom_segment(x = 1, y = 40, xend = 15, yend = 40, color = "darkgrey", linetype = 2) +
           scale_y_continuous(breaks = c(0, 20, 40, 60, 80, 100), limits = c(0, 100)) +
           scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
@@ -775,54 +660,56 @@ server <- function(input, output, session) {
     
   })
   
-  output$playoff_leverage <- renderPlot(
+  
+  output$playoff_leverage <- renderPlot({
     sx_playoff_leverage_chart + 
-      scale_fill_manual(values = fvoa_colors),
-    res = 96)
+      scale_fill_manual(values = fvoa_colors)
+  })
   
-  output$manager <- renderPlot(
-    sx_lineup_eval,
-    res = 96)
+  output$manager <- renderPlot({
+    sx_lineup_eval
+  })
   
-  output$quadrant <- renderPlot(
-    calculate_quadrants(sx_scores, sx_schedule,
-                        start = input$quad_week[1],
-                        end = input$quad_week[2]) %>% 
-      plot_quadrant(),
-    res = 96)
+  output$quadrant <- renderPlot({
+    
+    sx_scores %>% 
+      filter(week %in% input$quad_week[1]:input$quad_week[2]) %>% 
+      calculate_quadrants(sx_schedule, .) %>% 
+      plot_quadrant()
+  })
   
-  output$projected <- renderPlot(
+  output$projected <- renderPlot({
     sx_proj %>%
-      filter(Week %in% input$proj_week[1]:input$proj_week[2]) %>%
+      filter(week %in% input$proj_week[1]:input$proj_week[2]) %>%
       # spread(Type, Score) %>% 
-      group_by(Team) %>% 
-      mutate(margin = Score-Proj,
+      group_by(team) %>% 
+      mutate(margin = act - proj,
              sign = if_else(margin >=0, "positive", "negative"),
              avg = mean(margin),
              pos_count = sum(if_else(sign == "positive", 1, 0))) %>%
-      ggplot(aes(x= Week, y = margin, fill=sign)) +
+      ggplot(aes(x= week, y = margin, fill=sign)) +
       geom_bar(stat="identity") + 
       scale_x_continuous(breaks = pretty_breaks(n = 7)) +
-      facet_wrap(~reorder(Team, - pos_count), ncol=n_distinct(sx_proj$Team)/2) +
+      facet_wrap(~reorder(team, - pos_count), ncol=n_distinct(sx_proj$team)/2) +
       guides(fill=FALSE) +
-      labs(y = "Margin") +
+      labs(x = "Week", y = "Margin") +
       scale_fill_manual(values = c(equal = "#619CFF", negative = "#F8766D", positive = "#00BA38")) +
       theme_fvoa() + 
-      theme(panel.grid.major.y = element_blank()),
-    res = 96)
+      theme(panel.grid.major.y = element_blank())
+  })
   
-  output$boxplot <- renderPlot(
+  output$boxplot <- renderPlot({
     sx_scores %>% 
-      filter(Week %in% input$boxplot_week[1]:input$boxplot_week[2]) %>%
-      ggplot(aes(x=reorder(Team, -Score, fun=mean), y=Score, fill=Team)) + 
+      filter(week %in% input$boxplot_week[1]:input$boxplot_week[2]) %>%
+      ggplot(aes(x=reorder(team, -score, fun=mean), y=score, fill=team)) + 
       geom_boxplot(coef = 1.25, outlier.alpha = 0.6) + 
       stat_summary(fun.y=mean, geom="point", shape=18, size=3, show.legend=FALSE) + 
       guides(fill=F) +
       labs(y = "Score", x = "", title = "Team Boxplots") +
       theme_fvoa() + 
-      theme(panel.border = element_blank()) + 
-      scale_fill_manual(values = fvoa_colors),
-    res = 96)
+      scale_fill_manual(values = fvoa_colors) + 
+      theme(panel.border = element_blank())
+  })
   
   observeEvent(input$clear_teams_density, {
     updateCheckboxGroupInput(session, "team_density", selected = character(0))
@@ -832,9 +719,9 @@ server <- function(input, output, session) {
     
     if (is.null(input$team_density)) {
       x <- sx_scores %>% 
-        filter(Week %in% input$density_week[1]:input$density_week[2]) %>%
-        ggplot(aes(Score)) +
-        geom_density(aes(fill = Team, color = Team), alpha = 0.2) + 
+        filter(week %in% input$density_week[1]:input$density_week[2]) %>%
+        ggplot(aes(score)) +
+        geom_density(aes(fill = team, color = team), alpha = 0.2) + 
         labs(x = "Weekly Scores", y = "Density", title = "Density Plots") +
         guides(fill=FALSE) + 
         theme_fvoa() + 
@@ -844,19 +731,18 @@ server <- function(input, output, session) {
       ggplotly(x, tooltip = c("fill", "x"))
       
     } else {
-      tm <- sx_scores %>% filter(Team %in% input$team_density)
+      tm <- sx_scores %>% filter(team %in% input$team_density)
       
       x <- sx_scores %>% 
-        filter(Week %in% input$density_week[1]:input$density_week[2]) %>% 
+        filter(week %in% input$density_week[1]:input$density_week[2]) %>% 
         ggplot(aes(Score)) +
-        geom_density(aes(fill = Team, color = Team), alpha = 0.1) + 
-        geom_density(data = tm, aes(fill=Team, color = Team), alpha = 0.8) + 
+        geom_density(aes(fill = team, color = team), alpha = 0.1) + 
+        geom_density(data = tm, aes(fill = team, color = team), alpha = 0.8) + 
         labs(x = "Weekly Scores", y = "Density", title = "Density Plots") +
         guides(fill=FALSE, color = FALSE) + 
         theme_fvoa() + 
         scale_fill_manual(values = fvoa_colors) + 
         scale_color_manual(values = fvoa_colors)
-      
       
       ggplotly(x, tooltip = c("fill", "x"))
     }
@@ -865,18 +751,22 @@ server <- function(input, output, session) {
   ### Model Evaluation ###
   
   output$eval_accuracy <- renderText({
-    sx_model_eval[[1]]
+    
+    accuracy <- sx_model_eval %>% 
+      dplyr::summarize(x = sum(correct) / n()) %>% 
+      pull() %>% 
+      scales::percent()
+    
+    str_glue("FVOA has correctly predicted {accuracy} of games this season")
   })
   
-  output$eval_plot <- renderPlot(
-    sx_model_eval[[2]],
-    res = 96)
+  output$eval_plot <- renderPlot({
+    plot_model_eval_weekly(sx_model_eval)
+  })
   
-  output$eval_team = renderTable({
-    sx_model_eval[[3]] %>% 
-      filter(Week == weeks_played) %>% 
-      select(Team, Correct)
-  }, digits = 0, align = 'c')
+  output$eval_team = renderTable(
+    evaluate_team_accuracy(sx_model_eval, .latest = TRUE), 
+    digits = 0, align = 'c')
   
 }
 
