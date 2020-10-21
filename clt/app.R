@@ -164,6 +164,13 @@ ui  <- navbarPage(
              )
            )
            
+           # p("How do all the teams compare to each other?"),
+           # fluidRow(column(8, plotOutput("heatmap")), align = "center"),
+           # br(),
+           # br(),
+           # p("Just because you aren't matched up doesn't mean you can't still gamble on your scores:"),
+           # tableOutput("lines")
+           
   ),
   
   # Matchups Tab-------------------------------------------------------------
@@ -366,10 +373,7 @@ server <- function(input, output, session) {
   
   output$rankings <- renderTable({
 
-    rankings <- clt_rankings %>%
-      rename_all(snakecase::to_title_case) %>% 
-      rename(FVOA = Fvoa, `FVOA Rank` = `Fvoa Rank`, 
-             SoS = Sos, `SoS Rank` = `Sos Rank`)
+    rankings <- clt_rankings
     sort <- sorting[[input$sorting]]
     rank_sort <- rankings %>%
       arrange(rankings[[sort]])
@@ -388,7 +392,7 @@ server <- function(input, output, session) {
     
     clt_scores %>% 
       filter(week %in% input$league_week[1]:input$league_week[2]) %>% 
-      compare_league(.reps = 1e6) %>% 
+      compare_league(.reps = 1000) %>% 
       fvoa:::spread_league(.output = "wp")
     
   )
@@ -397,7 +401,7 @@ server <- function(input, output, session) {
     
     clt_scores %>% 
       filter(week %in% input$league_week[1]:input$league_week[2]) %>% 
-      compare_league(.reps = 1e6) %>% 
+      compare_league(.reps = 1000) %>% 
       fvoa:::spread_league(.output = "spread")
     
   )

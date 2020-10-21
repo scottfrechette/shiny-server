@@ -150,7 +150,10 @@ clt_matchups_prob <- compare_league(clt_scores, .reps = 1e6) %>%
   fvoa:::spread_league(.output = "wp")
 clt_matchups_spread <- compare_league(clt_scores, .reps = 1e6) %>% 
   fvoa:::spread_league(.output = "spread")
-clt_rankings <- calculate_rankings(clt_schedule, clt_scores, "yahoo")
+clt_rankings <- calculate_rankings(clt_schedule, clt_scores, "yahoo") %>% 
+  rename_all(snakecase::to_title_case) %>% 
+  rename(FVOA = Fvoa, `FVOA Rank` = `Fvoa Rank`, 
+         SoS = Sos, `SoS Rank` = `Sos Rank`)
 clt_current_matchups <- compare_current_matchups(clt_scores, 
                                                  clt_schedule, 
                                                  current_week, 
