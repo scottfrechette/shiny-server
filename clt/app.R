@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 5
+frech_stats <- 6
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -64,28 +64,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "It's absolutely astonishing that two of the best 4 teams (Josh and Barrett) have losing records"
+               "Looks like that 4th spot is up for grabs, and maybe even Barrett's 3rd spot"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "On flip side, the 3rd worst team (German) is sitting 1 win back from 1st"
+               "I would say I can't figure out why the top scorer through 6 weeks is in 8th until I look at weekly points and see Josh plummeting last 3 weeks"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Still a long season though, PFinn has a 1 in 5 shot of making playoffs despite being in 8th in the league"
+               "ERam and I both got a sizable playoff boost with strong wins last week, and Diaz really locked up the 2nd spot for now"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "I made some major upgrades on the backend so let me know if you see anything off, but that also let me update the Skill v Luck chart for PF instead of margin so it looks a little better"
+               "Not to be outdone German laid a real stinker with lowest score of the season and just barely edged out PFinn for least likely to make playoffs (though both still around 12%)"
              } else {
                "TBD"
              }

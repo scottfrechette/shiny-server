@@ -132,6 +132,7 @@ clt_simulated_season <- collect(tbl(clt_con, "simulated_seasons")) %>%
             by = c("league", "leagueID", "teamID")) %>% 
   select(league:week, team, points:rank)
 clt_simulated_scores <- collect(tbl(clt_con, "simulated_scores")) %>% 
+  filter(week == max(week)) %>% 
   left_join(clt_owners, 
             by = c("league", "leagueID", "teamID")) %>% 
   select(league:sim_week, team, score)
