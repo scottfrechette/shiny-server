@@ -350,9 +350,9 @@ server <- function(input, output, session) {
     clt_simulated_season %>% 
       filter(week == max(week)) %>% 
       mutate(points = as.integer(points),
-             Playoff = paste0(round(percent, 0), "%")) %>% 
+             Playoffs = paste0(round(percent, 0), "%")) %>% 
       select(Team = team, Points = points,
-             Wins = wins, Playoff)
+             Wins = wins, Playoffs)
   }, align = 'c', digits = 1)
   
   ### Rankings Tab ###
