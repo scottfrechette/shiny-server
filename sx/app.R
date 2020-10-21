@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 5
+frech_stats <- 6
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -64,28 +64,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Hoop and Obie still getting FVOA playoff love despite being two games back from leaders"
+               "Jangaard's win over Bethany and Burg's high score (even with a loss) have put everyone back in play for playoffs, so this season is really proving to be chaotic"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "I'm happy to tell Burgess he now did well enough in simulations to register above 0 again"
+               "Obie also overtook Herndon as top team even though he's 2 games back"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Wikle on other hand sitting in 4th place but only made playoffs in 6.6% of simulations"
+               "Hoop is really unluckly given he's 2nd best team but somehow has a losing record"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Based on feedback I've updated the Skill v Luck to show points for instead of margin"
+               "Wikle on the other hand is somehow in 4th despite being the 3rd worst team according to FVOA so he's getting very lucky"
              } else {
                "TBD"
              }
@@ -366,13 +366,7 @@ server <- function(input, output, session) {
   
   output$rankings <- renderTable({
     
-    rankings <- sx_rankings %>%
-      rename_all(snakecase::to_title_case) %>% 
-      rename(`ESPN Rank` = `Espn Rank`,
-             FVOA = Fvoa, 
-             `FVOA Rank` = `Fvoa Rank`, 
-             SoS = Sos, 
-             `SoS Rank` = `Sos Rank`)
+    rankings <- sx_rankings
     sort <- sorting[[input$sorting]]
     rank_sort <- rankings %>%
       arrange(rankings[[sort]])
@@ -391,7 +385,7 @@ server <- function(input, output, session) {
     
     sx_scores %>% 
       filter(week %in% input$league_week[1]:input$league_week[2]) %>% 
-      compare_league(.reps = 1e6) %>% 
+      compare_league(.reps = 1000) %>% 
       fvoa:::spread_league(.output = "wp")
     
   )
@@ -400,7 +394,7 @@ server <- function(input, output, session) {
     
     sx_scores %>% 
       filter(week %in% input$league_week[1]:input$league_week[2]) %>% 
-      compare_league(.reps = 1e6) %>% 
+      compare_league(.reps = 1000) %>% 
       fvoa:::spread_league(.output = "spread")
     
   )
