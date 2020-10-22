@@ -79,7 +79,7 @@ ui <- fluidPage(
                          min = 1,
                          max = 70,
                          value = 30),
-            selectInput("order", 
+            selectInput("order",
                         "Order Players By:",
                         choices = c("Points", "ECR"),
                         selected = "Points"
@@ -107,7 +107,7 @@ server <- function(input, output) {
             
             if("Roster" %in% c(input$groups)) {
                 roster <- clt_projections_df %>%
-                    filter(teamID == "Frech Prince Helaire") %>%
+                    filter(teamID == 3) %>%
                     mutate(first_name = str_c("*", first_name),
                            last_name = str_c(last_name, "*"))
             } else {
@@ -115,14 +115,14 @@ server <- function(input, output) {
             }
             
             if("Available" %in% input$groups) {
-                available <- clt_projections_df %>% filter(teamID == "FA"|is.na(teamID))
+                available <- clt_projections_df %>% filter(teamID == 0|is.na(teamID))
             } else {
                 available <- NULL
             }
             
             if("Taken" %in% input$groups) {
-                taken <- clt_projections_df %>% filter(!teamID %in% c("FA", "Frech Prince Helaire"),
-                                                    !is.na(teamID))
+                taken <- clt_projections_df %>% filter(!teamID %in% c(0, 3),
+                                                       !is.na(teamID))
             } else {
                 taken <- NULL
             }
@@ -163,7 +163,9 @@ server <- function(input, output) {
         
         bind_rows(roster, available, taken,
                   .id = "availability") %>% 
-            filter(!is.na(pos_ecr)|position == "DST")
+            filter(!is.na(pos_rank)|position == "DST") #%>% 
+            # filter(points < 50)
+            # filter(!is.na(pos_ecr)|position == "DST")
         
     })
     
