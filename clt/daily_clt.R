@@ -15,6 +15,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
+current_season <- year(today())
 
 clt_con <- dbConnect(SQLite(), here::here("clt", "clt.sqlite"))
 
@@ -22,7 +23,7 @@ clt_team_tmp <- scrape_team("yahoo", 479084, weeks_played)
 
 if(exists("clt_team_tmp")) {
   
-  dbSendQuery(clt_con, str_glue("DELETE from teams where week == {weeks_played}"))
+  dbSendQuery(clt_con, str_glue("DELETE from teams where week == {weeks_played} and season == {current_season}"))
   
   dbWriteTable(clt_con, 
                "teams", clt_team_tmp, 
@@ -36,7 +37,7 @@ clt_wp_tmp <- scrape_win_prob(479084, current_week, 2020, "yahoo")
 
 if(exists("clt_wp_tmp")) {
   
-  dbSendQuery(clt_con, str_glue("DELETE from wp where week == {weeks_played}"))
+  dbSendQuery(clt_con, str_glue("DELETE from wp where week == {weeks_played}"))# and season == {current_season}"))
   
   dbWriteTable(clt_con, 
                "wp", clt_wp_tmp, 
@@ -47,8 +48,12 @@ if(exists("clt_wp_tmp")) {
 }
 
 clt_owners <- collect(tbl(clt_con, "owners"))
-clt_schedule <- collect(tbl(clt_con, "schedule"))
-clt_team <- collect(tbl(clt_con, "teams"))
+clt_schedule <- tbl(clt_con, "schedule") %>% 
+  filter(season == current_season) %>% 
+  collect()
+clt_team <- tbl(clt_con, "teams") %>% 
+  filter(season == current_season) %>% 
+  collect()
 clt_scores <- extract_scores(clt_team)
 clt_proj <- extract_projections(clt_team)
 
@@ -56,7 +61,7 @@ clt_simulated_scores_tmp <- simulate_season(clt_team, 1000, max(clt_schedule$wee
 
 if(exists("clt_simulated_scores_tmp")) {
   
-  dbSendQuery(clt_con, str_glue("DELETE from simulated_scores where week == {weeks_played}"))
+  dbSendQuery(clt_con, str_glue("DELETE from simulated_scores where week == {weeks_played} and season == {current_season}"))
   
   dbWriteTable(clt_con, 
                "simulated_scores", clt_simulated_scores_tmp, 
@@ -71,7 +76,7 @@ clt_simulated_season_tmp <- simulate_record(clt_simulated_scores_tmp,
 
 if(exists("clt_simulated_season_tmp")) {
   
-  dbSendQuery(clt_con, str_glue("DELETE from simulated_seasons where week == {weeks_played}"))
+  dbSendQuery(clt_con, str_glue("DELETE from simulated_seasons where week == {weeks_played} and season == {current_season}"))
   
   dbWriteTable(clt_con, 
                "simulated_seasons", clt_simulated_season_tmp, 
@@ -85,7 +90,7 @@ clt_model_eval_tmp <- evaluate_model(clt_team, weeks_played, .reps = 1e6)
 
 if(exists("clt_model_eval_tmp")) {
   
-  dbSendQuery(clt_con, str_glue("DELETE from model_evaluation where week == {weeks_played}"))
+  dbSendQuery(clt_con, str_glue("DELETE from model_evaluation where week == {weeks_played} and season == {current_season}"))
   
   dbWriteTable(clt_con, 
                "model_evaluation", clt_model_eval_tmp, 
@@ -99,7 +104,7 @@ clt_players_tmp <- scrape_player_projections("yahoo", 479084, week = weeks_playe
 
 if(exists("clt_players_tmp")) {
   
-  dbSendQuery(clt_con, str_glue("DELETE from players where week == {weeks_played}"))
+  dbSendQuery(clt_con, str_glue("DELETE from players where week == {weeks_played} and season == {current_season}"))
   
   dbWriteTable(clt_con, 
                "players", clt_players_tmp, 

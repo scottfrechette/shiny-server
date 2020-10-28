@@ -16,6 +16,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
+current_season <- year(today())
 
 sx_con <- dbConnect(SQLite(), here::here("sx", "sx.sqlite"))
 
@@ -23,7 +24,7 @@ sx_team_tmp <- scrape_team("espn", 299999, weeks_played)
 
 if(exists("sx_team_tmp")) {
   
-  dbSendQuery(sx_con, str_glue("DELETE from teams where week == {weeks_played}"))
+  dbSendQuery(sx_con, str_glue("DELETE from teams where week == {weeks_played} and season == {current_season}"))
   
   dbWriteTable(sx_con, 
                "teams", sx_team_tmp, 
@@ -34,8 +35,12 @@ if(exists("sx_team_tmp")) {
 }
 
 sx_owners <- collect(tbl(sx_con, "owners"))
-sx_schedule <- collect(tbl(sx_con, "schedule"))
-sx_team <- collect(tbl(sx_con, "teams"))
+sx_schedule <- tbl(sx_con, "schedule") %>% 
+  filter(season == current_season) %>% 
+  collect()
+sx_team <- tbl(sx_con, "teams") %>% 
+  filter(season == current_season) %>% 
+  collect()
 sx_scores <- extract_scores(sx_team)
 sx_proj <- extract_projections(sx_team)
 
@@ -58,7 +63,7 @@ sx_simulated_season_tmp <- simulate_record(sx_simulated_scores_tmp,
 
 if(exists("sx_simulated_season_tmp")) {
   
-  dbSendQuery(sx_con, str_glue("DELETE from simulated_seasons where week == {weeks_played}"))
+  dbSendQuery(sx_con, str_glue("DELETE from simulated_seasons where week == {weeks_played} and season == {current_season}"))
   
   dbWriteTable(sx_con, 
                "simulated_seasons", sx_simulated_season_tmp, 
@@ -72,7 +77,7 @@ sx_model_eval_tmp <- evaluate_model(sx_team, weeks_played, .reps = 1e6)
 
 if(exists("sx_model_eval_tmp")) {
   
-  dbSendQuery(sx_con, str_glue("DELETE from model_evaluation where week == {weeks_played}"))
+  dbSendQuery(sx_con, str_glue("DELETE from model_evaluation where week == {weeks_played} and season == {current_season}"))
   
   dbWriteTable(sx_con, 
                "model_evaluation", sx_model_eval_tmp, 
@@ -86,7 +91,7 @@ sx_players_tmp <- scrape_player_projections("espn", 299999, week = weeks_played,
 
 if(exists("sx_players_tmp")) {
   
-  dbSendQuery(sx_con, str_glue("DELETE from players where week == {weeks_played}"))
+  dbSendQuery(sx_con, str_glue("DELETE from players where week == {weeks_played} and season == {current_season}"))
   
   dbWriteTable(sx_con, 
                "players", sx_players_tmp, 

@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 6
+frech_stats <- 7
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -64,28 +64,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Looks like that 4th spot is up for grabs, and maybe even Barrett's 3rd spot"
+               "David and Diaz starting to pull away from the pack here, with Barrett also managing coin flip's chance to make playoffs"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "I would say I can't figure out why the top scorer through 6 weeks is in 8th until I look at weekly points and see Josh plummeting last 3 weeks"
+               "Some real parity happening on the lower end where even the lowest two teas, German and PFinn, have a 1 in 8 chance of making it"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "ERam and I both got a sizable playoff boost with strong wins last week, and Diaz really locked up the 2nd spot for now"
+               "I'd be remiss to not mention Josh is the perennial unlucky team, and now Justin is inching into unlucky territory too"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Not to be outdone German laid a real stinker with lowest score of the season and just barely edged out PFinn for least likely to make playoffs (though both still around 12%)"
+               "bobby on the other hand is sitting pretty in 3rd place with 6th highest points"
              } else {
                "TBD"
              }
@@ -419,7 +419,7 @@ server <- function(input, output, session) {
       theme(panel.background=element_rect(fill="white", colour="white")) +
       ylim(rev(levels(hm$loser))) +
       labs(x = "Team 2", y="Team 1", fill="% Chance", title="Chance Team 1 Beats Team 2")
-  })
+  }, res = 96)
   
   output$lines <- renderTable({
     matchups_spread() %>% 
@@ -665,11 +665,11 @@ server <- function(input, output, session) {
   output$playoff_leverage <- renderPlot({
     clt_playoff_leverage_chart + 
       scale_fill_manual(values = fvoa_colors)
-  })
+  }, res = 96)
   
   output$manager <- renderPlot({
     clt_lineup_eval
-  })
+  }, res = 96)
   
   output$quadrant <- renderPlot({
     
@@ -677,7 +677,7 @@ server <- function(input, output, session) {
       filter(week %in% input$quad_week[1]:input$quad_week[2]) %>% 
       calculate_quadrants(clt_schedule, .) %>% 
       plot_quadrant()
-  })
+  }, res = 96)
   
   output$projected <- renderPlot({
     clt_proj %>%
@@ -697,7 +697,7 @@ server <- function(input, output, session) {
       scale_fill_manual(values = c(equal = "#619CFF", negative = "#F8766D", positive = "#00BA38")) +
       theme_fvoa() + 
       theme(panel.grid.major.y = element_blank())
-  })
+  }, res = 96)
   
   output$boxplot <- renderPlot({
     clt_scores %>% 
@@ -710,7 +710,7 @@ server <- function(input, output, session) {
       theme_fvoa() + 
       scale_fill_manual(values = fvoa_colors) + 
       theme(panel.border = element_blank())
-  })
+  }, res = 96)
   
   observeEvent(input$clear_teams_density, {
     updateCheckboxGroupInput(session, "team_density", selected = character(0))
@@ -763,7 +763,7 @@ server <- function(input, output, session) {
   
   output$eval_plot <- renderPlot({
     plot_model_eval_weekly(clt_model_eval)
-  })
+  }, res = 96)
   
   output$eval_team = renderTable(
     evaluate_team_accuracy(clt_model_eval, .latest = TRUE), 
