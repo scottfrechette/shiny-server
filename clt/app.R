@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 7
+frech_stats <- 8
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -64,28 +64,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "David and Diaz starting to pull away from the pack here, with Barrett also managing coin flip's chance to make playoffs"
+               "We're now seeing FVOA and official rankings agree on top 4, and also giving them strong chances to make playoffs (and even claiming David to be sure thing already)"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Some real parity happening on the lower end where even the lowest two teas, German and PFinn, have a 1 in 8 chance of making it"
+               "Bobby, German, and I on the other hand don't even deserve to have same record as Josh and Justin, so there's still chance for chaos to reign"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "I'd be remiss to not mention Josh is the perennial unlucky team, and now Justin is inching into unlucky territory too"
+               "Eric is getting to his own category where he's scoring more points than other bad teams like PFinn but can't quite catch up to our top 4"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "bobby on the other hand is sitting pretty in 3rd place with 6th highest points"
+               "And the Commish's playoff odds are going down with each passing lower-scoring week"
              } else {
                "TBD"
              }

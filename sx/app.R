@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 7
+frech_stats <- 8
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -64,28 +64,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Obie and Herndon are really starting to lock up those first two playoff spots"
+               "Herndon is now all but a sure thing, with Hoop also very likely"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Bethany's team is starting to dip, which is really helping Ford and Hoop's chances of 3rd and 4th spots"
+               "Ford and Obie are in strong position for final 2 spots but Bethany is still lingering"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Wikle still sitting in the lucky section because he keeps leaving so many points on his bench"
+               "Congrats to Jeremy on holding out for that one simulated season where he made the playoffs"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Maybe Burgess can be happy now that I'm scraping the bottom of the barrel with him"
+               "FVOA seems to be largely in line with actual rankings, so maybe there's not going to be as much chaos as we expected"
              } else {
                "TBD"
              }
@@ -343,7 +343,11 @@ server <- function(input, output, session) {
     sx_simulated_season %>% 
       filter(week == max(week)) %>% 
       mutate(points = as.integer(points),
-             Playoffs = paste0(round(percent, 0), "%")) %>% 
+             Playoffs = case_when(
+               week < 8 & percent < 1 ~ "<1%",
+               between(percent, 0, 1) ~ "<1%",
+               TRUE ~ paste0(round(percent, 0), "%")
+             )) %>% 
       select(Team = team, Points = points,
              Wins = wins, Playoffs)
   }, align = 'c', digits = 1)
