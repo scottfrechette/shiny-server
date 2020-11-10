@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 8
+frech_stats <- 9
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -64,28 +64,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "We're now seeing FVOA and official rankings agree on top 4, and also giving them strong chances to make playoffs (and even claiming David to be sure thing already)"
+               "FVOA Projection: David and Diaz will make the playoffs"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Bobby, German, and I on the other hand don't even deserve to have same record as Josh and Justin, so there's still chance for chaos to reign"
+               "FVOA Key Race Alert: Justin and Josh are in strong position for last two playoff spots but German is closing the gap after strong showing in absentee matchups"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Eric is getting to his own category where he's scoring more points than other bad teams like PFinn but can't quite catch up to our top 4"
+               "FVOA Projection: PFinn has lost his bid for playoff spot after leaving so many points on his bench last week"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "And the Commish's playoff odds are going down with each passing lower-scoring week"
+               "FVOA Key Race Alert: Eric, Bobby, Scott, and Commish still have a chance to sneak in but will need near 100% victory margin in remaining provisional matchups"
              } else {
                "TBD"
              }

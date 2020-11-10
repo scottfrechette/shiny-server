@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 8
+frech_stats <- 9
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -64,28 +64,35 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Herndon is now all but a sure thing, with Hoop also very likely"
+               "FVOA Projection: Herndon and Ford jumped out to early leads and appear to be headed for first 2 playoff spots"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Ford and Obie are in strong position for final 2 spots but Bethany is still lingering"
+               "FVOA Projection: Burgess and Jersey have almost no viable path forward and has lost their bids for playoff spot"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Congrats to Jeremy on holding out for that one simulated season where he made the playoffs"
+               "FVOA Key Race Alert: Hoop has strong chance to make the playoffs but at 5-4 we still need to see more from absentee games still being played"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "FVOA seems to be largely in line with actual rankings, so maybe there's not going to be as much chaos as we expected"
+               "FVOA Key Race Alert: After polling well and taking early leads in numerous rural counties Obie and Bethany are waiting to see if urban games will be enough to overtake their leads and bump them out of playoffs"
+             } else {
+               "TBD"
+             }
+           ),
+           tags$li(
+             if(weeks_played == frech_stats) {
+               "Still plenty of outstanding points out there and the uncertainty of where games will come from going forward mean that nothing is certain this season"
              } else {
                "TBD"
              }
