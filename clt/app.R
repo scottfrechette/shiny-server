@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 9
+frech_stats <- 10
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -64,28 +64,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "FVOA Projection: David and Diaz will make the playoffs"
+               "Well 3 straiaght high-score payouts will do wonders for your playoff chances, going from 1 in 6 to 2 in 3 chances"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "FVOA Key Race Alert: Justin and Josh are in strong position for last two playoff spots but German is closing the gap after strong showing in absentee matchups"
+               "Likewise David, Diaz, and Justin are all cruising along to playoffs still"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "FVOA Projection: PFinn has lost his bid for playoff spot after leaving so many points on his bench last week"
+               "Josh and I are hoping German stumbles, although FVOA doesn't really respect my ability to play people at their weakest for some reason"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "FVOA Key Race Alert: Eric, Bobby, Scott, and Commish still have a chance to sneak in but will need near 100% victory margin in remaining provisional matchups"
+               "Looks like FVOA hasn't completely eliminated anyone though so maybe chaos will reign and PFinn will sneak in on Brady's back"
              } else {
                "TBD"
              }
