@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 10
+frech_stats <- 11
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -64,33 +64,32 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Well 3 straiaght high-score payouts will do wonders for your playoff chances, going from 1 in 6 to 2 in 3 chances"
+               "FVOA has now written off Bobby, PFinn, and Barrett and even a win this week doesn't seem like it would do anything to help them"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Likewise David, Diaz, and Justin are all cruising along to playoffs still"
+               "Maybe things are getting weird now because 2 of the top 4 teams in FVOA, Josh and Eric, are in 6th and 7th place right now with only slim hopes of making the playoffs with their losing records"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Josh and I are hoping German stumbles, although FVOA doesn't really respect my ability to play people at their weakest for some reason"
+               "FVOA still doesn't trust German's team and apparently thinks his 3-peat high score was a fluke, probably because they were the three lowest high scores all season"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Looks like FVOA hasn't completely eliminated anyone though so maybe chaos will reign and PFinn will sneak in on Brady's back"
+               "I'm still pissed that if Justin had gained like 5 more yards I'd be in 4th right now"
              } else {
                "TBD"
              }
            ),
-
 
            hr(),
            # h5("Playoff Projections", align = "center"),

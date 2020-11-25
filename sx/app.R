@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 10
+frech_stats <- 11
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -64,28 +64,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Not a lot of drama as Herndon and Ford continue to dominate "
+               "I'd like to congrulate Hoop on being the first to jump on the Taysom loophole and ensure Herndon's dominance didn't box out the league's high scorer from top 4 spots"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Wikle and Hoop continue to defend their spots even if Wikle has gotten a little lucky with opponents' points each week"
+               "The matchup between Wikle and Bethany has big playoff implications with a roughly 45% playoff swing in the balance"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Bethany and Obie are still working hard to stay in the race and still have outside chances to sneak in should someone stumble"
+               "Obie's playoff odds continue to freefall even though a loss by both Hoop and Bethany would keep him in playoff race...if he could start scoring again"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "There's not much hope though for the rest of us, even if we all made the playoffs in at least simulation I wouldn't count on that much chaos"
+               "FVOA agrees whole-heartedly that Jangaard, Jersey, Burg, and myself are all below average teams with little to no shot of anything but spoiling other teams at this point"
              } else {
                "TBD"
              }
