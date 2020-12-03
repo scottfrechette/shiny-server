@@ -18,8 +18,8 @@ library(rlang)
 reps <-  1e6
 ranking_methods <- c("espn_rank", "fvoa_rank", "sos_rank", "colley_rank") %>%
   set_names(c("ESPN", "FVOA", "Strength of Schedule", "Colley (BCS)"))
-sorting <- c("ESPN Rank", "FVOA Rank", "SoS Rank", "Colley Rank", "Points") %>%
-  set_names(ranking_methods, "Points")
+sorting <- c("ESPN Rank", "FVOA Rank", "SoS Rank", "Colley Rank", "PF", "PA") %>%
+  set_names(ranking_methods, "PF", "PA")
 
 today_week <- today() %>%
   floor_date(unit = "week", week_start = 2) %>%
@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 11
+frech_stats <- 12
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -64,28 +64,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "I'd like to congrulate Hoop on being the first to jump on the Taysom loophole and ensure Herndon's dominance didn't box out the league's high scorer from top 4 spots"
+               "With 2 weeks still to go it looks like we have our playoff teams pretty much locked up"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "The matchup between Wikle and Bethany has big playoff implications with a roughly 45% playoff swing in the balance"
+               "Obie still has a chance if he beats Bethany (55% chance) and Herndon beats Ford (41%) and sets up head-to-head between big/lil bro for the final spot (38%), assuming Obie also makes up the 50-point deficit to break the tie)"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Obie's playoff odds continue to freefall even though a loss by both Hoop and Bethany would keep him in playoff race...if he could start scoring again"
+               "Bethany made it in exactly one simulation where she beat Obie (45%) and Burg (43%) and Wikle lost to Burg (34%) and Jang (26%). Oh and she outscored Wikle by at least 90 in last two games by getting 150 each week to his sub-100."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "FVOA agrees whole-heartedly that Jangaard, Jersey, Burg, and myself are all below average teams with little to no shot of anything but spoiling other teams at this point"
+               "It's too bad Burg had a rough start to the season because he's been picking up steam these last few weeks but it's all for naught"
              } else {
                "TBD"
              }
@@ -173,6 +173,8 @@ ui  <- navbarPage(
            h5("Matchup Breakdown", align = "center"),
            br(),
            fluidRow(tableOutput("matchup_breakdown"), align = "center"),
+           fluidRow(plotOutput("matchup_plot", width = "600px", height = "600px"),
+                    align = 'center'),
            hr(),
            fluidRow(column(4, offset = 1,
                            selectInput("team1", "Team 1:", teams, selected = teams[[1]]), 
@@ -244,7 +246,7 @@ ui  <- navbarPage(
              
              tabPanel("Playoff Leverage",
                       h5("How much will winning/losing your next game affect your playoff chances?"),
-                      plotOutput("playoff_leverage"),
+                      fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center"),
                       h5("Chart Notes:"),
                       tags$ol(
                         tags$li("Full bar is your chance of making playoffs with win"),
@@ -257,7 +259,7 @@ ui  <- navbarPage(
              
              tabPanel("Manager Evaluation",
                       h5("How well did you manage your team?"),
-                      plotOutput("manager"),
+                      fluidRow(plotOutput("manager", width = "80%"), align = "center"),
                       hr(),
                       fluidRow(column(4, offset = 4, wellPanel(sliderInput("proj_week", "Weeks to Include:", 1,
                                                                            max(weeks), c(1, max), step = 1))))
@@ -265,22 +267,22 @@ ui  <- navbarPage(
              
              tabPanel("Skill v Luck",
                       h5("How good or lucky is your team?"),
-                      plotOutput("quadrant"),
+                      fluidRow(plotOutput("quadrant", width = "80%"), align = "center"),
                       hr(),
                       fluidRow(column(4, offset = 4, wellPanel(sliderInput("quad_week", "Weeks to Include:", 1,
                                                                            max(weeks), c(1, max), step = 1))))
              ),
              
              tabPanel("Projected v Actual Scores",
-                      h5("How did your team perform against espn projections?"),
-                      plotOutput("projected"),
+                      h5("How did your team perform against Yahoo projections?"),
+                      fluidRow(plotOutput("projected", width = "80%"), align = "center"),
                       hr(),
                       fluidRow(column(4, offset = 4, wellPanel(sliderInput("proj_week", "Weeks to Include:", 1,
                                                                            max(weeks), c(1, max), step = 1))))
              ),
              
              tabPanel("Boxplots",
-                      plotOutput("boxplot"),
+                      fluidRow(plotOutput("boxplot", width = "80%"), align = "center"),
                       hr(),
                       fluidRow(column(4, offset = 4, wellPanel(sliderInput("boxplot_week", "Weeks to Include:", 1,
                                                                            max(weeks), c(1, max), step = 1))))
@@ -339,15 +341,16 @@ server <- function(input, output, session) {
   }, align = 'c', digits = 0)
   
   output$simulation <- renderTable({
-    sx_simulated_season %>% 
+    sx_simulated_records %>% 
       filter(week == max(week)) %>% 
-      mutate(points = as.integer(points),
+      mutate(PF = as.integer(pf),
+             PA = as.integer(pa),
              Playoffs = case_when(
-               week < 8 & percent < 1 ~ "<1%",
-               between(percent, 0, 1) ~ "<1%",
-               TRUE ~ paste0(round(percent, 0), "%")
+               week < 8 & playoffs < 0.01 ~ "<1%",
+               playoffs > 0 & playoffs <= 0.01 ~ "<1%",
+               TRUE ~ percent(playoffs, accuracy = 1)
              )) %>% 
-      select(Team = team, Points = points,
+      select(Team = team, PF,
              Wins = wins, Playoffs)
   }, align = 'c', digits = 1)
   
@@ -355,7 +358,7 @@ server <- function(input, output, session) {
   
   output$sorting <- renderUI({
     selectInput("sorting", "Sort Rankings By:", 
-                c(ranking_methods, "Points"))
+                c(ranking_methods, "PF", "PA"))
   })
   
   ranking_selections <- function(rankings, ...) {
@@ -369,13 +372,14 @@ server <- function(input, output, session) {
   
   output$rankings <- renderTable({
     
-    rankings <- sx_rankings
+    rankings <- sx_rankings %>% 
+      rename(PF = Pf, PA = Pa, WP = Wp)
     sort <- sorting[[input$sorting]]
     rank_sort <- rankings %>%
       arrange(rankings[[sort]])
     point_sort <- rankings %>%
       arrange(desc(rankings[[sort]]))
-    if (sort == "Points") {
+    if (sort %in% c("PF", "PA")) {
       point_sort
     } else {
       rank_sort
@@ -429,9 +433,17 @@ server <- function(input, output, session) {
     sx_scores %>% 
       filter(week %in% input$matchup_week[1]:input$matchup_week[2]) %>% 
       compare_teams(input$team1, input$team2, .reps = 1e6, .verbose = TRUE) %>% 
+      mutate(PctChance = paste0(round(PctChance, 0), "%")) %>% 
       rename(Margin = MarginVictory,
              Probability = PctChance), 
     align = 'c')
+  
+  output$matchup_plot <- renderPlot(
+    
+    sx_scores %>% 
+      filter(week %in% input$matchup_week[1]:input$matchup_week[2]) %>% 
+      compare_teams(input$team1, input$team2, .reps = 1e6, .output = "plot"),
+    res = 96)
   
   ### Team Charts ###
   
@@ -543,7 +555,7 @@ server <- function(input, output, session) {
     if (input$sim_chart_selection == "Wins") {
       
       if (is.null(input$team_sims)) {
-        x <- sx_simulated_season %>% 
+        x <- sx_simulated_records %>% 
           ggplot(aes(week, wins)) +
           geom_line(alpha = 0.5, aes(color=team), size = 1.5) +
           geom_point(aes(color=team)) +
@@ -560,9 +572,9 @@ server <- function(input, output, session) {
         ggplotly(x, tooltip = c("group", "x", "y"))
         
       } else {
-        tm <- sx_simulated_season %>% filter(team %in% input$team_sims)
+        tm <- sx_simulated_records %>% filter(team %in% input$team_sims)
         
-        x <- sx_simulated_season %>% 
+        x <- sx_simulated_records %>% 
           ggplot(aes(week, wins)) +
           geom_line(alpha = 0.2, aes(group=team, color=team), size = 1.5) +
           geom_line(data = tm, aes(group=team, color=team), size = 2) + 
@@ -581,7 +593,8 @@ server <- function(input, output, session) {
     } else if (input$sim_chart_selection == "Points") {
       
       if (is.null(input$team_sims)) {
-        x <- sx_simulated_season %>% 
+        x <- sx_simulated_records %>% 
+          rename(points = pf) %>% 
           ggplot(aes(week, points)) +
           geom_smooth(se=F, color = "darkgrey", n = n_distinct(sx_scores$week), linetype = 2) +
           geom_line(alpha = 0.5, aes(group=team, color=team), size = 1.5) +
@@ -596,10 +609,11 @@ server <- function(input, output, session) {
         ggplotly(x, tooltip = c("group", "x", "y"))
         
       } else {
-        tm <- sx_simulated_season %>% filter(team %in% input$team_sims)
+        tm <- sx_simulated_records %>% filter(team %in% input$team_sims)
         
-        x <- sx_simulated_season %>% 
-          ggplot(aes(Week, Points)) +
+        x <- sx_simulated_records %>% 
+          rename(points = pf) %>% 
+          ggplot(aes(Week, points)) +
           geom_smooth(se=F, color = "darkgrey", n = n_distinct(sx_scores$week), linetype=2) +
           geom_line(alpha = 0.2, aes(group=team, color=team), size = 1.5) +
           geom_line(data = tm, aes(group=team, color=team), size = 2) + 
@@ -617,12 +631,13 @@ server <- function(input, output, session) {
     } else if (input$sim_chart_selection == "Playoff Chances") {
       
       if (is.null(input$team_sims)) {
-        x <- sx_simulated_season %>% 
-          ggplot(aes(week, percent)) +
+        x <- sx_simulated_records %>% 
+          ggplot(aes(week, playoffs)) +
           geom_line(alpha = 0.5, aes(group=team, color=team), size = 1.5) +
           geom_point(aes(group=team, color=team)) +
           geom_segment(x = 1, y = 40, xend = 15, yend = 40, color = "darkgrey", linetype = 2) +
-          scale_y_continuous(breaks = c(0, 20, 40, 60, 80, 100), limits = c(0, 100)) +
+          scale_y_continuous(breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1), limits = c(0, 1),
+                             labels = percent) +
           scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
           labs(y = "Chance", x = "Week", title = "Projected Chance of Making Playoffs by Week") +
           guides(color=FALSE) +
@@ -632,15 +647,16 @@ server <- function(input, output, session) {
         ggplotly(x, tooltip = c("group", "x", "y"))
         
       } else {
-        tm <- sx_simulated_season %>% filter(team %in% input$team_sims)
+        tm <- sx_simulated_records %>% filter(team %in% input$team_sims)
         
-        x <- sx_simulated_season %>% 
-          ggplot(aes(week, percent)) +
+        x <- sx_simulated_records %>% 
+          ggplot(aes(week, playoffs)) +
           geom_line(alpha = 0.2, aes(group=team, color=team), size = 1.5) +
           geom_line(data = tm, aes(group=team, color=team), size = 2) + 
           geom_point(aes(group=team, color=team)) +
           geom_segment(x = 1, y = 40, xend = 15, yend = 40, color = "darkgrey", linetype = 2) +
-          scale_y_continuous(breaks = c(0, 20, 40, 60, 80, 100), limits = c(0, 100)) +
+          scale_y_continuous(breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1), limits = c(0, 1),
+                             labels = percent) +
           scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
           labs(y = "Chance", x = "Week", title = "Projected Chance of Making Playoffs by Week") +
           guides(color=FALSE) +
