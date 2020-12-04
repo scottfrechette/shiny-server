@@ -12,7 +12,7 @@ today_week <- Sys.Date() %>%
 start_week <- 35
 current_week <- today_week - start_week
 
-# Player Data -------------------------------------------------------------
+# Scrape Players ----------------------------------------------------------
 
 clt_player_data <- scrape_player_projections('yahoo', 479084, current_week, 2020)
 
