@@ -64,7 +64,7 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "We've still got ourselves a race for those last two spots with only two weeks to go"
+               "We've still got ourselves a race among 4 teams for those last two spots with only two weeks to go"
              } else {
                "TBD"
              }

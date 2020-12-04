@@ -71,7 +71,7 @@ ui  <- navbarPage(
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Obie still has a chance if he beats Bethany (55% chance) and Herndon beats Ford (41%) and sets up head-to-head between big/lil bro for the final spot (38%), assuming Obie also makes up the 50-point deficit to break the tie)"
+               "Obie still has a chance if he beats Bethany (55% chance) and Herndon beats Ford (41%) and sets up head-to-head between big/lil bro for the final spot (38%), assuming Obie also makes up the 50-point deficit to break the tie"
              } else {
                "TBD"
              }
