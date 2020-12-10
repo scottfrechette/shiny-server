@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 12
+frech_stats <- 13
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -64,35 +64,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "We've still got ourselves a race among 4 teams for those last two spots with only two weeks to go"
+               "It must be a wild season because neither the top 2 strongest teams nor the second-highest scoring team made the playoffs"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "The matchup between Justin has by far the biggest impact, with over 100% playoff swing based on outcome"
+               "Guess that explains why 3 of the playoff teams are in or on edge of the Lucky quadrant"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Josh still has a chance if he wins out and a lot of chaos happens given his strong PF gives him an edge in tiebreakers"
+               "Given people were discussing on Slack the playoff teams were all top 4 in Colley, so we would have made it in BCS system too"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "David's team has slipped to 7th in FVOA with lackluster performance coming down the stretch so playoffs might be scary for our season's powerhouse"
-             } else {
-               "TBD"
-             }
-           ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "I've also made some small tweaks I meant to do earlier in the season, including adding O/U and playoff leverage to weekly projections"
+               "Worth noting what may be a preview of round 1 Diaz and I are considered a pick 'em by both FVOA and Yahoo"
              } else {
                "TBD"
              }

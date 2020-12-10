@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 12
+frech_stats <- 13
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -64,28 +64,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "With 2 weeks still to go it looks like we have our playoff teams pretty much locked up"
+               "And with that the playoff teams are set - congrats to Herndon, Wikle, Hoop, and Ford. I'll have full odds next week but as of now Hoop is a 2:1 favorite to take it all home."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Obie still has a chance if he beats Bethany (55% chance) and Herndon beats Ford (41%) and sets up head-to-head between big/lil bro for the final spot (38%), assuming Obie also makes up the 50-point deficit to break the tie"
+               "Well technically Bethany can still get in with a win and Ford losing, assuming she also makes up the 125-point deficit"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Bethany made it in exactly one simulation where she beat Obie (45%) and Burg (43%) and Wikle lost to Burg (34%) and Jang (26%). Oh and she outscored Wikle by at least 90 in last two games by getting 150 each week to his sub-100."
+               "It's also worth noting our playoff teams are also the four strongest in FVOA, so looks like the right teams made it in"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "It's too bad Burg had a rough start to the season because he's been picking up steam these last few weeks but it's all for naught"
+               "To continue to emphasize how strongly Burgess is ending the season it looks like he'll finish as the 5th best team in FVOA despite never having better than 5% chance to make the playoffs"
              } else {
                "TBD"
              }
