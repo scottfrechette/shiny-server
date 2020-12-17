@@ -27,7 +27,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 13
+frech_stats <- 14
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -64,43 +64,43 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "It must be a wild season because neither the top 2 strongest teams nor the second-highest scoring team made the playoffs"
+               "Looks like a pretty close race for top 3 slots, with the first-place team as a heavy underdog"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Guess that explains why 3 of the playoff teams are in or on edge of the Lucky quadrant"
+               "In fact the regular-season winner is now 9th in FVOA and I sort of wish I had thrown my game to end in 4th place now"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Given people were discussing on Slack the playoff teams were all top 4 in Colley, so we would have made it in BCS system too"
+               "I didn't include round 1 odds but German and I are a pick 'em and Diaz is a 2:1 favorite (-11.5 spread)"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Worth noting what may be a preview of round 1 Diaz and I are considered a pick 'em by both FVOA and Yahoo"
+               "Pretty wild to see Justin missed the playoffs given he is the strongest team through regular season"
              } else {
                "TBD"
              }
            ),
 
            hr(),
-           # h5("Playoff Projections", align = "center"),
-           # fluidRow(tableOutput("playoffs"), align = "center"),
-           h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
-           br(),
-           fluidRow(tableOutput("weekly"), align="center"),
-           br(),
-           h5("Season Projections", align = "center"),
-           br(),
-           fluidRow(tableOutput("simulation"), align = "center"),
+           h5("Playoff Projections", align = "center"),
+           fluidRow(tableOutput("playoffs"), align = "center"),
+           # h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
+           # br(),
+           # fluidRow(tableOutput("weekly"), align="center"),
+           # br(),
+           # h5("Season Projections", align = "center"),
+           # br(),
+           # fluidRow(tableOutput("simulation"), align = "center"),
            hr(),
            p("FVOA Assumptions:"),
            tags$ol(
@@ -251,18 +251,18 @@ ui  <- navbarPage(
                       )
                       ),
              
-             tabPanel("Playoff Leverage",
-                      h5("How much will winning/losing your next game affect your playoff chances?"),
-                      fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center"),
-                      h5("Chart Notes:"),
-                      tags$ol(
-                        tags$li("Full bar is your chance of making playoffs with win"),
-                        tags$li("Darker portion is your chance of making playoffs with loss"),
-                        tags$li("The difference between these two, the light portion and number listed to the right,
-                                is the playoff leverage of this game"),
-                        tags$li("Note: these are all treated independently of the other teams winning/losing so it's not exact")
-                        )
-             ),
+             # tabPanel("Playoff Leverage",
+             #          h5("How much will winning/losing your next game affect your playoff chances?"),
+             #          fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center"),
+             #          h5("Chart Notes:"),
+             #          tags$ol(
+             #            tags$li("Full bar is your chance of making playoffs with win"),
+             #            tags$li("Darker portion is your chance of making playoffs with loss"),
+             #            tags$li("The difference between these two, the light portion and number listed to the right,
+             #                    is the playoff leverage of this game"),
+             #            tags$li("Note: these are all treated independently of the other teams winning/losing so it's not exact")
+             #            )
+             # ),
              
              tabPanel("Manager Evaluation",
                       h5("How well did you manage your team?"),
@@ -286,31 +286,6 @@ ui  <- navbarPage(
                       hr(),
                       fluidRow(column(4, offset = 4, wellPanel(sliderInput("proj_week", "Weeks to Include:", 1,
                                                                            max(weeks), c(1, max), step = 1))))
-             ),
-             
-             tabPanel("Boxplots",
-                      fluidRow(plotOutput("boxplot", width = "80%"), align = "center"),
-                      hr(),
-                      fluidRow(column(4, offset = 4, wellPanel(sliderInput("boxplot_week", "Weeks to Include:", 1,
-                                                                           max(weeks), c(1, max), step = 1))))
-             ),
-             
-             tabPanel("Density Plots",
-                      plotlyOutput("density"),
-                      hr(),
-                      fluidRow(column(4, offset = 4, wellPanel(sliderInput("density_week", "Weeks to Include:", 1,
-                                                                           max(weeks), c(1, max), step = 1)))),
-                      fluidRow(checkboxGroupInput("team_density", "Teams to Highlight:", sort(teams), inline = T), align = "center"),
-                      fluidRow(actionButton("clear_teams_denisty", "Clear Teams"), align = "center"),
-                      hr(),
-                      h5("Chart Notes:"),
-                      tags$ol(
-                        tags$li("Click Team names on right to add/remove"),
-                        tags$li("Use checkboxes below to highlight"),
-                        tags$li("Use slide to choose specific weeks to include"),
-                        tags$li("Hover over any point to get detailed info"),
-                        tags$li("Zoom in on any part of the chart by dragging box over that area (double-click to return)")
-                      )
              )
              ),
   
@@ -337,10 +312,10 @@ server <- function(input, output, session) {
   ### Weekly Projections ###
   
   output$playoffs <- renderTable({
-    tibble(Winner = c("Bobby", "PFinn", "Diaz", "David"),
-           Percent = c("37%", "21%", "20%", "18%"),
-           Odds = c("5:2", "9:2", "5:1", "11:2"),
-           BettingLine = c("+175", "+375", "+400", "+450"))
+    tibble(Winner = c("Diaz", "Scott", "German", "David"),
+           Percent = c("30%", "29%", "28%", "8%"),
+           Odds = c("7:2", "7:2", "7:2", "25:2"),
+           BettingLine = c("+225", "+250", "+250", "+1150"))
   }, align = "c")
 
   output$weekly <- renderTable({
@@ -467,7 +442,7 @@ server <- function(input, output, session) {
         geom_point(aes(group=team, color=team)) +
         scale_y_continuous(breaks = pretty_breaks(n = 5)) +
         # scale_x_continuous(breaks = pretty_breaks(n = 7)) +
-        scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
+        scale_x_continuous(breaks = c(1:14), limits = c(1, 14)) +
         labs(y = "Score", x = "Week", title = "Weekly Scores") +
         guides(color=FALSE) +
         theme_fvoa() + 
@@ -484,7 +459,7 @@ server <- function(input, output, session) {
         geom_line(data = tm, aes(group=team, color=team), size = 2) + 
         geom_point(aes(group=team, color=team)) +
         scale_y_continuous(breaks = pretty_breaks(n = 5)) +
-        scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
+        scale_x_continuous(breaks = c(1:14), limits = c(1, 14)) +
         labs(y = "Score", x = "Week", title = "Weekly Scores") +
         guides(color=FALSE) +
         theme_fvoa() + 
@@ -509,7 +484,7 @@ server <- function(input, output, session) {
         geom_segment(x = 1, y = 0, xend = 15, yend = 0, color = "darkgrey", linetype = 2) +
         scale_y_continuous(breaks = c(-100, -75, -50, -25, 0, 25, 50, 75, 100), limits = c(-100, 100)) +
         # scale_y_continuous(breaks = pretty_breaks(n = 5)) +
-        scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
+        scale_x_continuous(breaks = c(1:14), limits = c(1, 14)) +
         labs(y = "FVOA", x = "Week", title = "Weekly FVOA") +
         guides(color=FALSE) +
         theme_fvoa() + 
@@ -528,7 +503,7 @@ server <- function(input, output, session) {
         geom_segment(x = 1, y = 0, xend = 15, yend = 0, color = "darkgrey", linetype = 2) +
         scale_y_continuous(breaks = c(-100, -75, -50, -25, 0, 25, 50, 75, 100), limits = c(-100, 100)) +
         # scale_y_continuous(breaks = pretty_breaks(n = 5)) +
-        scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
+        scale_x_continuous(breaks = c(1:14), limits = c(1, 14)) +
         labs(y = "Score", x = "Week", title = "Weekly Scores") +
         guides(color=FALSE) +
         theme_fvoa() + 
@@ -570,7 +545,7 @@ server <- function(input, output, session) {
           # geom_point(aes(group=Team, color=Team)) +
           geom_segment(x = 1, y = 7.5, xend = 15, yend = 7.5, color = "darkgrey", linetype = 2) +
           scale_y_continuous(breaks = c(0, 2, 4, 6, 8, 10, 12, 14), limits = c(0, 15)) +
-          scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
+          scale_x_continuous(breaks = c(1:14), limits = c(1, 14)) +
           labs(y = "Wins", x = "Week", title = "Projected Wins by Week") +
           guides(color=FALSE) +
           theme_fvoa() + 
@@ -588,7 +563,7 @@ server <- function(input, output, session) {
           geom_point(aes(group=team, color=team)) +
           geom_segment(x = 1, y = 7.5, xend = 15, yend = 7.5, color = "darkgrey", linetype = 2) +
           scale_y_continuous(breaks = c(0, 2, 4, 6, 8, 10, 12, 14), limits = c(0, 15)) +
-          scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
+          scale_x_continuous(breaks = c(1:14), limits = c(1, 14)) +
           labs(y = "Wins", x = "Week", title = "Projected Wins by Week") +
           guides(color=FALSE) +
           theme_fvoa() + 
@@ -607,7 +582,7 @@ server <- function(input, output, session) {
           geom_line(alpha = 0.5, aes(group=team, color=team), size = 1.5) +
           geom_point(aes(group=team, color=team)) +
           scale_y_continuous(breaks = pretty_breaks(n = 5)) +
-          scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
+          scale_x_continuous(breaks = c(1:14), limits = c(1, 14)) +
           labs(y = "Points", x = "Week", title = "Projected Total Points by Week") +
           guides(color=FALSE) +
           theme_fvoa() + 
@@ -626,7 +601,7 @@ server <- function(input, output, session) {
           geom_line(data = tm, aes(group=team, color=team), size = 2) + 
           geom_point(aes(group=team, color=team)) +
           scale_y_continuous(breaks = pretty_breaks(n = 5)) +
-          scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
+          scale_x_continuous(breaks = c(1:14), limits = c(1, 14)) +
           labs(y = "Points", x = "Week", title = "Projected Total Points by Week") +
           guides(color=FALSE) +
           theme_fvoa() + 
@@ -645,7 +620,7 @@ server <- function(input, output, session) {
           geom_point(aes(group=team, color=team)) +
           geom_segment(x = 1, y = 40, xend = 15, yend = 40, color = "darkgrey", linetype = 2) +
           scale_y_continuous(breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1), limits = c(0, 1),
-                             labels = percent) +          scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
+                             labels = percent) +          scale_x_continuous(breaks = c(1:14), limits = c(1, 14)) +
           labs(y = "Chance", x = "Week", title = "Projected Chance of Making Playoffs by Week") +
           guides(color=FALSE) +
           theme_fvoa() + 
@@ -664,7 +639,7 @@ server <- function(input, output, session) {
           geom_point(aes(group=team, color=team)) +
           geom_segment(x = 1, y = 40, xend = 15, yend = 40, color = "darkgrey", linetype = 2) +
           scale_y_continuous(breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1), limits = c(0, 1),
-                             labels = percent) +          scale_x_continuous(breaks = c(1:15), limits = c(1, 15)) +
+                             labels = percent) +          scale_x_continuous(breaks = c(1:14), limits = c(1, 14)) +
           labs(y = "Chance", x = "Week", title = "Projected Chance of Making Playoffs by Week") +
           guides(color=FALSE) +
           theme_fvoa() + 
@@ -717,56 +692,6 @@ server <- function(input, output, session) {
       theme_fvoa() + 
       theme(panel.grid.major.y = element_blank())
   }, res = 96)
-  
-  output$boxplot <- renderPlot({
-    clt_scores %>% 
-      filter(week %in% input$boxplot_week[1]:input$boxplot_week[2]) %>%
-      ggplot(aes(x=reorder(team, -score, fun=mean), y=score, fill=team)) + 
-      geom_boxplot(coef = 1.25, outlier.alpha = 0.6) + 
-      stat_summary(fun.y=mean, geom="point", shape=18, size=3, show.legend=FALSE) + 
-      guides(fill=F) +
-      labs(y = "Score", x = "", title = "Team Boxplots") +
-      theme_fvoa() + 
-      scale_fill_manual(values = fvoa_colors) + 
-      theme(panel.border = element_blank())
-  }, res = 96)
-  
-  observeEvent(input$clear_teams_density, {
-    updateCheckboxGroupInput(session, "team_density", selected = character(0))
-  })
-  
-  output$density <- renderPlotly({
-    
-    if (is.null(input$team_density)) {
-      x <- clt_scores %>% 
-        filter(week %in% input$density_week[1]:input$density_week[2]) %>%
-        ggplot(aes(score)) +
-        geom_density(aes(fill = team, color = team), alpha = 0.2) + 
-        labs(x = "Weekly Scores", y = "Density", title = "Density Plots") +
-        guides(fill=FALSE) + 
-        theme_fvoa() + 
-        scale_fill_manual(values = fvoa_colors) + 
-        scale_color_manual(values = fvoa_colors)
-      
-      ggplotly(x, tooltip = c("fill", "x"))
-      
-    } else {
-      tm <- clt_scores %>% filter(team %in% input$team_density)
-      
-      x <- clt_scores %>% 
-        filter(week %in% input$density_week[1]:input$density_week[2]) %>% 
-        ggplot(aes(Score)) +
-        geom_density(aes(fill = team, color = team), alpha = 0.1) + 
-        geom_density(data = tm, aes(fill = team, color = team), alpha = 0.8) + 
-        labs(x = "Weekly Scores", y = "Density", title = "Density Plots") +
-        guides(fill=FALSE, color = FALSE) + 
-        theme_fvoa() + 
-        scale_fill_manual(values = fvoa_colors) + 
-        scale_color_manual(values = fvoa_colors)
-      
-      ggplotly(x, tooltip = c("fill", "x"))
-    }
-  })
   
   ### Model Evaluation ###
   
