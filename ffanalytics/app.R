@@ -53,7 +53,7 @@ ffanalytics_plot <- function(projections, pstn, n_players, plot_order) {
         theme_light() +
         labs(x = "Points", y = "Player",
              caption = str_glue("Last Updated: {lubridate::with_tz(last_updated, tzone = 'America/Chicago')}")) +
-        guides(color = FALSE)
+        guides(color = "none")
     
 }
 
@@ -107,7 +107,7 @@ server <- function(input, output) {
             
             if("Roster" %in% c(input$groups)) {
                 roster <- clt_projections_df %>%
-                    filter(teamID == 3) %>%
+                    filter(teamID == 4) %>%
                     mutate(first_name = str_c("*", first_name),
                            last_name = str_c(last_name, "*"))
             } else {
@@ -121,7 +121,7 @@ server <- function(input, output) {
             }
             
             if("Taken" %in% input$groups) {
-                taken <- clt_projections_df %>% filter(!teamID %in% c(0, 3),
+                taken <- clt_projections_df %>% filter(!teamID %in% c(0, 4),
                                                        !is.na(teamID))
             } else {
                 taken <- NULL

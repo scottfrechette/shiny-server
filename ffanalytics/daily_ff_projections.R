@@ -12,12 +12,6 @@ today_week <- Sys.Date() %>%
 start_week <- 35
 current_week <- today_week - start_week
 
-# Scrape Players ----------------------------------------------------------
-
-clt_player_data <- scrape_player_projections('yahoo', 479084, current_week, 2020)
-
-sx_player_data <- scrape_player_projections('espn', 299999, current_week, 2020)
-
 # Scoring Rules -----------------------------------------------------------
 
 clt_baseline <- c(QB = 16, RB = 48, WR = 48, TE = 13, K = 10, DST = 10)
@@ -106,24 +100,24 @@ sx_scoring <- list(
 )
 
 
+
+
 # Scrape Projections -------------------------------------------------------------
 
-my_scrape <- scrape_data(src = c("CBS", 
-                                 "FantasyPros",
-                                 "FantasySharks",
-                                 "FFToday",
-                                 "FleaFlicker",
-                                 "NumberFire",
-                                 "FantasyFootballNerd",
-                                 "ESPN", 
-                                 "FantasyData", 
-                                 "Yahoo",
-                                 "NFL", 
-                                 "RTSports", 
-                                 "Walterfootball"),
+my_scrape <- scrape_data(src = c('CBS', 
+                                 'ESPN',
+                                 'FantasyData', 
+                                 'FantasyPros', 
+                                 'FantasySharks', 
+                                 'FFToday', 
+                                 'FleaFlicker', 
+                                 'NumberFire',
+                                 # 'Yahoo', 
+                                 'FantasyFootballNerd', 
+                                 'NFL'),
                          pos = c("QB", "RB", "WR", "TE", 
                                  "K", "DST", "DL", "DB"),
-                         season = 2020, 
+                         season = 2021, 
                          week = current_week)
 
 # projection_sources$Yahoo$open_session(2020, 1, "QB")$scrape()
@@ -132,23 +126,30 @@ my_scrape <- scrape_data(src = c("CBS",
 
 clt_projections <-  my_scrape %>% 
   projections_table(scoring_rules = clt_scoring) %>%
-  # add_ecr() %>%
-  # add_risk() %>%
+  add_ecr() %>%
+  add_risk() %>%
   # add_adp() %>%
   add_player_info()
 
 sx_projections <-  my_scrape %>% 
   projections_table(scoring_rules = sx_scoring) %>%
-  # add_ecr() %>%
-  # add_risk() %>%
+  add_ecr() %>%
+  add_risk() %>%
   # add_adp() %>%
   add_player_info()
+
+# Scrape Players ----------------------------------------------------------
+
+clt_player_data <- scrape_player_projections(current_week, 'yahoo')
+
+sx_player_data <- scrape_player_projections(current_week, 'espn')
 
 # Join Data ---------------------------------------------------------------
 
 clt_projections_df <- clt_projections %>%
   left_join(clt_player_data %>%
-              select(id, teamID),
+              replace_na(list(teamID = 0)) %>% 
+              select(id = mflID, teamID),
             by = "id") %>% 
   mutate(position = case_when(
     position == "DEF" ~ "DST",
@@ -159,10 +160,9 @@ clt_projections_df <- clt_projections %>%
 
 sx_projections_df <- sx_projections %>% 
   left_join(sx_player_data %>% 
-              select(id, teamID),
-              # select(id, teamID, is_injured),
-            by = "id") #%>% 
-  # filter(!injuryStatus %in% c("OUT", "INJURY RESERVE", "SUSPENSION"))
+              replace_na(list(teamID = 0)) %>% 
+              select(id = mflID, teamID),
+            by = "id") 
 
 # Save Data ---------------------------------------------------------------
 last_updated <- now()
@@ -171,20 +171,13 @@ if(exists("clt_projections_df")) {
   
   save(sx_projections_df,
        clt_projections_df,
-       #sx_player_data,
-       #clt_player_data, 
        last_updated,
        file = here::here("ffanalytics", "projection-data.RData"))
   
 } else {
   
   save(sx_projections_df,
-       # clt_projections_df,
-       #sx_player_data,
-       #clt_player_data, 
        last_updated,
        file = here::here("ffanalytics", "projection-data.RData"))
   
 }
-
-
