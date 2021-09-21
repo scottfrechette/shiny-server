@@ -164,14 +164,14 @@ ui  <- navbarPage(
                       fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center")
              ),
              
-             # tabPanel("Skill v Luck",
-             #          h5("How good or lucky is your team?"),
-             #          fluidRow(plotOutput("quadrant", width = "80%"), align = "center"),
-             #          hr(),
-             #          fluidRow(column(4, offset = 4, wellPanel(sliderInput("quad_week", "Weeks to Include:", 
-             #                                                               1, weeks_played, 
-             #                                                               c(1, weeks_played), step = 1))))
-             # ),
+             tabPanel("Skill v Luck",
+                      h5("How good or lucky is your team?"),
+                      fluidRow(plotOutput("quadrant", width = "80%"), align = "center"),
+                      hr(),
+                      fluidRow(column(4, offset = 4, wellPanel(sliderInput("quad_week", "Weeks to Include:",
+                                                                           1, weeks_played,
+                                                                           c(1, weeks_played), step = 1))))
+             ),
              
              tabPanel("League Gambling",
                       p("How do all the teams compare to each other?"),
@@ -252,21 +252,21 @@ ui  <- navbarPage(
                       h5("How did your team perform against Yahoo projections?"),
                       fluidRow(plotOutput("projected", width = "80%"), align = "center")
              )
-  )#,
+  ),
   
   
   # Model Evaluation Tab-----------------------------------------------------
   
-  #   tabPanel("FVOA Evaluation",
-  #            h4("FVOA Accuracy by Week"),
-  #            hr(),
-  #            fluidRow(textOutput("eval_accuracy"), align = "center"),
-  #            br(),
-  #            fluidRow(column(8, offset = 2, plotOutput("eval_plot")), align = "center"),
-  #            br(),
-  #            p("Which teams screwed my model last week?", align = "center"),
-  #            fluidRow(tableOutput("eval_team"), align = "center")
-  #   )
+    tabPanel("FVOA Evaluation",
+             h4("FVOA Accuracy by Week"),
+             hr(),
+             fluidRow(textOutput("eval_accuracy"), align = "center"),
+             br(),
+             fluidRow(column(8, offset = 2, plotOutput("eval_plot")), align = "center"),
+             br(),
+             p("Which teams screwed my model last week?", align = "center"),
+             fluidRow(tableOutput("eval_team"), align = "center")
+    )
   
   # End of navbarPage
 )
@@ -626,23 +626,23 @@ server <- function(input, output, session) {
   
   ### Model Evaluation ###
   
-  # output$eval_accuracy <- renderText({
-  #   
-  #   accuracy <- clt_model_eval %>% 
-  #     dplyr::summarize(x = sum(correct) / n()) %>% 
-  #     pull() %>% 
-  #     scales::percent()
-  #   
-  #   str_glue("FVOA has correctly predicted {accuracy} of games this season")
-  # })
-  # 
-  # output$eval_plot <- renderPlot({
-  #   plot_model_eval_weekly(clt_model_eval)
-  # }, res= 96)
-  # 
-  # output$eval_team = renderTable(
-  #   evaluate_team_accuracy(clt_model_eval, .latest = TRUE), 
-  #   digits = 0, align = 'c')
+  output$eval_accuracy <- renderText({
+
+    accuracy <- clt_model_eval %>%
+      dplyr::summarize(x = sum(correct) / n()) %>%
+      pull() %>%
+      scales::percent()
+
+    str_glue("FVOA has correctly predicted {accuracy} of games this season")
+  })
+
+  output$eval_plot <- renderPlot({
+    plot_model_eval_weekly(clt_model_eval)
+  }, res= 96)
+
+  output$eval_team = renderTable(
+    evaluate_team_accuracy(clt_model_eval, .latest = TRUE),
+    digits = 0, align = 'c')
   
 }
 

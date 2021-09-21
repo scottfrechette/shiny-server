@@ -66,20 +66,6 @@ if(exists("sx_simulated_final_standings_tmp")) {
   
 }
 
-# sx_model_eval_tmp <- evaluate_model(sx_team)
-# 
-# if(exists("sx_model_eval_tmp")) {
-#   
-#   dbSendQuery(sx_con, str_glue("DELETE from model_evaluation where week == {weeks_played} and season == {current_season}"))
-#   
-#   dbWriteTable(sx_con, 
-#                "model_evaluation", sx_model_eval_tmp, 
-#                overwrite = FALSE, append = TRUE)
-#   
-#   rm(sx_model_eval_tmp)
-#   
-# }
-
 
 # Collect Results ---------------------------------------------------------
 
@@ -87,10 +73,6 @@ sx_team <- sx_team %>%
   select(week, team, score:points)
 sx_scores <- extract_scores(sx_team)
 sx_proj <- extract_projections(sx_team)
-# sx_model_eval <- collect(tbl(sx_con, "model_evaluation")) %>% 
-#   left_join(sx_owners, 
-#             by = c("league", "leagueID", "teamID")) %>% 
-#   select(league:week, team, opp:sim)
 sx_simulated_records <- collect(tbl(sx_con, "simulated_records")) %>%
   filter(season == current_season) %>%
   left_join(sx_owners,
@@ -121,12 +103,13 @@ sx_lineup_eval <- sx_team %>%
   rename(act_pts = points) %>% 
   evaluate_lineup(flex = 0,
                   plot = TRUE)
+sx_model_eval <- evaluate_model(sx_scores)
 
 # Save Data ---------------------------------------------------------------
 
 save(sx_schedule, sx_team, sx_proj, sx_scores,
      sx_fit, sx_simulated_records, 
-     sx_fvoa_season, #sx_model_eval, 
+     sx_fvoa_season, sx_model_eval, 
      sx_matchups_prob, sx_matchups_spread,
      sx_rankings, sx_current_matchups,
      sx_playoff_leverage_chart, sx_lineup_eval, 
