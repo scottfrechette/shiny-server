@@ -39,49 +39,34 @@ sx_schedule <- sx_schedule_tmp %>%
   left_join(select(sx_owners, opponent = team, opponentID = teamID), 
             by = "opponentID") %>% 
   select(week, team, opponent)
+
 sx_team <-sx_team_tmp %>% 
   left_join(sx_owners, by = "teamID") %>% 
   select(week, team, score:points)
+
 sx_scores <- extract_scores(sx_team)
 
 # Fit Model ---------------------------------------------------------------
 
-sx_fit <- fit_model(sx_scores)
+sx_fit_season <- fit_team_season(sx_scores)
+sx_fit <- slice_tail(sx_fit_season, n = 1)$model[[1]]
 
 # Run Simulations ---------------------------------------------------------
 
 sx_simulated_scores <- simulate_season_scores(sx_schedule, sx_fit)
 sx_simulated_standings <- simulate_season_standings(sx_simulated_scores)
-sx_simulated_final_standings_tmp <- simulate_final_standings(sx_simulated_standings) %>% 
-  left_join(sx_owners, by = "team") %>%
-  select(season, week, teamID, pf:rank)
-
-if(exists("sx_simulated_final_standings_tmp")) {
-  
-  dbSendQuery(sx_con, str_glue("DELETE from simulated_records where week == {weeks_played} and season == {current_season}"))
-  
-  dbWriteTable(sx_con,
-               "simulated_records", sx_simulated_final_standings_tmp,
-               overwrite = FALSE, append = TRUE)
-  
-}
-
+sx_simulated_final_standings <- simulate_final_standings(sx_simulated_standings)
+sx_simulated_records <- simulate_final_standings_season(sx_fit_season, sx_schedule)
 
 # Collect Results ---------------------------------------------------------
 
-sx_team <- sx_team %>% 
-  select(week, team, score:points)
+sx_team <- select(sx_team, week, team, score:points)
 sx_scores <- extract_scores(sx_team)
 sx_proj <- extract_projections(sx_team)
-sx_simulated_records <- collect(tbl(sx_con, "simulated_records")) %>%
-  filter(season == current_season) %>%
-  left_join(sx_owners,
-            by = "teamID") %>%
-  select(week, team, pf:rank)
 
 # Run Calculations --------------------------------------------------------
 
-sx_fvoa_season <- calculate_fvoa_season(sx_scores)
+sx_fvoa_season <- calculate_fvoa_season(sx_fit_season)
 sx_matchups_prob <- compare_league(sx_fit) %>%
   fvoa:::spread_league(.output = "wp")
 sx_matchups_spread <- compare_league(sx_fit) %>% 
@@ -103,7 +88,7 @@ sx_lineup_eval <- sx_team %>%
   rename(act_pts = points) %>% 
   evaluate_lineup(flex = 0,
                   plot = TRUE)
-sx_model_eval <- evaluate_model(sx_scores)
+sx_model_eval <- evaluate_model(sx_fit_season)
 
 # Save Data ---------------------------------------------------------------
 

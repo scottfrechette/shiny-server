@@ -66,6 +66,8 @@ if(exists("clt_players_tmp")) {
   
 }
 
+# Collect Results ---------------------------------------------------------
+
 clt_owners <- tbl(clt_con, 'owners') %>% 
   filter(season == current_season) %>% 
   select(teamID, team) %>% 
@@ -83,47 +85,27 @@ clt_team <- tbl(clt_con, "teams") %>%
   left_join(clt_owners, by = "teamID") %>% 
   select(week, team, score:points)
 clt_scores <- extract_scores(clt_team)
-
-# Fit Model ---------------------------------------------------------------
-
-clt_fit <- fit_model(clt_scores)
-
-# Run Simulations ---------------------------------------------------------
-
-clt_simulated_scores <- simulate_season_scores(clt_schedule, clt_fit)
-clt_simulated_standings <- simulate_season_standings(clt_simulated_scores)
-clt_simulated_final_standings_tmp <- simulate_final_standings(clt_simulated_standings) %>% 
-  left_join(clt_owners, by = "team") %>% 
-  mutate(season = current_season) %>% 
-  select(season, week, teamID, pf:rank)
- 
-if(exists("clt_simulated_final_standings_tmp")) {
-
-  dbSendQuery(clt_con, str_glue("DELETE from simulated_records where week == {weeks_played} and season == {current_season}"))
-
-  dbWriteTable(clt_con,
-               "simulated_records", clt_simulated_final_standings_tmp,
-               overwrite = FALSE, append = TRUE)
-
-}
-
-# Collect Results ---------------------------------------------------------
-
-clt_scores <- extract_scores(clt_team)
 clt_proj <- extract_projections(clt_team)
-clt_simulated_records <- collect(tbl(clt_con, "simulated_records")) %>%
-  filter(season == current_season) %>% 
-  left_join(clt_owners,
-            by = "teamID") %>%
-  select(week, team, pf:rank)
 clt_wp <- clt_wp_tmp %>%
   left_join(clt_owners, by = "teamID") %>% 
   select(week, team, wp) %>% 
   mutate(wp = scales::percent(wp, accuracy = 1))
 
+# Fit Model ---------------------------------------------------------------
+
+clt_fit_season <- fit_team_season(clt_scores)
+clt_fit <- slice_tail(clt_fit_season, n = 1)$model[[1]]
+
+# Run Simulations ---------------------------------------------------------
+
+clt_simulated_scores <- simulate_season_scores(clt_schedule, clt_fit)
+clt_simulated_standings <- simulate_season_standings(clt_simulated_scores)
+clt_simulated_final_standings <- simulate_final_standings(clt_simulated_standings)
+clt_simulated_records <- simulate_final_standings_season(clt_fit_season, clt_schedule)
+
 # Run Calculations --------------------------------------------------------
 
-clt_fvoa_season <- calculate_fvoa_season(clt_scores)
+clt_fvoa_season <- calculate_fvoa_season(clt_fit_season)
 clt_matchups_prob <- compare_league(clt_fit) %>%
   fvoa:::spread_league(.output = "wp")
 clt_matchups_spread <- compare_league(clt_fit) %>% 
@@ -144,7 +126,7 @@ clt_lineup_eval <- clt_team %>%
   rename(act_pts = points) %>% 
   evaluate_lineup(flex = 0,
                   plot = TRUE)
-clt_model_eval <- evaluate_model(clt_scores)
+clt_model_eval <- evaluate_model(clt_fit_season)
 
 # Save Data ---------------------------------------------------------------
 

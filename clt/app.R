@@ -26,7 +26,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 1
+frech_stats <- 2
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -63,28 +63,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Well looks like the strongest 4 teams according to FVOA are in the playoffs"
+               "Welcome back for another year of my worthless analytics - this time with improved FVOA model"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Hoop looks to be the Chiefs of our league not only as strong favorite to win it all but because he scored 240 points more than second-highest scoring team (and had 3rd most points scored against him)"
+               "I've still got a few more tweaks and updates for the site to get done over the next couple of weeks but I've been a little distracted with some needy little baby"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "That said if I was looking to place a wager I'd be looking at that +725 for Herndon pretty seriously"
+               "What I find interesting is no one really left points on their bench but Yahoo really shit the bed on projections, so that'll make for a fun season if it holds"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Also happy to point out FVOA went almost 60% on the season, including a very strong 7-week run until the last week"
+               "Luckily there's still plenty of time and no one has been written off yet, so hopefully we'll see some chaos again this year"
              } else {
                "TBD"
              }
@@ -105,9 +105,8 @@ ui  <- navbarPage(
            tags$ol(
              tags$li(HTML("<u><strong>Team scores only</strong></u> - opponent is random and you can't play defense 
                           so win-loss record is irrelevant")),
-             tags$li(HTML("<u><strong>Regression to mean</strong></u> - scores are slightly regressed to 
-                          our league's historical average for first six weeks on a 
-                          sliding scale (50% for week 1, 33% for week 2, etc.)")),
+             tags$li(HTML("<u><strong>Regression to mean</strong></u> - scores are regressed to 
+                          our league's historical average earlier in the season until enough evidence of true strength")),
              tags$li(HTML("<u><strong>Recency bias</strong></u> - recent games are more predictive because of things 
                           like injuries, waiver wire pickups, and trades")),
              tags$li(HTML("<u><strong>Outliers</strong></u> - freak games by your WR3 are not very predictive so very 
@@ -260,8 +259,6 @@ ui  <- navbarPage(
     tabPanel("FVOA Evaluation",
              h4("FVOA Accuracy by Week"),
              hr(),
-             fluidRow(textOutput("eval_accuracy"), align = "center"),
-             br(),
              fluidRow(column(8, offset = 2, plotOutput("eval_plot")), align = "center"),
              br(),
              p("Which teams screwed my model last week?", align = "center"),
