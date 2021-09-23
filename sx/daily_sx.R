@@ -83,7 +83,11 @@ sx_rankings <- calculate_rankings(sx_schedule, sx_fit, "espn") %>%
          `SoS Rank` = `Sos Rank`)
 sx_current_matchups <- compare_current_matchups(sx_schedule, sx_fit)
 sx_playoff_leverage_chart <- plot_playoff_leverage(sx_simulated_standings)
-sx_lineup_eval <- evaluate_lineup(sx_team, flex = 0, plot = TRUE)
+sx_lineup_eval <- sx_team %>% 
+  evaluate_lineup(wr = 2,
+                  dl = 0,
+                  db = 0) %>% 
+  plot_roster_skills()
 sx_model_eval <- evaluate_model(sx_fit_season)
 
 # Save Data ---------------------------------------------------------------

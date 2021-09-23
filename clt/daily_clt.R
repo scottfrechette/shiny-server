@@ -121,7 +121,9 @@ clt_rankings <- calculate_rankings(clt_schedule, clt_fit, "yahoo") %>%
          `SoS Rank` = `Sos Rank`)
 clt_current_matchups <- compare_current_matchups(clt_schedule, clt_fit, clt_wp)
 clt_playoff_leverage_chart <- plot_playoff_leverage(clt_simulated_standings)
-clt_lineup_eval <- evaluate_lineup(clt_team, flex = 0, plot = TRUE)
+clt_lineup_eval <- clt_team %>% 
+  evaluate_lineup(flex = 0) %>% 
+  plot_roster_skills()
 clt_model_eval <- evaluate_model(clt_fit_season)
 
 # Save Data ---------------------------------------------------------------
