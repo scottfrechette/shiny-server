@@ -157,12 +157,13 @@ ui  <- navbarPage(
   #                     h5("Matchup Breakdown", align = "center"),
   #                     fluidRow(tableOutput("matchup_breakdown"), align = "center")
   #            ),
-  #            
+  # 
   #            tabPanel("Playoff Leverage",
   #                     h5("How much will winning/losing your next game affect your playoff chances?"),
-  #                     fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center")
+  #                     fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center"),
+  #                     fluidRow(plotOutput("playoff_leverage_legend", width = "80%", height = "100px"), align = "center")
   #            ),
-  #            
+  # 
   #            tabPanel("Skill v Luck",
   #                     h5("How good or lucky is your team?"),
   #                     fluidRow(plotOutput("quadrant", width = "80%"), align = "center"),
@@ -171,7 +172,7 @@ ui  <- navbarPage(
   #                                                                          1, weeks_played,
   #                                                                          c(1, weeks_played), step = 1))))
   #            ),
-  #            
+  # 
   #            tabPanel("League Gambling",
   #                     p("How do all the teams compare to each other?"),
   #                     fluidRow(column(8, plotOutput("heatmap")), align = "center"),
@@ -585,10 +586,64 @@ server <- function(input, output, session) {
     
   })
   
-  
   output$playoff_leverage <- renderPlot({
-    clt_playoff_leverage_chart #+ scale_fill_manual(values = fvoa_colors)
+    clt_playoff_leverage_chart + 
+      scale_fill_manual(values = fvoa_colors)
   }, res = 96)
+  
+  output$playoff_leverage_legend <- renderPlot({
+    
+    # Core dataset with the basic labels
+    label_df <- tibble(
+      x = c(15, 15, 77, 101),
+      y = c(1.6, 0.35, 0.35, 1),
+      label = c("Chance to make playoffs with win ", "Chance to make playoffs with loss ", "Leverage", "X%")
+    )
+    
+    
+    # the horizontal lines
+    seg_df <- tibble(
+      x1 = c(0.2, 90, 0.2, 74.8, 75.3, 90, 103),
+      x2 = c(0.2, 90, 0.2, 74.8, 75.3, 90, 103),
+      y1 = c(1.3, 1.3, rep(.7, 5)),
+      y2 = c(1.61, 1.61, rep(.343, 5))
+      
+    )
+    
+    # vertical lines
+    seg2_df <- tibble(
+      x1 = c(0.2, 0.2, 75.3),
+      x2 = c(90, 74.8, 103),
+      y1 = c(1.6, .35, .35),
+      y2 = c(1.6, .35, .35)
+    )
+    
+    tibble(x = 75,
+           y = factor("Y"),
+           x2 = 90) %>%
+      ggplot(aes(x = x, y = y)) +
+      geom_col(aes(x = 100), fill = "white", color = "grey", width = 0.4) +
+      geom_col(aes(x = x2), width = 0.4, color = "#DC143C", fill = "grey") +
+      geom_col(width = 0.4, color = "black", fill = "black") +
+      geom_segment(data = seg_df,
+                   aes(x = x1, y = y1, xend = x2, yend = y2),
+                   color = c(rep("black", 4), rep("#DC143C", 3)),
+                   size = 1) +
+      geom_segment(data = seg2_df,
+                   aes(x = x1, y = y1, xend = x2, yend = y2),
+                   color = c("black", "black", "#DC143C"),
+                   size = 1) +
+      geom_label(data = label_df,
+                 aes(x = x, y = y, label = label),
+                 hjust = 0, size = 6, fontface = "bold", fill = "white",
+                 color = c("black", "black", "#DC143C", "#DC143C"),
+                 label.size = NA,
+                 # family = "Oswald",
+                 label.padding = unit(0.05, "lines"),) +
+      coord_cartesian(ylim = c(0.7, 1.2), xlim = c(0, 108)) +
+      theme_void() +
+      theme(plot.margin = unit(c(0.5, 1.5, 0.5, 1.5), "cm"))
+  })
   
   output$manager <- renderPlot({
     clt_lineup_eval
