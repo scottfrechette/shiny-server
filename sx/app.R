@@ -142,45 +142,45 @@ ui  <- navbarPage(
            )
   ),
   
-  # Compare -----------------------------------------------------------------
-  
-  navbarMenu("Compare",
-             tabPanel("Head-to-Head",
-                      h3("Individual Matchups"),
-                      hr(),
-                      fluidRow(column(2, offset = 4,
-                                      selectInput("team1", "Team 1:", teams, selected = teams[[1]])),
-                               column(2, selectInput("team2", "Team 2:", teams, selected = teams[[2]]))),
-                      hr(),
-                      fluidRow(plotOutput("matchup_plot", width = "600px", height = "600px"), align = 'center'),
-                      hr(),
-                      h5("Matchup Breakdown", align = "center"),
-                      fluidRow(tableOutput("matchup_breakdown"), align = "center")
-             ),
-             
-             tabPanel("Playoff Leverage",
-                      h5("How much will winning/losing your next game affect your playoff chances?"),
-                      fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center")
-             ),
-             
-             tabPanel("Skill v Luck",
-                      h5("How good or lucky is your team?"),
-                      fluidRow(plotOutput("quadrant", width = "80%"), align = "center"),
-                      hr(),
-                      fluidRow(column(4, offset = 4, wellPanel(sliderInput("quad_week", "Weeks to Include:",
-                                                                           1, weeks_played,
-                                                                           c(1, weeks_played), step = 1))))
-             ),
-             
-             tabPanel("League Gambling",
-                      p("How do all the teams compare to each other?"),
-                      fluidRow(column(8, plotOutput("heatmap")), align = "center"),
-                      br(),
-                      br(),
-                      p("Just because you aren't matched up doesn't mean you can't still gamble on your scores:"),
-                      tableOutput("lines")
-             )
-  ),
+  # # Compare -----------------------------------------------------------------
+  # 
+  # navbarMenu("Compare",
+  #            tabPanel("Head-to-Head",
+  #                     h3("Individual Matchups"),
+  #                     hr(),
+  #                     fluidRow(column(2, offset = 4,
+  #                                     selectInput("team1", "Team 1:", teams, selected = teams[[1]])),
+  #                              column(2, selectInput("team2", "Team 2:", teams, selected = teams[[2]]))),
+  #                     hr(),
+  #                     fluidRow(plotOutput("matchup_plot", width = "600px", height = "600px"), align = 'center'),
+  #                     hr(),
+  #                     h5("Matchup Breakdown", align = "center"),
+  #                     fluidRow(tableOutput("matchup_breakdown"), align = "center")
+  #            ),
+  #            
+  #            tabPanel("Playoff Leverage",
+  #                     h5("How much will winning/losing your next game affect your playoff chances?"),
+  #                     fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center")
+  #            ),
+  #            
+  #            tabPanel("Skill v Luck",
+  #                     h5("How good or lucky is your team?"),
+  #                     fluidRow(plotOutput("quadrant", width = "80%"), align = "center"),
+  #                     hr(),
+  #                     fluidRow(column(4, offset = 4, wellPanel(sliderInput("quad_week", "Weeks to Include:",
+  #                                                                          1, weeks_played,
+  #                                                                          c(1, weeks_played), step = 1))))
+  #            ),
+  #            
+  #            tabPanel("League Gambling",
+  #                     p("How do all the teams compare to each other?"),
+  #                     fluidRow(column(8, plotOutput("heatmap")), align = "center"),
+  #                     br(),
+  #                     br(),
+  #                     p("Just because you aren't matched up doesn't mean you can't still gamble on your scores:"),
+  #                     tableOutput("lines")
+  #            )
+  # ),
   
   
   # Visuals -----------------------------------------------------------------
