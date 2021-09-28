@@ -1,8 +1,4 @@
 
-oldw <- getOption("warn")
-options(warn = -1)
-
-
 # Setup -------------------------------------------------------------------
 
 # Load packages
@@ -21,7 +17,6 @@ current_week <- today_week - start_week
 weeks_played <- current_week - 1
 current_season <- year(today())
 
-
 # Scrape Data -------------------------------------------------------------
 
 clt_con <- dbConnect(SQLite(), here::here("clt", "clt.sqlite"))
@@ -30,15 +25,15 @@ clt_team_tmp <- scrape_team(weeks_played, 'yahoo') %>%
   mutate(season = current_season, .before = 1)
 
 if(exists("clt_team_tmp")) {
-
+  
   dbSendQuery(clt_con, str_glue("DELETE from teams where week == {weeks_played} and season == {current_season}"))
-
+  
   dbWriteTable(clt_con,
                "teams", clt_team_tmp,
                overwrite = FALSE, append = TRUE)
-
+  
   rm(clt_team_tmp)
-
+  
 }
 
 Sys.sleep(120)
@@ -105,33 +100,23 @@ clt_simulated_records <- simulate_final_standings_season(clt_fit_season, clt_sch
 
 # Run Calculations --------------------------------------------------------
 
-clt_fvoa_season <- calculate_fvoa_season(clt_fit_season)
-clt_matchups_prob <- compare_league(clt_fit) %>%
-  fvoa:::spread_league(.output = "wp")
-clt_matchups_spread <- compare_league(clt_fit) %>% 
-  fvoa:::spread_league(.output = "spread")
-clt_rankings <- calculate_rankings(clt_schedule, clt_fit, "yahoo") %>% 
-  rename_all(snakecase::to_title_case) %>% 
-  rename(PF = Pf,
-         PA = Pa,
-         WP = Wp,
-         FVOA = Fvoa, 
-         `FVOA Rank` = `Fvoa Rank`, 
-         SoS = Sos, 
-         `SoS Rank` = `Sos Rank`)
 clt_current_matchups <- compare_current_matchups(clt_schedule, clt_fit, clt_wp)
-clt_playoff_leverage_chart <- plot_playoff_leverage(clt_simulated_standings)
+clt_fvoa_season <- calculate_fvoa_season(clt_fit_season)
 clt_lineup_eval <- clt_team %>% 
-  evaluate_lineup(flex = 0) %>% 
+  evaluate_lineup(flex = 0 ) %>% 
   plot_roster_skills()
 clt_model_eval <- evaluate_model(clt_fit_season)
+clt_schedule_luck <- plot_schedule_luck(clt_schedule, clt_scores, clt_owners, sims = 1000)
 
 # Save Data ---------------------------------------------------------------
 
-save(clt_schedule, clt_team, clt_proj, clt_scores,
-     clt_fit, clt_simulated_records, clt_model_eval, 
+save(clt_schedule, 
+     clt_team, 
+     clt_fit, 
+     clt_simulated_records, 
      clt_fvoa_season,
-     clt_matchups_prob, clt_matchups_spread,
-     clt_rankings, clt_current_matchups,
-     clt_playoff_leverage_chart, clt_lineup_eval, 
+     clt_model_eval, 
+     clt_current_matchups,
+     clt_lineup_eval, 
+     clt_schedule_luck,
      file = here::here("clt", "clt-data.RData"))

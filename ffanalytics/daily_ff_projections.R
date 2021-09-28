@@ -1,8 +1,8 @@
 
 # Setup -------------------------------------------------------------------
 
-library(ffanalytics)
 library(tidyverse)
+library(ffanalytics)
 library(lubridate)
 library(fvoa)
 
@@ -165,6 +165,7 @@ sx_projections_df <- sx_projections %>%
             by = "id") 
 
 # Save Data ---------------------------------------------------------------
+
 last_updated <- now()
 
 if(exists("clt_projections_df")) {

@@ -1,6 +1,5 @@
 ####### CLT App #######
 
-
 # Initialize --------------------------------------------------------------
 
 ### Load Packages ###
@@ -35,6 +34,9 @@ fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
 
 load(here::here("clt", "clt-data.RData"))
 
+clt_scores <- extract_scores(clt_team)
+clt_proj <- extract_projections(clt_team)
+
 weeks <- n_distinct(clt_scores$week)
 teams <- unique(clt_scores$team)
 
@@ -51,7 +53,7 @@ ui  <- navbarPage(
   inverse = F,
   
   # footer = "Frech Takes",
-  title = "Charlotte's Finest",
+  title = "Seacows Football",
   
   # Frech Takes Tab----------------------------------------------------------
   
@@ -59,7 +61,6 @@ ui  <- navbarPage(
            h3("The Frechest of Takes"),
            h5(""),
            hr(),
-           
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
@@ -77,7 +78,7 @@ ui  <- navbarPage(
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "What I find interesting is no one really left points on their bench last week but Yahoo really shit the bed on projections, so that'll make for a fun season if it holds"
+               "I'm just so happy that Herndon and Hoop are picking up on the dominant path they left off last season. Good thing Heitz is bringing their average down so we don't have to kick their year all out next year."
              } else {
                "TBD"
              }
@@ -96,7 +97,6 @@ ui  <- navbarPage(
            h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
            br(),
            fluidRow(tableOutput("weekly"), align="center"),
-           br(),
            h5("Season Projections", align = "center"),
            br(),
            fluidRow(tableOutput("simulation"), align = "center"),
@@ -144,127 +144,101 @@ ui  <- navbarPage(
   
   # Compare -----------------------------------------------------------------
   
-  # navbarMenu("Compare",
-  #            tabPanel("Head-to-Head",
-  #                     h3("Individual Matchups"),
-  #                     hr(),
-  #                     fluidRow(column(2, offset = 4,
-  #                                     selectInput("team1", "Team 1:", teams, selected = teams[[1]])),
-  #                              column(2, selectInput("team2", "Team 2:", teams, selected = teams[[2]]))),
-  #                     hr(),
-  #                     fluidRow(plotOutput("matchup_plot", width = "600px", height = "600px"), align = 'center'),
-  #                     hr(),
-  #                     h5("Matchup Breakdown", align = "center"),
-  #                     fluidRow(tableOutput("matchup_breakdown"), align = "center")
-  #            ),
-  # 
-  #            tabPanel("Playoff Leverage",
-  #                     h5("How much will winning/losing your next game affect your playoff chances?"),
-  #                     fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center"),
-  #                     fluidRow(plotOutput("playoff_leverage_legend", width = "80%", height = "100px"), align = "center")
-  #            ),
-  # 
-  #            tabPanel("Skill v Luck",
-  #                     h5("How good or lucky is your team?"),
-  #                     fluidRow(plotOutput("quadrant", width = "80%"), align = "center"),
-  #                     hr(),
-  #                     fluidRow(column(4, offset = 4, wellPanel(sliderInput("quad_week", "Weeks to Include:",
-  #                                                                          1, weeks_played,
-  #                                                                          c(1, weeks_played), step = 1))))
-  #            ),
-  # 
-  #            tabPanel("League Gambling",
-  #                     p("How do all the teams compare to each other?"),
-  #                     fluidRow(column(8, plotOutput("heatmap")), align = "center"),
-  #                     br(),
-  #                     br(),
-  #                     p("Just because you aren't matched up doesn't mean you can't still gamble on your scores:"),
-  #                     tableOutput("lines")
-  #            )
-  # ),
-  
-  
-  # Visuals -----------------------------------------------------------------
-  
-  navbarMenu("Visuals",
-             tabPanel("Team Scores",
-                      plotlyOutput("weekly_plot"),
-                      hr(),
-                      fluidRow(checkboxGroupInput("team_week", "Teams to Highlight:", sort(teams), inline=T), align = "center"),
-                      fluidRow(actionButton("clear_teams_week", "Clear Teams"), align = "center"),
-                      hr(),
-                      h5("Chart Notes:"),
-                      tags$ol(
-                        tags$li("Click Team names on right to add/remove"),
-                        tags$li("Use checkboxes below to highlight"),
-                        tags$li("Hover over any point to get detailed info"),
-                        tags$li("Zoom in on any part of the chart by dragging box over that area (double-click to return)"),
-                        tags$li("Dotted grey line gives the average score for each week")
-                      )
-             ),
-             
-             tabPanel("Team FVOA",
-                      plotlyOutput("fvoa_plot"),
-                      hr(),
-                      fluidRow(checkboxGroupInput("team_fvoa", "Teams to Highlight:", sort(teams), inline=T), align = "center"),
-                      fluidRow(actionButton("clear_teams_fvoa", "Clear Teams"), align = "center"),
-                      hr(),
-                      h5("Chart Notes:"),
-                      tags$ol(
-                        tags$li("Click Team names on right to add/remove"),
-                        tags$li("Use checkboxes below to highlight"),
-                        tags$li("Hover over any point to get detailed info"),
-                        tags$li("Zoom in on any part of the chart by dragging box over that area (double-click to return)"),
-                        tags$li("Dotted grey line gives the average team")
-                      )
-             ),
-             
-             tabPanel("Simulation Charts",
-                      plotlyOutput("sim_chart"),
-                      hr(),
-                      fluidRow(selectizeInput("sim_chart_selection", "Show Simulations For:", selected = "Playoff Chances",
-                                              c("Playoff Chances", "Wins", "Points")),
-                               align = "center"),
-                      fluidRow(checkboxGroupInput("team_sims", "Teams to Highlight:", sort(teams), inline = T), align = "center"),
-                      fluidRow(actionButton("clear_teams_sims", "Clear Teams"), align = "center"),
-                      br(),
-                      # p("Calculated by simulating all remaining matchups in the season and figuring out the best 4 teams.
-                      #   I then do this another 999 times and figure out the percentage of each team making the playoffs.
-                      #   This will happen every week to see which teams have the best chance to make that money."),
-                      # hr(),
-                      h5("Chart Notes:"),
-                      tags$ol(
-                        tags$li("Click Team names on right to add/remove"),
-                        tags$li("Use checkboxes below to highlight"),
-                        tags$li("Hover over any point to get detailed info"),
-                        tags$li("Zoom in on any part of the chart by dragging box over that area (double-click to return)"),
-                        tags$li(textOutput("sim_text"))
-                      )
-             ),
-             
-             tabPanel("Manager Evaluation",
-                      h5("How well did you manage your team?"),
-                      fluidRow(plotOutput("manager", width = "80%"), align = "center"),
-                      hr()
-             ),
-             
-             tabPanel("Projected v Actual Scores",
-                      h5("How did your team perform against Yahoo projections?"),
-                      fluidRow(plotOutput("projected", width = "80%"), align = "center")
-             )
+  tabPanel("Compare",
+           h3("Head-to-Head Matchups"),
+           # br(),
+           fluidRow(column(2, offset = 4,
+                           selectInput("team1", "Team 1:", teams, selected = teams[[1]])),
+                    column(2, selectInput("team2", "Team 2:", teams, selected = teams[[2]]))),
+           # br(),
+           fluidRow(plotOutput("matchup_plot", width = "600px", height = "600px"), align = 'center'),
+           # br(),
+           # h5("Matchup Breakdown", align = "center"),
+           # fluidRow(tableOutput("matchup_breakdown"), align = "center"),
+           hr(),
+           h3("League Gambling"),
+           p("Just because you aren't matched up doesn't mean you can't still gamble on any spread:"),
+           fluidRow(tableOutput("lines"), align = 'center')
+           
   ),
   
   
-  # Model Evaluation Tab-----------------------------------------------------
+  # Weekly Charts -----------------------------------------------------------
   
-    tabPanel("FVOA Evaluation",
-             h4("FVOA Accuracy by Week"),
-             hr(),
-             fluidRow(column(8, offset = 2, plotOutput("eval_plot")), align = "center"),
-             br(),
-             p("Which teams screwed my model last week?", align = "center"),
-             fluidRow(tableOutput("eval_team"), align = "center")
-    )
+  tabPanel("Weekly Charts",
+           plotlyOutput("weekly_chart"),
+           hr(),
+           fluidRow(selectizeInput("weekly_chart_selection", 
+                                   "Show Chart For:", 
+                                   selected = "Scores",
+                                   c("Scores", "FVOA", 
+                                     "Simulated Playoff Chances", "Simulated Wins", "Simulated Points")),
+                    align = "center"),
+           fluidRow(checkboxGroupInput("team_weekly", "Teams to Highlight:", sort(teams), inline = T), align = "center"),
+           fluidRow(actionButton("clear_teams_weekly", "Clear Teams"), align = "center"),
+           br(),
+           # p("Calculated by simulating all remaining matchups in the season and figuring out the best 4 teams.
+           #   I then do this another 999 times and figure out the percentage of each team making the playoffs.
+           #   This will happen every week to see which teams have the best chance to make that money."),
+           # hr(),
+           h5("Chart Notes:"),
+           tags$ol(
+             tags$li("Click Team names on right to add/remove"),
+             tags$li("Use checkboxes below to highlight"),
+             tags$li("Hover over any point to get detailed info"),
+             tags$li("Zoom in on any part of the chart by dragging box over that area (double-click to return)"),
+             tags$li(textOutput("weekly_text"))
+           )
+  ),
+  
+  
+  # Playoff Leverage --------------------------------------------------------
+  
+  # tabPanel("Playoff Leverage",
+  #          h5("How much will winning/losing your next game affect your playoff chances?"),
+  #          fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center"),
+  #          fluidRow(plotOutput("playoff_leverage_legend", width = "80%", height = "100px"), align = "center")
+  #          
+  # ),
+  
+  
+  # Skill v Luck ------------------------------------------------------------
+  
+  tabPanel("Skill v Luck",
+           h3("Is your team skilled or lucky?"),
+           hr(),
+           fluidRow(plotOutput("wpag", width = "80%"), align = "center"),
+           hr(),
+           fluidRow(plotOutput("schedule_luck", width = "80%"), align = "center"),
+           hr(),
+           fluidRow(plotOutput("points_luck", width = "80%"), align = "center")
+  ),
+  
+  
+  # Roster Evaluation -------------------------------------------------------
+  
+  tabPanel("Team Management",
+           fluidRow(plotOutput("manager", width = "80%"), align = "center"),
+           hr()
+  ),
+  
+  # Model Evaluation Tab ----------------------------------------------------
+  
+  navbarMenu("Evaluate",
+             tabPanel("FVOA Evaluation",
+                      fluidRow(column(8, offset = 2, plotOutput("eval_fvoa_plot")), align = "center"),
+                      br(),
+                      p("Which teams screwed my model last week?", align = "center"),
+                      fluidRow(plotOutput("eval_fvoa_team", width = "80%"), align = "center")
+             ),
+             tabPanel("Yahoo Evaluation",
+                      fluidRow(column(8, offset = 2, plotOutput("eval_proj_plot")), align = "center"),
+                      br(),
+                      h5("How did your team perform against Yahoo projections?"),
+                      fluidRow(plotOutput("projected", width = "80%"), align = "center")
+             )
+  )
+  
   
   # End of navbarPage
 )
@@ -273,14 +247,7 @@ ui  <- navbarPage(
 
 server <- function(input, output, session) {
   
-  ### Weekly Projections ###
-  
-  # output$playoffs <- renderTable({
-  #   tibble(Winner = c("Hoop", "Wikle", "Herndon", "Ford"),
-  #          Percent = c("58%", "16%", "12%", "12%"),
-  #          Odds = c("3:2", "13:2", "8:1", "17:2"),
-  #          BettingLine = c("-125", "+525", "+725", "+775"))
-  # }, align = "c")
+  # Weekly Projections ------------------------------------------------------
   
   output$weekly <- renderTable({
     clt_current_matchups #%>% select(-yahoo)
@@ -300,7 +267,14 @@ server <- function(input, output, session) {
              Wins = wins, Playoffs)
   }, align = 'c', digits = 1)
   
-  ### Rankings Tab ###
+  # output$playoffs <- renderTable({
+  #   tibble(Winner = c("Hoop", "Wikle", "Herndon", "Ford"),
+  #          Percent = c("58%", "16%", "12%", "12%"),
+  #          Odds = c("3:2", "13:2", "8:1", "17:2"),
+  #          BettingLine = c("-125", "+525", "+725", "+775"))
+  # }, align = "c")
+  
+  # Rankings ----------------------------------------------------------------
   
   output$sorting <- renderUI({
     selectInput("sorting", "Sort Rankings By:", 
@@ -318,7 +292,12 @@ server <- function(input, output, session) {
   
   output$rankings <- renderTable({
     
-    rankings <- clt_rankings 
+    rankings <- calculate_rankings(clt_schedule, clt_fit, "yahoo") %>% 
+      set_names("Team", "PF", "PA", 
+                "Record", "WP", "Yahoo Rank", 
+                "FVOA", "FVOA Rank",
+                "SoS", "SoS Rank", 
+                "Colley Rating", "Colley Rank")
     sort <- sorting[[input$sorting]]
     rank_sort <- rankings %>%
       arrange(rankings[[sort]])
@@ -331,23 +310,8 @@ server <- function(input, output, session) {
     }
   }, align = 'c', digits = 2)
   
-  ### League Tab ###
+  # H2H Matchups ------------------------------------------------------------
   
-  output$heatmap <- renderPlot({
-    clt_matchups_prob %>%
-      rename(winner = team) %>%
-      gather(loser, score, -winner) %>%
-      mutate(loser = factor(loser, levels = sort(unique(loser)))) %>% 
-      rename(team1 = 1, team2 = 2, wp = 3) %>% 
-      plot_matchups_hm()
-  }, res = 96)
-  
-  output$lines <- renderTable({
-    clt_matchups_spread %>% 
-      rename(Team = team)
-  }, align = 'c')
-  
-  ### Matchups Tab ###
   output$matchup_breakdown <- renderTable(
     
     compare_teams(clt_fit, input$team1, input$team2, .verbose = T)  %>% 
@@ -358,104 +322,43 @@ server <- function(input, output, session) {
   
   output$matchup_plot <- renderPlot(plot_h2h_matchup(clt_fit, input$team1, input$team2), res = 96)
   
-  ### Team Charts ###
+  # League Comparison -------------------------------------------------------
   
-  observeEvent(input$clear_teams_week, {
-    updateCheckboxGroupInput(session, "team_week", selected = character(0))
+  output$heatmap <- renderPlot({
+    compare_league(clt_fit) %>%
+      fvoa:::spread_league(.output = "wp") %>%
+      rename(winner = team) %>%
+      gather(loser, score, -winner) %>%
+      mutate(loser = factor(loser, levels = sort(unique(loser)))) %>% 
+      rename(team1 = 1, team2 = 2, wp = 3) %>% 
+      plot_matchups_hm()
+  }, res = 96)
+  
+  output$lines <- renderTable({
+    compare_league(clt_fit) %>% 
+      fvoa:::spread_league(.output = "spread") %>% 
+      rename(Team = team)
+  }, align = 'c')
+  
+  
+  
+  # Weekly Charts -----------------------------------------------------------
+  
+  observeEvent(input$clear_teams_weekly, {
+    updateCheckboxGroupInput(session, "team_weekly", selected = character(0))
   })
   
-  output$weekly_plot <- renderPlotly({
+  output$weekly_text <- renderText({
     
-    if (is.null(input$team_week)) {
-      x <- ggplot(clt_scores, aes(week, score)) +
-        geom_smooth(se=F, color = "darkgrey", n = n_distinct(clt_scores$week), linetype=2) +
-        geom_line(alpha = 0.5, aes(group=team, color=team), size = 1.5) +
-        geom_point(aes(group=team, color=team)) +
-        scale_y_continuous(breaks = pretty_breaks(n = 5)) +
-        # scale_x_continuous(breaks = pretty_breaks(n = 7)) +
-        scale_x_continuous(breaks = c(1:14), limits = c(1, 14)) +
-        labs(y = "Score", x = "Week", title = "Weekly Scores") +
-        guides(color=FALSE) +
-        theme_fvoa() + 
-        scale_color_manual(values = fvoa_colors)
-      
-      ggplotly(x, tooltip = c("group", "x", "y"))
-      
-    } else {
-      tm <- clt_scores %>% filter(team %in% input$team_week)
-      
-      x <- ggplot(clt_scores, aes(week, score)) +
-        geom_smooth(se=F, color = "darkgrey", n = n_distinct(clt_scores$week), linetype=2) +
-        geom_line(alpha = 0.2, aes(group=team, color=team), size = 1.5) +
-        geom_line(data = tm, aes(group=team, color=team), size = 2) + 
-        geom_point(aes(group=team, color=team)) +
-        scale_y_continuous(breaks = pretty_breaks(n = 5)) +
-        scale_x_continuous(breaks = c(1:14), limits = c(1, 14)) +
-        labs(y = "Score", x = "Week", title = "Weekly Scores") +
-        guides(color=FALSE) +
-        theme_fvoa() + 
-        scale_color_manual(values = fvoa_colors)
-      
-      ggplotly(x, tooltip = c("group", "x", "y"))
-      
-    }
-  })
-  
-  observeEvent(input$clear_teams_fvoa, {
-    updateCheckboxGroupInput(session, "team_fvoa", selected = character(0))
-  })
-  
-  output$fvoa_plot <- renderPlotly({
-    
-    if (is.null(input$team_fvoa)) {
-      x <- ggplot(clt_fvoa_season, aes(week, fvoa)) +
-        # geom_smooth(se=F, color = "darkgrey", n = n_distinct(clt_scores$Week), linetype=2) +
-        geom_line(alpha = 0.5, aes(group=team, color=team), size = 1.5) +
-        geom_point(aes(group=team, color=team)) +
-        geom_segment(x = 1, y = 0, xend = 15, yend = 0, color = "darkgrey", linetype = 2) +
-        scale_y_continuous(breaks = c(-100, -75, -50, -25, 0, 25, 50, 75, 100), limits = c(-100, 100)) +
-        # scale_y_continuous(breaks = pretty_breaks(n = 5)) +
-        scale_x_continuous(breaks = c(1:14), limits = c(1, 14)) +
-        labs(y = "FVOA", x = "Week", title = "Weekly FVOA") +
-        guides(color=FALSE) +
-        theme_fvoa() + 
-        scale_color_manual(values = fvoa_colors)
-      
-      ggplotly(x, tooltip = c("group", "x", "y"))
-      
-    } else {
-      tm <- clt_fvoa_season %>% filter(team %in% input$team_fvoa)
-      
-      x <- ggplot(clt_fvoa_season, aes(week, fvoa)) +
-        # geom_smooth(se=F, color = "darkgrey", n = n_distinct(clt_scores$Week), linetype=2) +
-        geom_line(alpha = 0.2, aes(group=team, color=team), size = 1.5) +
-        geom_line(data = tm, aes(group=team, color=team), size = 2) + 
-        geom_point(aes(group=team, color=team)) +
-        geom_segment(x = 1, y = 0, xend = 15, yend = 0, color = "darkgrey", linetype = 2) +
-        scale_y_continuous(breaks = c(-100, -75, -50, -25, 0, 25, 50, 75, 100), limits = c(-100, 100)) +
-        # scale_y_continuous(breaks = pretty_breaks(n = 5)) +
-        scale_x_continuous(breaks = c(1:14), limits = c(1, 14)) +
-        labs(y = "Score", x = "Week", title = "Weekly Scores") +
-        guides(color=FALSE) +
-        theme_fvoa() + 
-        scale_color_manual(values = fvoa_colors)
-      
-      ggplotly(x, tooltip = c("group", "x", "y"))
-      
-    }
-  })
-  
-  observeEvent(input$clear_teams_sims, {
-    updateCheckboxGroupInput(session, "team_sims", selected = character(0))
-  })
-  
-  output$sim_text <- renderText({
-    
-    if(input$sim_chart_selection == "Wins") {
+    if (input$weekly_chart_selection == "Scores") {
+      "Dotted grey line gives the average score for each week"
+    } else if (input$weekly_chart_selection == "FVOA") {
+      "Dotted grey line gives the average team"
+    } else if (input$weekly_chart_selection == "Simulated Wins") {
       "Dotted grey line gives the league average (7 wins)"
-    } else if(input$sim_chart_selection == "Points") {
+    } else if (input$weekly_chart_selection == "Simulated Points") {
       "Dotted grey line gives the average total points for each week"
-    } else if(input$sim_chart_selection == "Playoff Chances") {
+    } else if (input$weekly_chart_selection == "Simulated Playoff Chances") {
       "Dotted grey line gives the baseline (40%)"
     } else {
       "ERROR"
@@ -463,11 +366,92 @@ server <- function(input, output, session) {
     
   })
   
-  output$sim_chart <- renderPlotly({
+  output$weekly_chart <- renderPlotly({
     
-    if (input$sim_chart_selection == "Wins") {
+    if (input$weekly_chart_selection == "Scores") {
       
-      if (is.null(input$team_sims)) {
+      if (is.null(input$team_weekly)) {
+        
+        x <- ggplot(clt_scores, aes(week, score)) +
+          geom_smooth(se=F, color = "darkgrey", n = n_distinct(clt_scores$week), linetype=2) +
+          geom_line(alpha = 0.5, aes(group=team, color=team), size = 1.5) +
+          geom_point(aes(group=team, color=team)) +
+          scale_y_continuous(breaks = pretty_breaks(n = 5)) +
+          # scale_x_continuous(breaks = pretty_breaks(n = 7)) +
+          scale_x_continuous(breaks = c(1:14), limits = c(1, 14)) +
+          labs(y = "Score", x = "Week", title = "Weekly Scores") +
+          guides(color = "none") +
+          theme_fvoa() + 
+          scale_color_manual(values = fvoa_colors)
+        
+        ggplotly(x, tooltip = c("group", "x", "y"))
+        
+      } else {
+        
+        tm <- filter(clt_scores, team %in% input$team_weekly)
+        
+        x <- ggplot(clt_scores, aes(week, score)) +
+          geom_smooth(se=F, color = "darkgrey", n = n_distinct(clt_scores$week), linetype=2) +
+          geom_line(alpha = 0.2, aes(group=team, color=team), size = 1.5) +
+          geom_line(data = tm, aes(group=team, color=team), size = 2) + 
+          geom_point(aes(group=team, color=team)) +
+          scale_y_continuous(breaks = pretty_breaks(n = 5)) +
+          scale_x_continuous(breaks = c(1:14), limits = c(1, 14)) +
+          labs(y = "Score", x = "Week", title = "Weekly Scores") +
+          guides(color = "none") +
+          theme_fvoa() + 
+          scale_color_manual(values = fvoa_colors)
+        
+        ggplotly(x, tooltip = c("group", "x", "y"))
+        
+      }
+      
+    } else if (input$weekly_chart_selection == "FVOA") {
+      
+      if (is.null(input$team_weekly)) {
+        
+        x <- ggplot(clt_fvoa_season, aes(week, fvoa)) +
+          # geom_smooth(se=F, color = "darkgrey", n = n_distinct(clt_scores$Week), linetype=2) +
+          geom_line(alpha = 0.5, aes(group=team, color=team), size = 1.5) +
+          geom_point(aes(group=team, color=team)) +
+          geom_segment(x = 1, y = 0, xend = 15, yend = 0, color = "darkgrey", linetype = 2) +
+          # scale_y_continuous(breaks = c(-100, -75, -50, -25, 0, 25, 50, 75, 100), limits = c(-100, 100)) +
+          scale_y_continuous(breaks = pretty_breaks(n = 5)) +
+          scale_x_continuous(breaks = c(1:14), limits = c(1, 14)) +
+          labs(y = "FVOA", x = "Week", title = "Weekly FVOA") +
+          guides(color = "none") +
+          theme_fvoa() + 
+          scale_color_manual(values = fvoa_colors)
+        
+        ggplotly(x, tooltip = c("group", "x", "y"))
+        
+      } else {
+        
+        tm <- filter(clt_fvoa_season, team %in% input$team_weekly)
+        
+        x <- ggplot(clt_fvoa_season, aes(week, fvoa)) +
+          # geom_smooth(se=F, color = "darkgrey", n = n_distinct(clt_scores$Week), linetype=2) +
+          geom_line(alpha = 0.2, aes(group=team, color=team), size = 1.5) +
+          geom_line(data = tm, aes(group=team, color=team), size = 2) + 
+          geom_point(aes(group=team, color=team)) +
+          geom_segment(x = 1, y = 0, xend = 15, yend = 0, color = "darkgrey", linetype = 2) +
+          scale_y_continuous(breaks = c(-100, -75, -50, -25, 0, 25, 50, 75, 100), limits = c(-100, 100)) +
+          # scale_y_continuous(breaks = pretty_breaks(n = 5)) +
+          scale_x_continuous(breaks = c(1:14), limits = c(1, 14)) +
+          labs(y = "Score", x = "Week", title = "Weekly Scores") +
+          guides(color = "none") +
+          theme_fvoa() + 
+          scale_color_manual(values = fvoa_colors)
+        
+        ggplotly(x, tooltip = c("group", "x", "y"))
+        
+      }
+      
+      
+    } else if (input$weekly_chart_selection == "Simulated Wins") {
+      
+      if (is.null(input$team_weekly)) {
+        
         x <- clt_simulated_records %>% 
           ggplot(aes(week, wins)) +
           geom_line(alpha = 0.5, aes(color=team), size = 1.5) +
@@ -478,14 +462,15 @@ server <- function(input, output, session) {
           scale_y_continuous(breaks = c(0, 2, 4, 6, 8, 10, 12, 14), limits = c(0, 15)) +
           scale_x_continuous(breaks = c(1:14), limits = c(1, 14)) +
           labs(y = "Wins", x = "Week", title = "Projected Wins by Week") +
-          guides(color=FALSE) +
+          guides(color = "none") +
           theme_fvoa() + 
           scale_color_manual(values = fvoa_colors)
         
         ggplotly(x, tooltip = c("group", "x", "y"))
         
       } else {
-        tm <- clt_simulated_records %>% filter(team %in% input$team_sims)
+        
+        tm <- filter(clt_simulated_records, team %in% input$team_sims)
         
         x <- clt_simulated_records %>% 
           ggplot(aes(week, wins)) +
@@ -496,16 +481,17 @@ server <- function(input, output, session) {
           scale_y_continuous(breaks = c(0, 2, 4, 6, 8, 10, 12, 14), limits = c(0, 15)) +
           scale_x_continuous(breaks = c(1:14), limits = c(1, 14)) +
           labs(y = "Wins", x = "Week", title = "Projected Wins by Week") +
-          guides(color=FALSE) +
+          guides(color = "none") +
           theme_fvoa() + 
           scale_color_manual(values = fvoa_colors)
         
         ggplotly(x, tooltip = c("group", "x", "y"))
       }
       
-    } else if (input$sim_chart_selection == "Points") {
+    } else if (input$weekly_chart_selection == "Simulated Points") {
       
-      if (is.null(input$team_sims)) {
+      if (is.null(input$team_weekly)) {
+        
         x <- clt_simulated_records %>% 
           rename(points = pf) %>% 
           ggplot(aes(week, points)) +
@@ -515,14 +501,15 @@ server <- function(input, output, session) {
           scale_y_continuous(breaks = pretty_breaks(n = 5)) +
           scale_x_continuous(breaks = c(1:14), limits = c(1, 14)) +
           labs(y = "Points", x = "Week", title = "Projected Total Points by Week") +
-          guides(color=FALSE) +
+          guides(color = "none") +
           theme_fvoa() + 
           scale_color_manual(values = fvoa_colors)
         
         ggplotly(x, tooltip = c("group", "x", "y"))
         
       } else {
-        tm <- clt_simulated_records %>% filter(team %in% input$team_sims)
+        
+        tm <- filter(clt_simulated_records, team %in% input$team_sims)
         
         x <- clt_simulated_records %>% 
           rename(points = pf) %>% 
@@ -534,16 +521,17 @@ server <- function(input, output, session) {
           scale_y_continuous(breaks = pretty_breaks(n = 5)) +
           scale_x_continuous(breaks = c(1:14), limits = c(1, 14)) +
           labs(y = "Points", x = "Week", title = "Projected Total Points by Week") +
-          guides(color=FALSE) +
+          guides(color = "none") +
           theme_fvoa() + 
           scale_color_manual(values = fvoa_colors)
         
         ggplotly(x, tooltip = c("group", "x", "y"))
       }
       
-    } else if (input$sim_chart_selection == "Playoff Chances") {
+    } else if (input$weekly_chart_selection == "Simulated Playoff Chances") {
       
-      if (is.null(input$team_sims)) {
+      if (is.null(input$team_weekly)) {
+        
         x <- clt_simulated_records %>% 
           ggplot(aes(week, playoffs)) +
           geom_line(alpha = 0.5, aes(group=team, color=team), size = 1.5) +
@@ -553,14 +541,15 @@ server <- function(input, output, session) {
                              labels = percent) +
           scale_x_continuous(breaks = c(1:14), limits = c(1, 14)) +
           labs(y = "Chance", x = "Week", title = "Projected Chance of Making Playoffs by Week") +
-          guides(color=FALSE) +
+          guides(color = "none") +
           theme_fvoa() + 
           scale_color_manual(values = fvoa_colors)
         
         ggplotly(x, tooltip = c("group", "x", "y"))
         
       } else {
-        tm <- clt_simulated_records %>% filter(team %in% input$team_sims)
+        
+        tm <- filter(clt_simulated_records, team %in% input$team_sims)
         
         x <- clt_simulated_records %>% 
           ggplot(aes(week, playoffs)) +
@@ -572,7 +561,7 @@ server <- function(input, output, session) {
                              labels = percent) +
           scale_x_continuous(breaks = c(1:14), limits = c(1, 14)) +
           labs(y = "Chance", x = "Week", title = "Projected Chance of Making Playoffs by Week") +
-          guides(color=FALSE) +
+          guides(color = "none") +
           theme_fvoa() + 
           scale_color_manual(values = fvoa_colors)
         
@@ -586,8 +575,10 @@ server <- function(input, output, session) {
     
   })
   
+  # Playoff Leverage --------------------------------------------------------
+  
   output$playoff_leverage <- renderPlot({
-    clt_playoff_leverage_chart + 
+    plot_playoff_leverage(clt_simulated_standings) + 
       scale_fill_manual(values = fvoa_colors)
   }, res = 96)
   
@@ -639,22 +630,42 @@ server <- function(input, output, session) {
                  color = c("black", "black", "#DC143C", "#DC143C"),
                  label.size = NA,
                  # family = "Oswald",
-                 label.padding = unit(0.05, "lines"),) +
+                 label.padding = unit(0.05, "lines")) +
       coord_cartesian(ylim = c(0.7, 1.2), xlim = c(0, 108)) +
       theme_void() +
       theme(plot.margin = unit(c(0.5, 1.5, 0.5, 1.5), "cm"))
   })
   
-  output$manager <- renderPlot({
-    clt_lineup_eval
+  # Skill v Luck ------------------------------------------------------------
+  
+  output$points_luck <- renderPlot(plot_points_luck(clt_schedule, clt_scores, x = "pf"),
+                                   res = 96)
+  
+  output$schedule_luck <- renderPlot(clt_schedule_luck, res = 96)
+  
+  output$wpag <- renderPlot(plot_wpag(clt_schedule, clt_scores), res = 96)
+  
+  # Roster Evaluation -------------------------------------------------------
+  
+  output$manager <- renderPlot(clt_lineup_eval, res = 96)
+  
+  # FVOA Evaluation ---------------------------------------------------------
+  
+  output$eval_fvoa_plot <- renderPlot({
+    plot_model_eval_weekly(clt_model_eval)
+  }, res= 96)
+  
+  output$eval_fvoa_team = renderPlot({
+    plot_model_eval_team(clt_model_eval) + 
+      scale_fill_manual(values = fvoa_colors)
   }, res = 96)
   
-  output$quadrant <- renderPlot({
-    
-    clt_scores %>% 
-      filter(week %in% input$quad_week[1]:input$quad_week[2]) %>%
-      calculate_quadrants(clt_schedule, .) %>% 
-      plot_quadrant()
+  # Yahoo Evaluation ---------------------------------------------------------
+  
+  output$eval_proj_plot <- renderPlot({
+    evaluate_projections(clt_proj) %>% 
+      filter(week > 1) %>% 
+      plot_projection_eval()
   }, res = 96)
   
   output$projected <- renderPlot({
@@ -669,32 +680,12 @@ server <- function(input, output, session) {
       scale_x_continuous(breaks = 1:max(clt_proj$week),
                          labels = 1:max(clt_proj$week)) +
       facet_wrap(~reorder(team, - pos_count), ncol=n_distinct(clt_proj$team)/2) +
-      guides(fill=FALSE) +
+      guides(fill = "none") +
       labs(x = "Week", y = "Margin") +
       scale_fill_manual(values = c(equal = "#619CFF", negative = "#F8766D", positive = "#00BA38")) +
       theme_fvoa() + 
       theme(panel.grid.major.y = element_blank())
   }, res = 96)
-  
-  ### Model Evaluation ###
-  
-  output$eval_accuracy <- renderText({
-
-    accuracy <- clt_model_eval %>%
-      dplyr::summarize(x = sum(correct) / n()) %>%
-      pull() %>%
-      scales::percent()
-
-    str_glue("FVOA has correctly predicted {accuracy} of games this season")
-  })
-
-  output$eval_plot <- renderPlot({
-    plot_model_eval_weekly(clt_model_eval)
-  }, res= 96)
-
-  output$eval_team = renderTable(
-    evaluate_team_accuracy(clt_model_eval, .latest = TRUE),
-    digits = 0, align = 'c')
   
 }
 
