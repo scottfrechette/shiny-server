@@ -121,11 +121,8 @@ ui  <- navbarPage(
   tabPanel("Rankings",
            sidebarLayout(
              sidebarPanel(
-               # checkboxGroupInput("rankings", "Choose Rankings:", 
-               #                    ranking_methods, selected = c("yahoo_rankings")),
                uiOutput("sorting")
              ), 
-             # mainPanel("Rankings")
              mainPanel(tableOutput("rankings"))
            ),
            hr(),
@@ -243,7 +240,7 @@ server <- function(input, output, session) {
   # Weekly Projections ------------------------------------------------------
   
   output$weekly <- renderTable({
-    clt_current_matchups #%>% select(-yahoo)
+    clt_current_matchups
   }, align = 'c', digits = 0)
   
   output$simulation <- renderTable({
@@ -366,7 +363,6 @@ server <- function(input, output, session) {
       if (is.null(input$team_weekly)) {
         
         x <- ggplot(clt_scores, aes(week, score)) +
-          # geom_smooth(se=F, color = "darkgrey", n = n_distinct(clt_scores$week), linetype=2) +
           geom_line(alpha = 0.5, aes(group=team, color=team), size = 1.5) +
           geom_point(aes(group=team, color=team)) +
           geom_segment(x = 1, y = 115, xend = max_weeks, yend = 115, color = "darkgrey", linetype = 2) +
@@ -384,7 +380,6 @@ server <- function(input, output, session) {
         tm <- filter(clt_scores, team %in% input$team_weekly)
         
         x <- ggplot(clt_scores, aes(week, score)) +
-          # geom_smooth(se=F, color = "darkgrey", n = n_distinct(clt_scores$week), linetype=2) +
           geom_line(alpha = 0.2, aes(group=team, color=team), size = 1.5) +
           geom_line(data = tm, aes(group=team, color=team), size = 2) + 
           geom_point(aes(group=team, color=team)) +
@@ -405,11 +400,9 @@ server <- function(input, output, session) {
       if (is.null(input$team_weekly)) {
         
         x <- ggplot(clt_fvoa_season, aes(week, fvoa)) +
-          # geom_smooth(se=F, color = "darkgrey", n = n_distinct(clt_scores$Week), linetype=2) +
           geom_line(alpha = 0.5, aes(group=team, color=team), size = 1.5) +
           geom_point(aes(group=team, color=team)) +
           geom_segment(x = 1, y = 0, xend = max_weeks, yend = 0, color = "darkgrey", linetype = 2) +
-          # scale_y_continuous(breaks = c(-100, -75, -50, -25, 0, 25, 50, 75, 100), limits = c(-100, 100)) +
           scale_y_continuous(breaks = pretty_breaks(n = 5)) +
           scale_x_continuous(breaks = c(1:max_weeks), limits = c(1, max_weeks)) +
           labs(y = "FVOA", x = "Week", title = "Weekly FVOA") +
@@ -424,13 +417,11 @@ server <- function(input, output, session) {
         tm <- filter(clt_fvoa_season, team %in% input$team_weekly)
         
         x <- ggplot(clt_fvoa_season, aes(week, fvoa)) +
-          # geom_smooth(se=F, color = "darkgrey", n = n_distinct(clt_scores$Week), linetype=2) +
           geom_line(alpha = 0.2, aes(group=team, color=team), size = 1.5) +
           geom_line(data = tm, aes(group=team, color=team), size = 2) + 
           geom_point(aes(group=team, color=team)) +
           geom_segment(x = 1, y = 0, xend = max_weeks, yend = 0, color = "darkgrey", linetype = 2) +
           scale_y_continuous(breaks = c(-100, -75, -50, -25, 0, 25, 50, 75, 100), limits = c(-100, 100)) +
-          # scale_y_continuous(breaks = pretty_breaks(n = 5)) +
           scale_x_continuous(breaks = c(1:max_weeks), limits = c(1, max_weeks)) +
           labs(y = "Score", x = "Week", title = "Weekly Scores") +
           guides(color = "none") +
@@ -450,8 +441,6 @@ server <- function(input, output, session) {
           ggplot(aes(week, wins)) +
           geom_line(alpha = 0.5, aes(color=team), size = 1.5) +
           geom_point(aes(color=team)) +
-          # geom_line(alpha = 0.5, aes(group=Team, color=Team), size = 1.5) +
-          # geom_point(aes(group=Team, color=Team)) +
           geom_segment(x = 1, y = 7.5, xend = max_weeks, yend = 7.5, color = "darkgrey", linetype = 2) +
           scale_y_continuous(breaks = c(0, 2, 4, 6, 8, 10, 12, 14), limits = c(0, 15)) +
           scale_x_continuous(breaks = c(1:max_weeks), limits = c(1, max_weeks)) +
@@ -489,7 +478,6 @@ server <- function(input, output, session) {
         x <- clt_simulated_records %>% 
           rename(points = pf) %>% 
           ggplot(aes(week, points)) +
-          # geom_smooth(se=F, color = "darkgrey", n = n_distinct(clt_scores$week), linetype = 2) +
           geom_line(alpha = 0.5, aes(group=team, color=team), size = 1.5) +
           geom_point(aes(group=team, color=team)) +
           geom_segment(x = 1, y = 115 * max_weeks, xend = max_weeks, yend = 115 * max_weeks, color = "darkgrey", linetype = 2) +
@@ -509,7 +497,6 @@ server <- function(input, output, session) {
         x <- clt_simulated_records %>% 
           rename(points = pf) %>% 
           ggplot(aes(Week, points)) +
-          # geom_smooth(se=F, color = "darkgrey", n = n_distinct(clt_scores$week), linetype=2) +
           geom_line(alpha = 0.2, aes(group=team, color=team), size = 1.5) +
           geom_line(data = tm, aes(group=team, color=team), size = 2) + 
           geom_point(aes(group=team, color=team)) +
