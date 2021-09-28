@@ -292,7 +292,7 @@ server <- function(input, output, session) {
   
   output$rankings <- renderTable({
     
-    rankings <- calculate_rankings(sx_schedule, sx_fit, "espn") %>% 
+    rankings <- calculate_rankings(sx_schedule, sx_fit) %>% 
       set_names("Team", "PF", "PA", 
                 "Record", "WP", "ESPN Rank", 
                 "FVOA", "FVOA Rank",
@@ -536,7 +536,7 @@ server <- function(input, output, session) {
           ggplot(aes(week, playoffs)) +
           geom_line(alpha = 0.5, aes(group=team, color=team), size = 1.5) +
           geom_point(aes(group=team, color=team)) +
-          geom_segment(x = 1, y = 40, xend = 15, yend = 40, color = "darkgrey", linetype = 2) +
+          geom_segment(x = 1, y = 0.4, xend = 15, yend = 0.4, color = "darkgrey", linetype = 2) +
           scale_y_continuous(breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1), limits = c(0, 1),
                              labels = percent) +
           scale_x_continuous(breaks = c(1:14), limits = c(1, 14)) +
@@ -556,7 +556,7 @@ server <- function(input, output, session) {
           geom_line(alpha = 0.2, aes(group=team, color=team), size = 1.5) +
           geom_line(data = tm, aes(group=team, color=team), size = 2) + 
           geom_point(aes(group=team, color=team)) +
-          geom_segment(x = 1, y = 40, xend = 15, yend = 40, color = "darkgrey", linetype = 2) +
+          geom_segment(x = 1, y = 0.4, xend = 15, yend = 0.4, color = "darkgrey", linetype = 2) +
           scale_y_continuous(breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1), limits = c(0, 1),
                              labels = percent) +
           scale_x_continuous(breaks = c(1:14), limits = c(1, 14)) +
