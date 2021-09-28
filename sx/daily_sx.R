@@ -15,8 +15,7 @@ current_week <- today_week - start_week
 weeks_played <- current_week - 1
 current_season <- year(today())
 
-# Load Data ---------------------------------------------------------------
-
+# Load Team IDs
 source(here::here("sx", "sx_owners.R"))
 
 # Scrape Data -------------------------------------------------------------
