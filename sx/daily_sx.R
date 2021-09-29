@@ -26,7 +26,7 @@ sx_team_tmp <- map_df(1:weeks_played, scrape_team)
 
 sx_schedule <- sx_schedule_tmp %>% 
   left_join(sx_owners, by = "teamID") %>% 
-  left_join(select(sx_owners, opponent = 1, opponentID = 2), by = "opponentID") %>% 
+  left_join(select(sx_owners, opponent = team, opponentID = teamID), by = "opponentID") %>% 
   select(week, team, opponent)
 
 sx_team <-sx_team_tmp %>% 

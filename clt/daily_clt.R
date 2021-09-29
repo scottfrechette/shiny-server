@@ -36,13 +36,13 @@ if(exists("clt_team_tmp")) {
   
 }
 
-Sys.sleep(120)
+Sys.sleep(60)
 
 clt_wp_tmp <- scrape_win_prob(current_week) %>% 
   mutate(season = current_season,
          week = current_week, .before = 1)
 
-Sys.sleep(120)
+Sys.sleep(60)
 
 clt_players_tmp <- scrape_player_projections(current_week, 'yahoo') %>% 
   mutate(season = current_season,
@@ -103,7 +103,7 @@ clt_simulated_records <- simulate_final_standings_season(clt_fit_season, clt_sch
 clt_current_matchups <- compare_current_matchups(clt_schedule, clt_fit, clt_wp)
 clt_fvoa_season <- calculate_fvoa_season(clt_fit_season)
 clt_lineup_eval <- clt_team %>% 
-  evaluate_lineup(flex = 0 ) %>% 
+  evaluate_lineup(flex = 0) %>% 
   plot_roster_skills()
 clt_model_eval <- evaluate_model(clt_fit_season)
 clt_schedule_luck <- plot_schedule_luck(clt_schedule, clt_scores, clt_owners, sims = 1000)

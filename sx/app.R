@@ -25,7 +25,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 2
+frech_stats <- 3
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -65,28 +65,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Welcome back for another year of my worthless analytics - this time with improved FVOA model"
+               "Welcome back to the new (and hopefully?) improved version of FVOA for another year of my worthless analytics"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "I've still got a few more tweaks and updates for the site to get done over the next couple of weeks but I've been a little distracted with some needy little baby"
+               "There's still a decent amount of regression to historical mean but we should start to see more separation as season goes on"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "I'm just so happy that Herndon and Hoop are picking up on the dominant path they left off last season. Good thing Heitz is bringing their average down so we don't have to kick their year all out next year."
+               "That said chaos is already reigning as our only undefeated team is considered overestimated by FVOA"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Luckily there's still plenty of time and no one has been written off yet, so hopefully we'll see some chaos again this year"
+               "In more embarrassing news it seems the 3rd strongest team is Jangaard's autodraft zombie team - which will be a rough look if it holds"
              } else {
                "TBD"
              }
@@ -140,27 +140,57 @@ ui  <- navbarPage(
            )
   ),
   
-  # Compare -----------------------------------------------------------------
-  
-  tabPanel("Compare",
-           h3("Head-to-Head Matchups"),
-           p("Simulate any potential matchup:"),
-           fluidRow(column(2, offset = 4,
-                           selectInput("team1", "Team 1:", teams, selected = teams[[1]])),
-                    column(2, selectInput("team2", "Team 2:", teams, selected = teams[[2]]))),
-           fluidRow(plotOutput("matchup_plot", width = "600px", height = "600px"), align = 'center'),
-           hr(),
-           h3("League Gambling"),
-           p("Just because you aren't matched up doesn't mean you can't still gamble on any spread:"),
-           fluidRow(tableOutput("lines"), align = 'center')
-           
+  # Simulate ----------------------------------------------------------------
+
+  navbarMenu("Simulate",
+             tabPanel("Matchups",
+                      h3("Head-to-Head Matchups"),
+                      p("Simulate any potential matchup:"),
+                      fluidRow(column(2, offset = 4,
+                                      selectInput("team1", "Team 1:", teams, selected = teams[[1]])),
+                               column(2, selectInput("team2", "Team 2:", teams, selected = teams[[2]]))),
+                      fluidRow(plotOutput("matchup_plot", width = "600px", height = "600px"), align = 'center'),
+                      hr(),
+                      h3("League Gambling"),
+                      p("Just because you aren't matched up doesn't mean you can't still gamble on any spread:"),
+                      fluidRow(tableOutput("lines"), align = 'center')
+
+             ),
+             tabPanel("Season",
+                      h3("Playoff Leverage"),
+                      h5("How much will winning/losing your next game affect your playoff chances?"),
+                      fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center"),
+                      fluidRow(plotOutput("playoff_leverage_legend", width = "80%", height = "100px"), align = "center")
+
+             )
   ),
   
+  # Skill v Luck ------------------------------------------------------------
+  
+  tabPanel("Skill v Luck",
+           h3("Are you skilled or lucky?"),
+           hr(),
+           h4("Roster Evaluation"),
+           p("How well have you managed your roster each week?"),
+           fluidRow(plotOutput("manager", width = "80%"), align = "center"),
+           hr(),
+           h4("Schedule Luck"),
+           p("What would your rank be with other simulated schedules?"),
+           fluidRow(plotOutput("schedule_luck", width = "80%"), align = "center"),
+           hr(),
+           h4("Win Percentage for All Games"),
+           p("How well would your team do if you were measured against every team each week?"),
+           fluidRow(plotOutput("wpag", width = "80%"), align = "center"),
+           hr(),
+           h4("Win Percentage vs Points"),
+           p("How is your team doing relative to total points scored?"),
+           fluidRow(plotOutput("points_luck", width = "80%"), align = "center")
+  ),
   
   # Weekly Charts -----------------------------------------------------------
   
   tabPanel("Weekly Charts",
-           plotlyOutput("weekly_chart"),
+           div(plotlyOutput("weekly_chart", width = "80%"), align = "center"),
            hr(),
            fluidRow(selectizeInput("weekly_chart_selection", 
                                    "Show Chart For:", 
@@ -170,7 +200,7 @@ ui  <- navbarPage(
                     align = "center"),
            fluidRow(checkboxGroupInput("team_weekly", "Teams to Highlight:", sort(teams), inline = T), align = "center"),
            fluidRow(actionButton("clear_teams_weekly", "Clear Teams"), align = "center"),
-           br(),
+           hr(),
            h5("Chart Notes:"),
            tags$ol(
              tags$li("Click Team names on right to add/remove"),
@@ -180,51 +210,24 @@ ui  <- navbarPage(
              tags$li(textOutput("weekly_text"))
            )
   ),
-  
-  
-  # Playoff Leverage --------------------------------------------------------
-  
-  # tabPanel("Playoff Leverage",
-  #          h5("How much will winning/losing your next game affect your playoff chances?"),
-  #          fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center"),
-  #          fluidRow(plotOutput("playoff_leverage_legend", width = "80%", height = "100px"), align = "center")
-  #          
-  # ),
-  
-  
-  # Skill v Luck ------------------------------------------------------------
-  
-  tabPanel("Skill v Luck",
-           h3("Is your team skilled or lucky?"),
-           hr(),
-           fluidRow(plotOutput("wpag", width = "80%"), align = "center"),
-           hr(),
-           fluidRow(plotOutput("schedule_luck", width = "80%"), align = "center"),
-           hr(),
-           fluidRow(plotOutput("points_luck", width = "80%"), align = "center")
-  ),
-  
-  
-  # Roster Evaluation -------------------------------------------------------
-  
-  tabPanel("Team Management",
-           fluidRow(plotOutput("manager", width = "80%"), align = "center"),
-           hr()
-  ),
-  
+
   # Model Evaluation Tab ----------------------------------------------------
   
   navbarMenu("Evaluate",
              tabPanel("FVOA Evaluation",
+                      h3("How well is the FVOA model performing?"),
+                      hr(),
                       fluidRow(column(8, offset = 2, plotOutput("eval_fvoa_plot")), align = "center"),
                       br(),
-                      p("Which teams screwed my model last week?", align = "center"),
+                      # p("Which teams screwed my model last week?"),
                       fluidRow(plotOutput("eval_fvoa_team", width = "80%"), align = "center")
              ),
              tabPanel("ESPN Evaluation",
+                      h3("How well are ESPN projections performing?"),
+                      hr(),
                       fluidRow(column(8, offset = 2, plotOutput("eval_proj_plot")), align = "center"),
                       br(),
-                      h5("How did your team perform against ESPN projections?"),
+                      # h5("How did your team perform against ESPN projections?"),
                       fluidRow(plotOutput("projected", width = "80%"), align = "center")
              )
   )
@@ -664,7 +667,9 @@ server <- function(input, output, session) {
                          labels = 1:max(sx_proj$week)) +
       facet_wrap(~reorder(team, - pos_count), ncol=n_distinct(sx_proj$team)/2) +
       guides(fill = "none") +
-      labs(x = "Week", y = "Margin") +
+      labs(x = "Week", 
+           y = "Margin",
+           title = "League Projections by Team") +
       scale_fill_manual(values = c(equal = "#619CFF", negative = "#F8766D", positive = "#00BA38")) +
       theme_fvoa() + 
       theme(panel.grid.major.y = element_blank())
