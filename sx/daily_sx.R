@@ -39,6 +39,7 @@ sx_scores <- extract_scores(sx_team)
 
 sx_fit_season <- fit_team_season(sx_scores)
 sx_fit <- slice_tail(sx_fit_season, n = 1)$model[[1]]
+sx_draws <- fvoa:::extract_draws(distinct(sx_scores, team), sx_fit)
 
 # Run Simulations ---------------------------------------------------------
 
@@ -63,7 +64,7 @@ sx_schedule_luck <- plot_schedule_luck(sx_schedule, sx_scores, sx_owners, sims =
 
 save(sx_schedule, 
      sx_team,
-     sx_fit, 
+     sx_draws, 
      sx_simulated_records, 
      sx_fvoa_season,
      sx_model_eval, 

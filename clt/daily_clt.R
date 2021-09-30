@@ -90,6 +90,7 @@ clt_wp <- clt_wp_tmp %>%
 
 clt_fit_season <- fit_team_season(clt_scores)
 clt_fit <- slice_tail(clt_fit_season, n = 1)$model[[1]]
+clt_draws <- fvoa:::extract_draws(distinct(clt_scores, team), clt_fit)
 
 # Run Simulations ---------------------------------------------------------
 
@@ -112,7 +113,7 @@ clt_schedule_luck <- plot_schedule_luck(clt_schedule, clt_scores, clt_owners, si
 
 save(clt_schedule, 
      clt_team, 
-     clt_fit, 
+     clt_draws, 
      clt_simulated_records, 
      clt_fvoa_season,
      clt_model_eval, 

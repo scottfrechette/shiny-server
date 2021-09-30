@@ -304,16 +304,9 @@ server <- function(input, output, session) {
   }, align = 'c', digits = 2)
   
   # H2H Matchups ------------------------------------------------------------
-  
-  output$matchup_breakdown <- renderTable(
-    
-    compare_teams(sx_fit, input$team1, input$team2, .verbose = T)  %>% 
-      mutate(PctChance = paste0(round(PctChance, 0), "%")) %>% 
-      rename(Margin = MarginVictory,
-             Probability = PctChance), 
-    align = 'c')
-  
-  output$matchup_plot <- renderPlot(plot_h2h_matchup(sx_fit, input$team1, input$team2), res = 96)
+
+  output$matchup_plot <- renderPlot(plot_h2h_matchup(input$team1, input$team2, draws = sx_draws), 
+                                    res = 96)
   
   # League Comparison -------------------------------------------------------
   
