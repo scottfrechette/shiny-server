@@ -52,12 +52,22 @@ sx_simulated_records <- simulate_final_standings_season(sx_fit_season, sx_schedu
 
 sx_current_matchups <- compare_current_matchups(sx_schedule, sx_fit)
 sx_fvoa_season <- calculate_fvoa_season(sx_fit_season)
+sx_rankings <- calculate_rankings(sx_schedule, sx_fit) %>% 
+  set_names("Team", "PF", "PA", 
+            "Record", "WP", "ESPN Rank", 
+            "FVOA", "FVOA Rank",
+            "SoS", "SoS Rank", 
+            "Colley Rating", "Colley Rank")
+sx_lines <- compare_league(sx_fit) %>% 
+  fvoa:::spread_league(.output = "spread") %>% 
+  rename(Team = team)
 sx_lineup_eval <- sx_team %>% 
   evaluate_lineup(wr = 2,
                   dl = 0,
                   db = 0) %>% 
   plot_roster_skills()
 sx_model_eval <- evaluate_model(sx_fit_season)
+sx_playoff_leverage <- plot_playoff_leverage(sx_simulated_standings)
 sx_schedule_luck <- plot_schedule_luck(sx_schedule, sx_scores, sx_owners, sims = 1000)
 
 # Save Data ---------------------------------------------------------------
@@ -66,9 +76,12 @@ save(sx_schedule,
      sx_team,
      sx_draws, 
      sx_simulated_records, 
+     sx_rankings,
+     sx_lines,
      sx_fvoa_season,
      sx_model_eval, 
      sx_current_matchups,
      sx_lineup_eval, 
+     sx_playoff_leverage,
      sx_schedule_luck,
      file = here::here("sx", "sx-data.RData"))

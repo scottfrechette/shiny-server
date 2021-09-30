@@ -286,17 +286,11 @@ server <- function(input, output, session) {
   
   output$rankings <- renderTable({
     
-    rankings <- calculate_rankings(clt_schedule, clt_fit) %>% 
-      set_names("Team", "PF", "PA", 
-                "Record", "WP", "Yahoo Rank", 
-                "FVOA", "FVOA Rank",
-                "SoS", "SoS Rank", 
-                "Colley Rating", "Colley Rank")
     sort <- sorting[[input$sorting]]
-    rank_sort <- rankings %>%
-      arrange(rankings[[sort]])
-    point_sort <- rankings %>%
-      arrange(desc(rankings[[sort]]))
+    rank_sort <- clt_rankings %>%
+      arrange(clt_rankings[[sort]])
+    point_sort <- clt_rankings %>%
+      arrange(desc(clt_rankings[[sort]]))
     if (sort %in% c("PF", "PA")) {
       point_sort
     } else {
@@ -310,24 +304,8 @@ server <- function(input, output, session) {
                                     res = 96)
   
   # League Comparison -------------------------------------------------------
-  
-  output$heatmap <- renderPlot({
-    compare_league(clt_fit) %>%
-      fvoa:::spread_league(.output = "wp") %>%
-      rename(winner = team) %>%
-      gather(loser, score, -winner) %>%
-      mutate(loser = factor(loser, levels = sort(unique(loser)))) %>% 
-      rename(team1 = 1, team2 = 2, wp = 3) %>% 
-      plot_matchups_hm()
-  }, res = 96)
-  
-  output$lines <- renderTable({
-    compare_league(clt_fit) %>% 
-      fvoa:::spread_league(.output = "spread") %>% 
-      rename(Team = team)
-  }, align = 'c')
-  
-  
+
+  output$lines <- renderTable(clt_lines, align = 'c')
   
   # Weekly Charts -----------------------------------------------------------
   
@@ -558,7 +536,7 @@ server <- function(input, output, session) {
   # Playoff Leverage --------------------------------------------------------
   
   output$playoff_leverage <- renderPlot({
-    plot_playoff_leverage(clt_simulated_standings) + 
+    clt_playoff_leverage + 
       scale_fill_manual(values = fvoa_colors)
   }, res = 96)
   
