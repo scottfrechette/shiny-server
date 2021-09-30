@@ -304,7 +304,7 @@ server <- function(input, output, session) {
   
   # League Comparison -------------------------------------------------------
 
-  output$lines <- renderTable(clt_lines, align = 'c')
+  output$lines <- renderTable(sx_lines, align = 'c')
   
   # Weekly Charts -----------------------------------------------------------
   
