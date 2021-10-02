@@ -20,9 +20,9 @@ source(here::here("sx", "sx_owners.R"))
 
 # Scrape Data -------------------------------------------------------------
 
-sx_schedule_tmp <- scrape_schedule('espn')
+sx_schedule_tmp <- get_schedule('espn')
 
-sx_team_tmp <- map_df(1:weeks_played, scrape_team)
+sx_team_tmp <- map_df(1:weeks_played, get_team)
 
 sx_schedule <- sx_schedule_tmp %>% 
   left_join(sx_owners, by = "teamID") %>% 

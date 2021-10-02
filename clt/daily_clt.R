@@ -21,7 +21,7 @@ current_season <- year(today())
 
 clt_con <- dbConnect(SQLite(), here::here("clt", "clt.sqlite"))
 
-clt_team_tmp <- scrape_team(weeks_played, 'yahoo') %>% 
+clt_team_tmp <- get_team(weeks_played, 'yahoo') %>% 
   mutate(season = current_season, .before = 1)
 
 if(exists("clt_team_tmp")) {
@@ -38,13 +38,13 @@ if(exists("clt_team_tmp")) {
 
 Sys.sleep(60)
 
-clt_wp_tmp <- scrape_win_prob(current_week) %>% 
+clt_wp_tmp <- get_win_prob(current_week) %>% 
   mutate(season = current_season,
          week = current_week, .before = 1)
 
 Sys.sleep(60)
 
-clt_players_tmp <- scrape_player_projections(current_week, 'yahoo') %>% 
+clt_players_tmp <- get_player_projections(current_week, 'yahoo') %>% 
   mutate(season = current_season,
          week = current_week, 
          .before = 1)
