@@ -141,7 +141,7 @@ ui  <- navbarPage(
   ),
   
   # Simulate ----------------------------------------------------------------
-
+  
   navbarMenu("Simulate",
              tabPanel("Matchups",
                       h3("Head-to-Head Matchups"),
@@ -154,14 +154,16 @@ ui  <- navbarPage(
                       h3("League Gambling"),
                       p("Just because you aren't matched up doesn't mean you can't still gamble on any spread:"),
                       fluidRow(tableOutput("lines"), align = 'center')
-
+                      
              ),
              tabPanel("Season",
                       h3("Playoff Leverage"),
                       h5("How much will winning/losing your next game affect your playoff chances?"),
-                      fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center"),
-                      fluidRow(plotOutput("playoff_leverage_legend", width = "80%", height = "100px"), align = "center")
-
+                      fluidRow(plotOutput("playoff_leverage", width = "700px", height = "600px"), align = 'center'),
+                      fluidRow(plotOutput("playoff_leverage_legend", width = "700px", height = "100px"), align = 'center')#,
+                      # fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center"),
+                      # fluidRow(plotOutput("playoff_leverage_legend", width = "80%", height = "100px"), align = "center")
+                      
              )
   ),
   
@@ -172,25 +174,29 @@ ui  <- navbarPage(
            hr(),
            h4("Roster Evaluation"),
            p("How well have you managed your roster each week?"),
-           fluidRow(plotOutput("manager", width = "80%"), align = "center"),
+           # fluidRow(plotOutput("manager", width = "80%"), align = "center"),
+           fluidRow(plotOutput("manager", width = "600px", height = "600px"), align = 'center'),
            hr(),
            h4("Schedule Luck"),
            p("What would your rank be with other simulated schedules?"),
-           fluidRow(plotOutput("schedule_luck", width = "80%"), align = "center"),
+           # fluidRow(plotOutput("schedule_luck", width = "80%"), align = "center"),
+           fluidRow(plotOutput("schedule_luck", width = "600px", height = "600px"), align = 'center'),
            hr(),
            h4("Win Percentage for All Games"),
            p("How well would your team do if you were measured against every team each week?"),
-           fluidRow(plotOutput("wpag", width = "80%"), align = "center"),
+           # fluidRow(plotOutput("wpag", width = "80%"), align = "center"),
+           fluidRow(plotOutput("wpag", width = "600px", height = "600px"), align = 'center'),
            hr(),
            h4("Win Percentage vs Points"),
            p("How is your team doing relative to total points scored?"),
-           fluidRow(plotOutput("points_luck", width = "80%"), align = "center")
+           # fluidRow(plotOutput("points_luck", width = "80%"), align = "center")
+           fluidRow(plotOutput("points_luck", width = "600px", height = "600px"), align = 'center')
   ),
   
   # Weekly Charts -----------------------------------------------------------
   
   tabPanel("Weekly Charts",
-           div(plotlyOutput("weekly_chart", width = "80%"), align = "center"),
+           div(plotlyOutput("weekly_chart", width = "600px", height = "600px"), align = "center"),
            hr(),
            fluidRow(selectizeInput("weekly_chart_selection", 
                                    "Show Chart For:", 
@@ -210,25 +216,25 @@ ui  <- navbarPage(
              tags$li(textOutput("weekly_text"))
            )
   ),
-
+  
   # Model Evaluation Tab ----------------------------------------------------
   
   navbarMenu("Evaluate",
              tabPanel("FVOA Evaluation",
                       h3("How well is the FVOA model performing?"),
                       hr(),
-                      fluidRow(column(8, offset = 2, plotOutput("eval_fvoa_plot")), align = "center"),
+                      fluidRow(plotOutput("eval_fvoa_plot", width = "600px", height = "600px"), align = "center"),
                       br(),
                       # p("Which teams screwed my model last week?"),
-                      fluidRow(plotOutput("eval_fvoa_team", width = "80%"), align = "center")
+                      fluidRow(plotOutput("eval_fvoa_team", width = "600px", height = "600px"), align = "center")
              ),
              tabPanel("ESPN Evaluation",
                       h3("How well are ESPN projections performing?"),
                       hr(),
-                      fluidRow(column(8, offset = 2, plotOutput("eval_proj_plot")), align = "center"),
+                      fluidRow(plotOutput("eval_proj_plot", width = "600px", height = "600px"), align = "center"),
                       br(),
                       # h5("How did your team perform against ESPN projections?"),
-                      fluidRow(plotOutput("projected", width = "80%"), align = "center")
+                      fluidRow(plotOutput("projected", width = "600px", height = "600px"), align = "center")
              )
   )
   
@@ -298,12 +304,12 @@ server <- function(input, output, session) {
   }, align = 'c', digits = 2)
   
   # H2H Matchups ------------------------------------------------------------
-
+  
   output$matchup_plot <- renderPlot(plot_h2h_matchup(input$team1, input$team2, draws = sx_draws), 
                                     res = 96)
   
   # League Comparison -------------------------------------------------------
-
+  
   output$lines <- renderTable(sx_lines, align = 'c')
   
   # Weekly Charts -----------------------------------------------------------

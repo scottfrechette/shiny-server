@@ -90,7 +90,7 @@ clt_wp <- clt_wp_tmp %>%
 
 clt_fit_season <- fit_team_season(clt_scores)
 clt_fit <- slice_tail(clt_fit_season, n = 1)$model[[1]]
-clt_draws <- fvoa:::extract_draws(distinct(clt_scores, team), clt_fit)
+clt_draws <- fvoa:::extract_team_draws(distinct(clt_scores, team), clt_fit)
 
 # Run Simulations ---------------------------------------------------------
 

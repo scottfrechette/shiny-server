@@ -39,7 +39,7 @@ sx_scores <- extract_scores(sx_team)
 
 sx_fit_season <- fit_team_season(sx_scores)
 sx_fit <- slice_tail(sx_fit_season, n = 1)$model[[1]]
-sx_draws <- fvoa:::extract_draws(distinct(sx_scores, team), sx_fit)
+sx_draws <- fvoa:::extract_team_draws(distinct(sx_scores, team), sx_fit)
 
 # Run Simulations ---------------------------------------------------------
 
