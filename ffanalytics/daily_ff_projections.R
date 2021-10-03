@@ -41,7 +41,7 @@ sx_player_data <- get_players(current_week, 'espn')
 
 clt_projections_df <- left_join(clt_projections,
                                 select(clt_player_data, mflID, teamID),
-                                by = "mdlID") %>% 
+                                by = "mflID") %>% 
   mutate(position = case_when(
     position == "DEF" ~ "DST",
     position %in% c("CB", "S") ~ "DB",
