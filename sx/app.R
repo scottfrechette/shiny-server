@@ -25,7 +25,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 3
+frech_stats <- 4
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -72,21 +72,15 @@ ui  <- navbarPage(
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "There's still a decent amount of regression to historical mean but we should start to see more separation as season goes on"
+               "Someone is going to have to explain to me how the possibly zombie Jangaard team is in 9th but has the 2nd highest points. Guess it makes more sense when you realize that his team would be 2nd in 96% of randomly created schedules, so that's some really shitty luck."
              } else {
                "TBD"
              }
            ),
+           
            tags$li(
              if(weeks_played == frech_stats) {
-               "That said chaos is already reigning as our only undefeated team is considered overestimated by FVOA"
-             } else {
-               "TBD"
-             }
-           ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "In more embarrassing news it seems the 3rd strongest team is Jangaard's autodraft zombie team - which will be a rough look if it holds"
+               "It's still early and no team has really distinguished themselves a lot so fair bit of regression to mean still happening"
              } else {
                "TBD"
              }
@@ -182,12 +176,12 @@ ui  <- navbarPage(
            # fluidRow(plotOutput("schedule_luck", width = "80%"), align = "center"),
            fluidRow(plotOutput("schedule_luck", width = "600px", height = "600px"), align = 'center'),
            hr(),
-           h4("Win Percentage for All Games"),
-           p("How well would your team do if you were measured against every team each week?"),
+           h4("All Play"),
+           p("How well would your team do if we did all play each week instead of scheduled matchups?"),
            # fluidRow(plotOutput("wpag", width = "80%"), align = "center"),
            fluidRow(plotOutput("wpag", width = "600px", height = "600px"), align = 'center'),
            hr(),
-           h4("Win Percentage vs Points"),
+           h4("Win Percentage Relative to Points"),
            p("How is your team doing relative to total points scored?"),
            # fluidRow(plotOutput("points_luck", width = "80%"), align = "center")
            fluidRow(plotOutput("points_luck", width = "600px", height = "600px"), align = 'center')
@@ -223,18 +217,18 @@ ui  <- navbarPage(
              tabPanel("FVOA Evaluation",
                       h3("How well is the FVOA model performing?"),
                       hr(),
-                      fluidRow(plotOutput("eval_fvoa_plot", width = "600px", height = "600px"), align = "center"),
+                      fluidRow(plotOutput("eval_fvoa_plot", width = "600px", height = "300px"), align = "center"),
                       br(),
                       # p("Which teams screwed my model last week?"),
-                      fluidRow(plotOutput("eval_fvoa_team", width = "600px", height = "600px"), align = "center")
+                      fluidRow(plotOutput("eval_fvoa_team", width = "600px", height = "400px"), align = "center")
              ),
              tabPanel("ESPN Evaluation",
                       h3("How well are ESPN projections performing?"),
                       hr(),
-                      fluidRow(plotOutput("eval_proj_plot", width = "600px", height = "600px"), align = "center"),
+                      fluidRow(plotOutput("eval_proj_plot", width = "600px", height = "300px"), align = "center"),
                       br(),
                       # h5("How did your team perform against ESPN projections?"),
-                      fluidRow(plotOutput("projected", width = "600px", height = "600px"), align = "center")
+                      fluidRow(plotOutput("projected", width = "600px", height = "400px"), align = "center")
              )
   )
   
@@ -353,7 +347,8 @@ server <- function(input, output, session) {
           theme_fvoa() + 
           scale_color_manual(values = fvoa_colors)
         
-        ggplotly(x, tooltip = c("group", "x", "y"))
+        ggplotly(x, tooltip = c("group", "x", "y")) %>%
+          layout(legend = list(orientation = "h", x = 0.2, y = -0.2))
         
       } else {
         
@@ -371,7 +366,8 @@ server <- function(input, output, session) {
           theme_fvoa() + 
           scale_color_manual(values = fvoa_colors)
         
-        ggplotly(x, tooltip = c("group", "x", "y"))
+        ggplotly(x, tooltip = c("group", "x", "y")) %>%
+          layout(legend = list(orientation = "h", x = 0.2, y = -0.2))
         
       }
       
@@ -390,7 +386,8 @@ server <- function(input, output, session) {
           theme_fvoa() + 
           scale_color_manual(values = fvoa_colors)
         
-        ggplotly(x, tooltip = c("group", "x", "y"))
+        ggplotly(x, tooltip = c("group", "x", "y")) %>%
+          layout(legend = list(orientation = "h", x = 0.2, y = -0.2))
         
       } else {
         
@@ -408,7 +405,8 @@ server <- function(input, output, session) {
           theme_fvoa() + 
           scale_color_manual(values = fvoa_colors)
         
-        ggplotly(x, tooltip = c("group", "x", "y"))
+        ggplotly(x, tooltip = c("group", "x", "y")) %>%
+          layout(legend = list(orientation = "h", x = 0.2, y = -0.2))
         
       }
       
@@ -429,7 +427,8 @@ server <- function(input, output, session) {
           theme_fvoa() + 
           scale_color_manual(values = fvoa_colors)
         
-        ggplotly(x, tooltip = c("group", "x", "y"))
+        ggplotly(x, tooltip = c("group", "x", "y")) %>%
+          layout(legend = list(orientation = "h", x = 0.2, y = -0.2))
         
       } else {
         
@@ -448,7 +447,8 @@ server <- function(input, output, session) {
           theme_fvoa() + 
           scale_color_manual(values = fvoa_colors)
         
-        ggplotly(x, tooltip = c("group", "x", "y"))
+        ggplotly(x, tooltip = c("group", "x", "y")) %>%
+          layout(legend = list(orientation = "h", x = 0.2, y = -0.2))
       }
       
     } else if (input$weekly_chart_selection == "Simulated Points") {
@@ -468,7 +468,8 @@ server <- function(input, output, session) {
           theme_fvoa() + 
           scale_color_manual(values = fvoa_colors)
         
-        ggplotly(x, tooltip = c("group", "x", "y"))
+        ggplotly(x, tooltip = c("group", "x", "y")) %>%
+          layout(legend = list(orientation = "h", x = 0.2, y = -0.2))
         
       } else {
         
@@ -488,7 +489,8 @@ server <- function(input, output, session) {
           theme_fvoa() + 
           scale_color_manual(values = fvoa_colors)
         
-        ggplotly(x, tooltip = c("group", "x", "y"))
+        ggplotly(x, tooltip = c("group", "x", "y")) %>%
+          layout(legend = list(orientation = "h", x = 0.2, y = -0.2))
       }
       
     } else if (input$weekly_chart_selection == "Simulated Playoff Chances") {
@@ -508,7 +510,8 @@ server <- function(input, output, session) {
           theme_fvoa() + 
           scale_color_manual(values = fvoa_colors)
         
-        ggplotly(x, tooltip = c("group", "x", "y"))
+        ggplotly(x, tooltip = c("group", "x", "y")) %>%
+          layout(legend = list(orientation = "h", x = 0.2, y = -0.2))
         
       } else {
         
@@ -528,7 +531,8 @@ server <- function(input, output, session) {
           theme_fvoa() + 
           scale_color_manual(values = fvoa_colors)
         
-        ggplotly(x, tooltip = c("group", "x", "y"))
+        ggplotly(x, tooltip = c("group", "x", "y")) %>%
+          layout(legend = list(orientation = "h", x = 0.2, y = -0.2))
       }
       
       
@@ -606,7 +610,7 @@ server <- function(input, output, session) {
   
   output$schedule_luck <- renderPlot(sx_schedule_luck, res = 96)
   
-  output$wpag <- renderPlot(plot_wpag(sx_schedule, sx_scores), res = 96)
+  output$wpag <- renderPlot(plot_wp_allplay(sx_schedule, sx_scores), res = 96)
   
   # Roster Evaluation -------------------------------------------------------
   

@@ -25,7 +25,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 3
+frech_stats <- 4
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -65,32 +65,36 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Looks like Eric is currently the unfortunate team to be much stronger than his record implies"
+               "Safe to say FVOA thinks our commish is in a nosedive and at this point is likely only a spoiler"
              } else {
                "TBD"
              }
            ),
+           
            tags$li(
              if(weeks_played == frech_stats) {
-               "Barrett and German are running out of time to still have a chance at the playoffs"
+               "Looks like Eric's 1-3 team is pretty unlucky according to FVOA and would consider him an above .500 team if we didn't have scheduled matchups"
              } else {
                "TBD"
              }
            ),
+           
            tags$li(
              if(weeks_played == frech_stats) {
-               "Looks like PFinn is getting a little boost from his easy schedule (says the guy who would be in 1st in 69% of the 1,000 various simulated schedules)"
+               "Looks like PFinn may get some help from being the easiest schedule because his team has slightly higher playoff chances than me despite being in 2nd place"
              } else {
                "TBD"
              }
            ),
+           
            tags$li(
              if(weeks_played == frech_stats) {
-               "I've added a lot of new features and some face lifts to the site, so let me know if you break anything"
+               "So far I'm pretty happy with the new version of FVOA being skeptical of any teams being really good (or bad - aside from Commish of course) because there's still a lot of matchups to play so it needs to see more to start letting people pull away"
              } else {
                "TBD"
              }
            ),
+
            
            hr(),
            # h5("Playoff Projections", align = "center"),
@@ -224,18 +228,18 @@ ui  <- navbarPage(
              tabPanel("FVOA Evaluation",
                       h3("How well is the FVOA model performing?"),
                       hr(),
-                      fluidRow(plotOutput("eval_fvoa_plot", width = "600px", height = "600px"), align = "center"),
+                      fluidRow(plotOutput("eval_fvoa_plot", width = "600px", height = "300px"), align = "center"),
                       br(),
                       # p("Which teams screwed my model last week?"),
-                      fluidRow(plotOutput("eval_fvoa_team", width = "600px", height = "600px"), align = "center")
+                      fluidRow(plotOutput("eval_fvoa_team", width = "600px", height = "400px"), align = "center")
              ),
              tabPanel("Yahoo Evaluation",
                       h3("How well are Yahoo projections performing?"),
                       hr(),
-                      fluidRow(plotOutput("eval_proj_plot", width = "600px", height = "600px"), align = "center"),
+                      fluidRow(plotOutput("eval_proj_plot", width = "600px", height = "300px"), align = "center"),
                       br(),
                       # h5("How did your team perform against Yahoo projections?"),
-                      fluidRow(plotOutput("projected", width = "600px", height = "600px"), align = "center")
+                      fluidRow(plotOutput("projected", width = "600px", height = "400px"), align = "center")
              )
   )
   
@@ -354,7 +358,8 @@ server <- function(input, output, session) {
           theme_fvoa() + 
           scale_color_manual(values = fvoa_colors)
         
-        ggplotly(x, tooltip = c("group", "x", "y"))
+        ggplotly(x, tooltip = c("group", "x", "y")) %>%
+          layout(legend = list(orientation = "h", x = 0.2, y = -0.2))
         
       } else {
         
@@ -372,7 +377,8 @@ server <- function(input, output, session) {
           theme_fvoa() + 
           scale_color_manual(values = fvoa_colors)
         
-        ggplotly(x, tooltip = c("group", "x", "y"))
+        ggplotly(x, tooltip = c("group", "x", "y")) %>%
+          layout(legend = list(orientation = "h", x = 0.2, y = -0.2))
         
       }
       
@@ -391,7 +397,8 @@ server <- function(input, output, session) {
           theme_fvoa() + 
           scale_color_manual(values = fvoa_colors)
         
-        ggplotly(x, tooltip = c("group", "x", "y"))
+        ggplotly(x, tooltip = c("group", "x", "y")) %>%
+          layout(legend = list(orientation = "h", x = 0.2, y = -0.2))
         
       } else {
         
@@ -409,7 +416,8 @@ server <- function(input, output, session) {
           theme_fvoa() + 
           scale_color_manual(values = fvoa_colors)
         
-        ggplotly(x, tooltip = c("group", "x", "y"))
+        ggplotly(x, tooltip = c("group", "x", "y")) %>%
+          layout(legend = list(orientation = "h", x = 0.2, y = -0.2))
         
       }
       
@@ -430,7 +438,8 @@ server <- function(input, output, session) {
           theme_fvoa() + 
           scale_color_manual(values = fvoa_colors)
         
-        ggplotly(x, tooltip = c("group", "x", "y"))
+        ggplotly(x, tooltip = c("group", "x", "y")) %>%
+          layout(legend = list(orientation = "h", x = 0.2, y = -0.2))
         
       } else {
         
@@ -449,7 +458,8 @@ server <- function(input, output, session) {
           theme_fvoa() + 
           scale_color_manual(values = fvoa_colors)
         
-        ggplotly(x, tooltip = c("group", "x", "y"))
+        ggplotly(x, tooltip = c("group", "x", "y")) %>%
+          layout(legend = list(orientation = "h", x = 0.2, y = -0.2))
       }
       
     } else if (input$weekly_chart_selection == "Simulated Points") {
@@ -469,7 +479,8 @@ server <- function(input, output, session) {
           theme_fvoa() + 
           scale_color_manual(values = fvoa_colors)
         
-        ggplotly(x, tooltip = c("group", "x", "y"))
+        ggplotly(x, tooltip = c("group", "x", "y")) %>%
+          layout(legend = list(orientation = "h", x = 0.2, y = -0.2))
         
       } else {
         
@@ -489,7 +500,8 @@ server <- function(input, output, session) {
           theme_fvoa() + 
           scale_color_manual(values = fvoa_colors)
         
-        ggplotly(x, tooltip = c("group", "x", "y"))
+        ggplotly(x, tooltip = c("group", "x", "y")) %>%
+          layout(legend = list(orientation = "h", x = 0.2, y = -0.2))
       }
       
     } else if (input$weekly_chart_selection == "Simulated Playoff Chances") {
@@ -509,7 +521,8 @@ server <- function(input, output, session) {
           theme_fvoa() + 
           scale_color_manual(values = fvoa_colors)
         
-        ggplotly(x, tooltip = c("group", "x", "y"))
+        ggplotly(x, tooltip = c("group", "x", "y")) %>%
+          layout(legend = list(orientation = "h", x = 0.2, y = -0.2))
         
       } else {
         
@@ -529,7 +542,8 @@ server <- function(input, output, session) {
           theme_fvoa() + 
           scale_color_manual(values = fvoa_colors)
         
-        ggplotly(x, tooltip = c("group", "x", "y"))
+        ggplotly(x, tooltip = c("group", "x", "y")) %>%
+          layout(legend = list(orientation = "h", x = 0.2, y = -0.2))
       }
       
       
@@ -607,7 +621,7 @@ server <- function(input, output, session) {
   
   output$schedule_luck <- renderPlot(clt_schedule_luck, res = 96)
   
-  output$wpag <- renderPlot(plot_wpag(clt_schedule, clt_scores), res = 96)
+  output$wpag <- renderPlot(plot_wp_allplay(clt_schedule, clt_scores), res = 96)
   
   # Roster Evaluation -------------------------------------------------------
   
