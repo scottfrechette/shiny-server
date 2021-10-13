@@ -25,7 +25,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 4
+frech_stats <- 5
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -65,27 +65,25 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Welcome back to the new (and hopefully?) improved version of FVOA for another year of my worthless analytics"
+               "It's pretty wild that the two 4-1 teams aren't even considered playoff-worthy by FVOA"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Someone is going to have to explain to me how the possibly zombie Jangaard team is in 9th but has the 2nd highest points. Guess it makes more sense when you realize that his team would be 2nd in 96% of randomly created schedules, so that's some really shitty luck."
+               "Congrats to Bethany for breaking the league record for highest score ever, no one's ever cleared 200 before I believe"
              } else {
                "TBD"
              }
            ),
-           
            tags$li(
              if(weeks_played == frech_stats) {
-               "It's still early and no team has really distinguished themselves a lot so fair bit of regression to mean still happening"
+               "I still can't figure out if Jangaard is secretly managing his roster or his zombie team is going to ravage us despite being undead"
              } else {
                "TBD"
              }
            ),
-           
            hr(),
            # h5("Playoff Projections", align = "center"),
            # fluidRow(tableOutput("playoffs"), align = "center"),

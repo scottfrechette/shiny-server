@@ -25,7 +25,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 4
+frech_stats <- 5
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -65,31 +65,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Safe to say FVOA thinks our commish is in a nosedive and at this point is likely only a spoiler"
+               "Congrats to Commish for pulling himself out of the abyss and leaving the door open for a surprise playoff run"
              } else {
                "TBD"
              }
            ),
-           
            tags$li(
              if(weeks_played == frech_stats) {
-               "Looks like Eric's 1-3 team is pretty unlucky according to FVOA and would consider him an above .500 team if we didn't have scheduled matchups"
+               "German also pulled himself up to essentially a historically average team by coming up just short of season high score"
              } else {
                "TBD"
              }
            ),
-           
            tags$li(
              if(weeks_played == frech_stats) {
-               "Looks like PFinn may get some help from being the easiest schedule because his team has slightly higher playoff chances than me despite being in 2nd place"
+               "FVOA really loves Eric's 6th place team, but he happens to have the hardest schedule"
              } else {
                "TBD"
              }
            ),
-           
            tags$li(
              if(weeks_played == frech_stats) {
-               "So far I'm pretty happy with the new version of FVOA being skeptical of any teams being really good (or bad - aside from Commish of course) because there's still a lot of matchups to play so it needs to see more to start letting people pull away"
+               "Justin on the other hand seems to be very lucky by having the easiest schedule to let him sneak in 5th place despite the worst team"
              } else {
                "TBD"
              }
