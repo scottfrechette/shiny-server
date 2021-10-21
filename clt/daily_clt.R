@@ -42,25 +42,6 @@ clt_wp_tmp <- get_win_prob(current_week) %>%
   mutate(season = current_season,
          week = current_week, .before = 1)
 
-Sys.sleep(60)
-
-clt_players_tmp <- get_player_projections(current_week, 'yahoo') %>% 
-  mutate(season = current_season,
-         week = current_week, 
-         .before = 1)
-
-if(exists("clt_players_tmp")) {
-  
-  dbSendQuery(clt_con, str_glue("DELETE from players where week == {weeks_played} and season == {current_season}"))
-  
-  dbWriteTable(clt_con, 
-               "players", clt_players_tmp, 
-               overwrite = FALSE, append = TRUE)
-  
-  rm(clt_players_tmp)
-  
-}
-
 # Collect Results ---------------------------------------------------------
 
 clt_owners <- tbl(clt_con, 'owners') %>% 
