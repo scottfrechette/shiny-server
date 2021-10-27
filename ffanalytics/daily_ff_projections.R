@@ -15,17 +15,18 @@ current_week <- today_week - start_week
 # Scrape Projections -------------------------------------------------------------
 
 ffa_data <- get_ffa_data(week = current_week,
-                         src = c('CBS', 
-                                 'ESPN',
-                                 'FantasyData', 
-                                 'FantasyPros', 
-                                 'FantasySharks', 
-                                 'FFToday', 
-                                 'FleaFlicker', 
-                                 'NumberFire',
-                                 # 'Yahoo', 
-                                 'FantasyFootballNerd', 
-                                 'NFL'))
+                         src = c('CBS', #no weekly
+                                 'ESPN', #no
+                                 'FantasyData', #no
+                                 'FantasyPros', #yes
+                                 'FantasySharks', #yes
+                                 'FFToday', #yes
+                                 'FleaFlicker', #yes
+                                 'NumberFire', #yes
+                                 # 'Yahoo', #no
+                                 'FantasyFootballNerd', #yes
+                                 'NFL') #yes
+                         )
 
 # Projections -------------------------------------------------------------
 
