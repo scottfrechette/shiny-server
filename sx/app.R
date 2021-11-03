@@ -25,7 +25,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 7
+frech_stats <- 8
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -65,14 +65,14 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "I'm mostly just happy to report that Burg's team is overrated and is the worst team despite somehow being in 6th place - even worse than the zombie Jangaard team"
+               ""
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Otherwise FVOA agrees with the top 5 teams in order, with Herndon and Bethany really pulling away"
+               ""
              } else {
                "TBD"
              }
@@ -91,7 +91,6 @@ ui  <- navbarPage(
                "TBD"
              }
            ),
-
            hr(),
            # h5("Playoff Projections", align = "center"),
            # fluidRow(tableOutput("playoffs"), align = "center"),

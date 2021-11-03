@@ -25,7 +25,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 7
+frech_stats <- 8
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -65,28 +65,21 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "We're starting to see a little separation in teams finally, though everyone still has a reasonable chance of making playoffs so we got a long ways to go"
+               "Eric and PFinn have the 3rd and 4th strongest teams but continue to see their chances of playoff run slip away with bad schedule luck"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "This season is now 2nd in team parity but also 2nd in highest average points, so basically everyone's team is scoring a lot"
+               "Diaz on the other hand is 8th best team but sitting in good spot for playoffs thanks to generous schedule"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "FVOA now looks at Eric and Josh as almost criminally underrated, with both of them only having their current rank in 6% of randomly generated schedules (Eric would be 1st in about half and Josh closer to 6th)"
-             } else {
-               "TBD"
-             }
-           ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "Barrett and Justin are the only teams who would be getting points from a historically average team, but German is really close to joining them in the negative zone"
+               "Though with that said we're past halfway and everyone still has a shot of making the playoffs because it's still the most parity we've ever seen"
              } else {
                "TBD"
              }
