@@ -25,7 +25,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 8
+frech_stats <- 9
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -65,21 +65,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Eric and PFinn have the 3rd and 4th strongest teams but continue to see their chances of playoff run slip away with bad schedule luck"
+               "As I said in Slack this week was historically bad all around, which is odd because for a while this was the highest-scoring season we've seen."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Diaz on the other hand is 8th best team but sitting in good spot for playoffs thanks to generous schedule"
+               "Eric and PFinn, it must be rough to be a 0.333 team despite being 3rd and 4th strongest overall. Especially when I won because your player couldn't get an extra few yards on MNF."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Though with that said we're past halfway and everyone still has a shot of making the playoffs because it's still the most parity we've ever seen"
+               "Diaz on the other hand sitting in 4th despite having the lowest points scored of everyone"
+             } else {
+               "TBD"
+             }
+           ),
+           tags$li(
+             if(weeks_played == frech_stats) {
+               "They're not quite there yet but Josh and Justin are flirting with having no real chance of making playoffs already"
              } else {
                "TBD"
              }
