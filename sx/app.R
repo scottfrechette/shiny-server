@@ -14,9 +14,9 @@ library(rlang)
 
 ### Initial Settings ###
 
-ranking_methods <- c("espn_rank", "fvoa_rank", "sos_rank", "colley_rank") %>%
-  set_names(c("ESPN", "FVOA", "Strength of Schedule", "Colley (BCS)"))
-sorting <- c("ESPN Rank", "FVOA Rank", "SoS Rank", "Colley Rank", "PF", "PA") %>%
+ranking_methods <- c("espn_rank", "fvoa_rank", "sos_rank", "sor_rank", "colley_rank") %>%
+  set_names(c("ESPN", "FVOA", "Strength of Schedule", "Strength of Record", "Colley (BCS)"))
+sorting <- c("ESPN Rank", "FVOA Rank", "SOS Rank", "SOR Rank", "Colley Rank", "PF", "PA") %>%
   set_names(ranking_methods, "PF", "PA")
 
 today_week <- today() %>%
@@ -128,14 +128,16 @@ ui  <- navbarPage(
            h5("Ranking Notes:"),
            tags$ol(
              tags$li(HTML("<u><strong>ESPN</strong></u>: our official ranking based on win percentage and total points")),
-             tags$li(HTML("<u><strong>FVOA</strong></u>: Frech-adjusted Value Over Average (similar to DVOA) - 
-                          equivalent to spread against an average team")),
-             tags$li(HTML("<u><strong>SoS</strong></u>: strength of schedule based on FVOA scores (higher means harder schedule)")),
+             tags$li(HTML("<u><strong>FVOA</strong></u>: Frech-adjusted Value Over Average measures team's true strength
+                          on net points scale, expected points margin vs average opponent")),
+             tags$li(HTML("<u><strong>SOS</strong></u>: strength of schedule played, from perspective of an average team")),
+             tags$li(HTML("<u><strong>SOR</strong></u>: strength of record reflects chance an average team would 
+                          have team's record or better, given the schedule")),
              tags$li(HTML("<u><strong>Colley</strong></u>: one of the models that was used in the BCS computer rankings
                           and is based on win-loss record adjusted for strength of schedule")),
-             tags$li("So in other words, Colley ranks on record only, 
-                     FVOA and SoS rank on points only,
-                     and ESPN ranks on record and points")
+             tags$li("So in other words, FVOA and SOS rank on points,
+                     SOR and Colley rank on record, 
+                     and ESPN ranks on both")
            )
   ),
   
@@ -279,22 +281,27 @@ server <- function(input, output, session) {
                 c(ranking_methods, "PF", "PA"))
   })
   
-  ranking_selections <- function(rankings, ...) {
-    
-    dots <- quos(...)
-    
-    rankings %>% 
-      rename_all(snakecase::to_sentence_case) %>% 
-      select(Team:Percent, contains(paste(!!! dots, collapse = "|")))
-  }
-  
+  # ranking_selections <- function(rankings, ...) {
+  #   
+  #   dots <- quos(...)
+  #   
+  #   rankings %>% 
+  #     rename_all(snakecase::to_sentence_case) %>% 
+  #     select(Team:Percent, contains(paste(!!! dots, collapse = "|")))
+  # }
+  # 
   output$rankings <- renderTable({
     
+    rankings <- sx_rankings %>% 
+      select(1:8, SOS = 13, `SOS Rank` = 14, 18:21) %>% 
+      mutate(SOR = percent(SOR, accuracy = 1))
+    
     sort <- sorting[[input$sorting]]
-    rank_sort <- sx_rankings %>%
-      arrange(sx_rankings[[sort]])
-    point_sort <- sx_rankings %>%
-      arrange(desc(sx_rankings[[sort]]))
+    
+    rank_sort <- arrange(rankings, rankings[[sort]])
+    
+    point_sort <- arrange(rankings, desc(rankings[[sort]]))
+    
     if (sort %in% c("PF", "PA")) {
       point_sort
     } else {

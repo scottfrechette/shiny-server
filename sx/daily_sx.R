@@ -56,7 +56,10 @@ sx_rankings <- calculate_rankings(sx_schedule, sx_fit) %>%
   set_names("Team", "PF", "PA", 
             "Record", "WP", "ESPN Rank", 
             "FVOA", "FVOA Rank",
-            "SoS", "SoS Rank", 
+            "SOS Favored", "SOS", "SOS Rank", 
+            "SOS Played Favored", "SOS Played", "SOS Played Rank",
+            "SOS Remaining Favored", "SOS Remaining", "SOS Remaining Rank",
+            "SOR", "SOR Rank",
             "Colley Rating", "Colley Rank")
 sx_lines <- compare_league(sx_fit) %>% 
   fvoa:::spread_league(.output = "spread") %>% 

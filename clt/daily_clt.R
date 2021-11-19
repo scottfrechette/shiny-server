@@ -88,7 +88,10 @@ clt_rankings <- calculate_rankings(clt_schedule, clt_fit) %>%
   set_names("Team", "PF", "PA", 
             "Record", "WP", "Yahoo Rank", 
             "FVOA", "FVOA Rank",
-            "SoS", "SoS Rank", 
+            "SOS Favored", "SOS", "SOS Rank", 
+            "SOS Played Favored", "SOS Played", "SOS Played Rank",
+            "SOS Remaining Favored", "SOS Remaining", "SOS Remaining Rank",
+            "SOR", "SOR Rank",
             "Colley Rating", "Colley Rank")
 clt_lines <- compare_league(clt_fit) %>% 
   fvoa:::spread_league(.output = "spread") %>% 
