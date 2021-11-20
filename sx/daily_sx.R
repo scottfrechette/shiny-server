@@ -57,7 +57,7 @@ sx_rankings <- calculate_rankings(sx_schedule, sx_fit) %>%
             "Record", "WP", "ESPN Rank", 
             "FVOA", "FVOA Rank",
             "SOS Favored", "SOS", "SOS Rank", 
-            "SOS Played Favored", "SOS Played", "SOS Played Rank",
+            "SOS Played Favored", "SOS Played Avg FVOA", "SOS Played Margin", "SOS Played", "SOS Played Rank",
             "SOS Remaining Favored", "SOS Remaining", "SOS Remaining Rank",
             "SOR", "SOR Rank",
             "Colley Rating", "Colley Rank")

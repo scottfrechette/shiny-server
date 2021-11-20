@@ -89,7 +89,7 @@ clt_rankings <- calculate_rankings(clt_schedule, clt_fit) %>%
             "Record", "WP", "Yahoo Rank", 
             "FVOA", "FVOA Rank",
             "SOS Favored", "SOS", "SOS Rank", 
-            "SOS Played Favored", "SOS Played", "SOS Played Rank",
+            "SOS Played Favored", "SOS Played Avg FVOA", "SOS Played Margin", "SOS Played", "SOS Played Rank",
             "SOS Remaining Favored", "SOS Remaining", "SOS Remaining Rank",
             "SOR", "SOR Rank",
             "Colley Rating", "Colley Rank")

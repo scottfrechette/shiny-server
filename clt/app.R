@@ -282,19 +282,10 @@ server <- function(input, output, session) {
                 c(ranking_methods, "PF", "PA"))
   })
   
-  # ranking_selections <- function(rankings, ...) {
-  #   
-  #   dots <- quos(...)
-  #   
-  #   rankings %>% 
-  #     rename_all(snakecase::to_sentence_case) %>% 
-  #     select(Team:Percent, contains(paste(!!! dots, collapse = "|")))
-  # }
-  # 
   output$rankings <- renderTable({
     
     rankings <- clt_rankings %>% 
-      select(1:8, SOS = 13, `SOS Rank` = 14, 18:21) %>% 
+      select(1:8, SOS = 14, `SOS Rank` = 16, 20:23) %>% 
       mutate(SOR = percent(SOR, accuracy = 1))
     
     sort <- sorting[[input$sorting]]
@@ -411,9 +402,9 @@ server <- function(input, output, session) {
           geom_line(data = tm, aes(group=team, color=team), size = 2) + 
           geom_point(aes(group=team, color=team)) +
           geom_segment(x = 1, y = 0, xend = max_weeks, yend = 0, color = "darkgrey", linetype = 2) +
-          scale_y_continuous(breaks = c(-100, -75, -50, -25, 0, 25, 50, 75, 100), limits = c(-100, 100)) +
+          scale_y_continuous(breaks = pretty_breaks(n = 5)) +
           scale_x_continuous(breaks = c(1:max_weeks), limits = c(1, max_weeks)) +
-          labs(y = "Score", x = "Week", title = "Weekly Scores") +
+          labs(y = "FVOA", x = "Week", title = "Weekly FVOA") +
           guides(color = "none") +
           theme_fvoa() + 
           scale_color_manual(values = fvoa_colors)
@@ -445,7 +436,7 @@ server <- function(input, output, session) {
         
       } else {
         
-        tm <- filter(clt_simulated_records, team %in% input$team_sims)
+        tm <- filter(clt_simulated_records, team %in% input$team_weekly)
         
         x <- clt_simulated_records %>% 
           ggplot(aes(week, wins)) +
@@ -486,13 +477,13 @@ server <- function(input, output, session) {
         
       } else {
         
-        tm <- filter(clt_simulated_records, team %in% input$team_sims)
+        tm <- filter(clt_simulated_records, team %in% input$team_weekly)
         
         x <- clt_simulated_records %>% 
           rename(points = pf) %>% 
-          ggplot(aes(Week, points)) +
+          ggplot(aes(week, points)) +
           geom_line(alpha = 0.2, aes(group=team, color=team), size = 1.5) +
-          geom_line(data = tm, aes(group=team, color=team), size = 2) + 
+          geom_line(data = tm, aes(y = pf, group=team, color=team), size = 2) + 
           geom_point(aes(group=team, color=team)) +
           geom_segment(x = 1, y = 115 * max_weeks, xend = max_weeks, yend = 115 * max_weeks, color = "darkgrey", linetype = 2) +
           scale_y_continuous(breaks = pretty_breaks(n = 5)) +
@@ -528,7 +519,7 @@ server <- function(input, output, session) {
         
       } else {
         
-        tm <- filter(clt_simulated_records, team %in% input$team_sims)
+        tm <- filter(clt_simulated_records, team %in% input$team_weekly)
         
         x <- clt_simulated_records %>% 
           ggplot(aes(week, playoffs)) +
