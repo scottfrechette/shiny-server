@@ -25,7 +25,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 10
+frech_stats <- 11
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -65,28 +65,35 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Welcome to yet another terrible week overall - it was the 3rd lowest top score of all time and also the least variance across teams we've ever seen"
+               ""
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "2 of the top 4 ranked teams aren't even in the top-5 of FVOA, both considered outkicking their PF coverage thanks to least PA of the league"
+               ""
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "In fact only 4 teams this season would be favored over a neutral team because of how low-scoring it's gotten lately, and even those 4 are trending down last few weeks"
+               ""
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "The simulated schedule visual shows how the lack of any true dominant/pathetic teams is making the playoffs really dependent on schedule luck (quickly checks and sees my remaining opponents are ranked 2, 7, 8, 6, and 3...maybe I'll start tracking this for everyone as we get closer to playoffs)"
+               ""
+             } else {
+               "TBD"
+             }
+           ),
+           tags$li(
+             if(weeks_played == frech_stats) {
+               ""
              } else {
                "TBD"
              }
