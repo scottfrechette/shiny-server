@@ -65,35 +65,42 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               ""
+               "Well that's more like it - 3 teams over 140 and the weekly average right at historical average"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               ""
+               "With only 4 weeks left until playoffs we're starting to approach the endgame. For example, if Josh
+               doesn't win this week he's officially eliminated from playoffs already."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               ""
+               "FVOA seems to have locked in on 4 favorites as being in a tier of their own, although FVOA hasn't quite yet learned
+               I was holding on for Seahawks offense to get back in shape and uhhh that's not going great for me"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               ""
+               "Eric and PFinn - I've run out of ways to say your teams are 3rd and 4th in FVOA and yet have at best a 10% shot of making the playoffs.
+               In fact you each need to basically win out to have any outside shot at playoffs and this week you're playing *checks notes* oh shit."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               ""
+               "I've made a couple changes to the Rankings tab - added Strength of Record to measure how likely
+               an average team could have done as well or better with your schedule and updated Strength of Schedule
+               to measure how hard your schedule would have been so far for an average team (instead of projecting entire season). 
+               This tracks more closely with how ESPN handles college football and gives a better sense who are the stronger
+               teams."
              } else {
                "TBD"
              }
