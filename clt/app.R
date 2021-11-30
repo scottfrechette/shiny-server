@@ -25,7 +25,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 11
+frech_stats <- 12
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -65,42 +65,30 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Well that's more like it - 3 teams over 140 and the weekly average right at historical average"
+               "Technically any team could still make playoffs and no one has secured a spot but FVOA is pretty confident David is in and PFinn, Josh, and Justin are out. 
+               Though PFinn still makes playoffs in 52 simulations out of 10k whereas Josh makes it in 5 and Justin in 4. But it's saying there's a chance."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "With only 4 weeks left until playoffs we're starting to approach the endgame. For example, if Josh
-               doesn't win this week he's officially eliminated from playoffs already."
+               "FVOA and SOR agree with top 3 teams. It's Diaz and German in 4th and 5th place that are 6/8 in FVOA and 9/8 in SOR, mostly because they've played the two easiest schedules so far.
+               Their remaining schedules rank 3 and 5 so we'll see if they can prove their mettle yet."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "FVOA seems to have locked in on 4 favorites as being in a tier of their own, although FVOA hasn't quite yet learned
-               I was holding on for Seahawks offense to get back in shape and uhhh that's not going great for me"
+               "And again we still see Eric and PFinn as ranked 6/8 but 4/5 in FVOA. They've played hard schedules but Eric has done enough with his to be 4th in SOR, and given he's only 2 games back still has an outside shot of making playoffs."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Eric and PFinn - I've run out of ways to say your teams are 3rd and 4th in FVOA and yet have at best a 10% shot of making the playoffs.
-               In fact you each need to basically win out to have any outside shot at playoffs and this week you're playing *checks notes* oh shit."
-             } else {
-               "TBD"
-             }
-           ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "I've made a couple changes to the Rankings tab - added Strength of Record to measure how likely
-               an average team could have done as well or better with your schedule and updated Strength of Schedule
-               to measure how hard your schedule would have been so far for an average team (instead of projecting entire season). 
-               This tracks more closely with how ESPN handles college football and gives a better sense who are the stronger
-               teams."
+               "And not to leave out Commish - he's sitting ranked exactly where FVOA thinks he should be as a slightly below-average team with a chance of inside run to playoffs if maximum chaos ensues"
              } else {
                "TBD"
              }
