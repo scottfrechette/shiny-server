@@ -50,7 +50,7 @@ sx_simulated_records <- simulate_final_standings_season(sx_fit_season, sx_schedu
 
 # Run Calculations --------------------------------------------------------
 
-sx_current_matchups <- compare_current_matchups(sx_schedule, sx_fit)
+sx_current_matchups <- compare_current_matchups(sx_schedule, sx_fit, quality = T, sim_standings = sx_simulated_standings)
 sx_fvoa_season <- calculate_fvoa_season(sx_fit_season)
 sx_rankings <- calculate_rankings(sx_schedule, sx_fit) %>% 
   set_names("Team", "PF", "PA", 

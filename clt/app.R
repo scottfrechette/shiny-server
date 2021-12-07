@@ -25,7 +25,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 12
+frech_stats <- 13
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -65,30 +65,39 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Technically any team could still make playoffs and no one has secured a spot but FVOA is pretty confident David is in and PFinn, Josh, and Justin are out. 
-               Though PFinn still makes playoffs in 52 simulations out of 10k whereas Josh makes it in 5 and Justin in 4. But it's saying there's a chance."
+               "David has officially clinched his playoff spot and Josh and Justin are mathematically eliminated"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "FVOA and SOR agree with top 3 teams. It's Diaz and German in 4th and 5th place that are 6/8 in FVOA and 9/8 in SOR, mostly because they've played the two easiest schedules so far.
-               Their remaining schedules rank 3 and 5 so we'll see if they can prove their mettle yet."
+               "FVOA has gone ahead and booked me a first-class ticket as well as saying it's seen enough and declaring PFinn and Barrett dead"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "And again we still see Eric and PFinn as ranked 6/8 but 4/5 in FVOA. They've played hard schedules but Eric has done enough with his to be 4th in SOR, and given he's only 2 games back still has an outside shot of making playoffs."
+               "Given Bobby currently has a 94% chance of taking the 3rd spot it sets up a really good three-way race between Diaz, German, and Eric for that last spot - 
+               especially when German has to play both of them to end the season"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "And not to leave out Commish - he's sitting ranked exactly where FVOA thinks he should be as a slightly below-average team with a chance of inside run to playoffs if maximum chaos ensues"
+               HTML("In fact, the game between Diaz and German is so important I added some new data below to indicate how exciting each matchup is.
+               <i><strong>Quality</strong></i> measures how good teams are and <i><strong>Importance</strong></i> measures how much this game matters to playoff race, both on scale of 0-100.
+               For example even though the David-PFinn and Scott-Bobby matchups have better teams there's much less impact on the playoff race (Bobby seals it with win for that final 6%).")
+             } else {
+               "TBD"
+             }
+           ),
+           tags$li(
+             if(weeks_played == frech_stats) {
+               "For example even though the David-PFinn and Scott-Bobby matchups have better teams there's much less impact on the playoff race (Bobby seals it with win for that final 6%).
+               German-Diaz on the other hand isn't exactly attracting viewers from coast-to-coast it has a lot of impact on the playoff race because each team is vying for that 4th spot."
              } else {
                "TBD"
              }
@@ -253,7 +262,7 @@ server <- function(input, output, session) {
   # Weekly Projections ------------------------------------------------------
   
   output$weekly <- renderTable({
-    clt_current_matchups
+    select(clt_current_matchups, -Overall)
   }, align = 'c', digits = 0)
   
   output$simulation <- renderTable({
