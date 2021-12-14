@@ -25,7 +25,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 13
+frech_stats <- 14
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -65,39 +65,43 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "David has officially clinched his playoff spot and Josh and Justin are mathematically eliminated"
+               "Well here it is - the final week. David and I are in, and the winner of the Bobby-German match locks up the 3rd spot"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "FVOA has gone ahead and booked me a first-class ticket as well as saying it's seen enough and declaring PFinn and Barrett dead"
+               "The fun part is we have 4 teams vying for that 4th spot - loser of Bobby-German matchup, Eric, and Diaz"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Given Bobby currently has a 94% chance of taking the 3rd spot it sets up a really good three-way race between Diaz, German, and Eric for that last spot - 
-               especially when German has to play both of them to end the season"
+               "If Bobby loses he needs Eric to lose OR outscore him by 1.5+ to get the tiebreaker"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               HTML("In fact, the game between Diaz and German is so important I added some new data below to indicate how exciting each matchup is.
-               <i><strong>Quality</strong></i> measures how good teams are and <i><strong>Importance</strong></i> measures how much this game matters to playoff race, both on scale of 0-100.
-               For example even though the David-PFinn and Scott-Bobby matchups have better teams there's much less impact on the playoff race (Bobby seals it with win for that final 6%).")
+               "If German loses he needs Eric to lose AND Diaz to lose or at least not gain back 30+ points German got last week"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "For example even though the David-PFinn and Scott-Bobby matchups have better teams there's much less impact on the playoff race (Bobby seals it with win for that final 6%).
-               German-Diaz on the other hand isn't exactly attracting viewers from coast-to-coast it has a lot of impact on the playoff race because each team is vying for that 4th spot."
+               "Diaz has a remote shot if Eric and German both lose and he gains that 30+ points back on German"
+             } else {
+               "TBD"
+             }
+           ),
+           tags$li(
+             if(weeks_played == frech_stats) {
+               "I'd like to pour some out for PFinn who is 5th in points, FVOA, and SOR but because he had the 2nd hardest schedule he isn't even a contender.
+               In fact, his PF is 80 points higher than 6th place so his team is clearly in the upper tier of strength but really had terrible luck with teams having their best games against him"
              } else {
                "TBD"
              }

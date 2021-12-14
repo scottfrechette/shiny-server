@@ -29,7 +29,7 @@ sx_schedule <- sx_schedule_tmp %>%
   left_join(select(sx_owners, opponent = team, opponentID = teamID), by = "opponentID") %>% 
   select(week, team, opponent)
 
-sx_team <-sx_team_tmp %>% 
+sx_team <- sx_team_tmp %>% 
   left_join(sx_owners, by = "teamID") %>% 
   select(week, team, score:points)
 
