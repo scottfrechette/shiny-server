@@ -107,14 +107,15 @@ ui  <- navbarPage(
              }
            ),
            hr(),
-           # h5("Playoff Projections", align = "center"),
-           # fluidRow(tableOutput("playoffs"), align = "center"),
-           h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
+           h5("Playoff Projections", align = "center"),
            br(),
-           fluidRow(tableOutput("weekly"), align="center"),
-           h5("Season Projections", align = "center"),
-           br(),
-           fluidRow(tableOutput("simulation"), align = "center"),
+           fluidRow(tableOutput("playoffs"), align = "center"),
+           # h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
+           # br(),
+           # fluidRow(tableOutput("weekly"), align="center"),
+           # h5("Season Projections", align = "center"),
+           # br(),
+           # fluidRow(tableOutput("simulation"), align = "center"),
            hr(),
            p("FVOA Assumptions:"),
            tags$ol(
@@ -283,12 +284,12 @@ server <- function(input, output, session) {
              Wins = wins, Playoffs)
   }, align = 'c', digits = 1)
   
-  # output$playoffs <- renderTable({
-  #   tibble(Winner = c("Hoop", "Wikle", "Herndon", "Ford"),
-  #          Percent = c("58%", "16%", "12%", "12%"),
-  #          Odds = c("3:2", "13:2", "8:1", "17:2"),
-  #          BettingLine = c("-125", "+525", "+725", "+775"))
-  # }, align = "c")
+  output$playoffs <- renderTable({
+    tibble(Winner = c("Hoop", "Wikle", "Herndon", "Ford"),
+           Percent = c("58%", "16%", "12%", "12%"),
+           Odds = c("3:2", "13:2", "8:1", "17:2"),
+           BettingLine = c("-125", "+525", "+725", "+775"))
+  }, align = "c")
   
   # Rankings ----------------------------------------------------------------
   
