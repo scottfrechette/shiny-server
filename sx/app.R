@@ -269,10 +269,10 @@ server <- function(input, output, session) {
   }, align = 'c', digits = 1)
   
   output$playoffs <- renderTable({
-    tibble(Winner = c("Hoop", "Wikle", "Herndon", "Ford"),
-           Percent = c("58%", "16%", "12%", "12%"),
-           Odds = c("3:2", "13:2", "8:1", "17:2"),
-           BettingLine = c("-125", "+525", "+725", "+775"))
+    tibble(Winner = c("Bethany", "Hoop", "Ford", "Herndon"),
+           Percent = c("33%", "22%", "21%", "19%"),
+           Odds = c("3:1", "9:2", "9:2", "11:2"),
+           BettingLine = c("+200", "+35-", "+375", "+425"))
   }, align = "c")
   
   # Rankings ----------------------------------------------------------------

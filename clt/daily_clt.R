@@ -82,7 +82,7 @@ clt_simulated_records <- simulate_final_standings_season(clt_fit_season, clt_sch
 
 # Run Calculations --------------------------------------------------------
 
-clt_current_matchups <- compare_current_matchups(clt_schedule, clt_fit, clt_wp, quality = T, clt_simulated_standings)
+# clt_current_matchups <- compare_current_matchups(clt_schedule, clt_fit, clt_wp, quality = T, clt_simulated_standings)
 clt_fvoa_season <- calculate_fvoa_season(clt_fit_season)
 clt_rankings <- calculate_rankings(clt_schedule, clt_fit) %>% 
   set_names("Team", "PF", "PA", 
@@ -100,7 +100,7 @@ clt_lineup_eval <- clt_team %>%
   evaluate_lineup(flex = 0) %>% 
   plot_roster_skills()
 clt_model_eval <- evaluate_model(clt_fit_season)
-clt_playoff_leverage <- plot_playoff_leverage(clt_simulated_standings)
+# clt_playoff_leverage <- plot_playoff_leverage(clt_simulated_standings)
 clt_schedule_luck <- plot_schedule_luck(clt_schedule, clt_scores, clt_owners, sims = 1000)
 
 # Save Data ---------------------------------------------------------------
@@ -113,8 +113,8 @@ save(clt_schedule,
      clt_lines,
      clt_fvoa_season,
      clt_model_eval, 
-     clt_current_matchups,
+     # clt_current_matchups,
      clt_lineup_eval, 
-     clt_playoff_leverage,
+     # clt_playoff_leverage,
      clt_schedule_luck,
      file = here::here("clt", "clt-data.RData"))

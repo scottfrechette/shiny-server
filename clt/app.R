@@ -25,7 +25,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 14
+frech_stats <- 15
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -65,43 +65,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Well here it is - the final week. David and I are in, and the winner of the Bobby-German match locks up the 3rd spot"
+               "So in the end Eric snuck in past Bobby and Diaz to take the final spot"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "The fun part is we have 4 teams vying for that 4th spot - loser of Bobby-German matchup, Eric, and Diaz"
+               "It looks like 3 of the 4 best teams made it in with Bobby missing out"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "If Bobby loses he needs Eric to lose OR outscore him by 1.5+ to get the tiebreaker"
+               "German got a big win to give him that 3rd spot despite being 6th in FVOA and SOR, all because he ended up having the easiest record in the league"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "If German loses he needs Eric to lose AND Diaz to lose or at least not gain back 30+ points German got last week"
-             } else {
-               "TBD"
-             }
-           ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "Diaz has a remote shot if Eric and German both lose and he gains that 30+ points back on German"
-             } else {
-               "TBD"
-             }
-           ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "I'd like to pour some out for PFinn who is 5th in points, FVOA, and SOR but because he had the 2nd hardest schedule he isn't even a contender.
-               In fact, his PF is 80 points higher than 6th place so his team is clearly in the upper tier of strength but really had terrible luck with teams having their best games against him"
+               "Which of course means he'll kick my ass in 1st round and be like all the commentators making fun of analytics after the Ravens game"
              } else {
                "TBD"
              }
@@ -173,16 +158,16 @@ ui  <- navbarPage(
                       p("Just because you aren't matched up doesn't mean you can't still gamble on any spread:"),
                       fluidRow(tableOutput("lines"), align = 'center')
                       
-             ),
-             tabPanel("Season",
-                      h3("Playoff Leverage"),
-                      h5("How much will winning/losing your next game affect your playoff chances?"),
-                      fluidRow(plotOutput("playoff_leverage", width = "700px", height = "600px"), align = 'center'),
-                      fluidRow(plotOutput("playoff_leverage_legend", width = "700px", height = "100px"), align = 'center')#,
-                      # fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center"),
-                      # fluidRow(plotOutput("playoff_leverage_legend", width = "80%", height = "100px"), align = "center")
-                      
-             )
+             )#,
+             # tabPanel("Season",
+             #          h3("Playoff Leverage"),
+             #          h5("How much will winning/losing your next game affect your playoff chances?"),
+             #          fluidRow(plotOutput("playoff_leverage", width = "700px", height = "600px"), align = 'center'),
+             #          fluidRow(plotOutput("playoff_leverage_legend", width = "700px", height = "100px"), align = 'center')#,
+             #          # fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center"),
+             #          # fluidRow(plotOutput("playoff_leverage_legend", width = "80%", height = "100px"), align = "center")
+             #          
+             # )
   ),
   
   # Skill v Luck ------------------------------------------------------------
@@ -285,10 +270,10 @@ server <- function(input, output, session) {
   }, align = 'c', digits = 1)
   
   output$playoffs <- renderTable({
-    tibble(Winner = c("Hoop", "Wikle", "Herndon", "Ford"),
-           Percent = c("58%", "16%", "12%", "12%"),
-           Odds = c("3:2", "13:2", "8:1", "17:2"),
-           BettingLine = c("-125", "+525", "+725", "+775"))
+    tibble(Winner = c("Scott", "David", "Eric", "German"),
+           Percent = c("29%", "27%", "23%", "16%"),
+           Odds = c("7:2", "7:2", "9:2", "13:2"),
+           BettingLine = c("+250", "+275", "+350", "+525"))
   }, align = "c")
   
   # Rankings ----------------------------------------------------------------

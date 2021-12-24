@@ -73,6 +73,9 @@ sx_model_eval <- evaluate_model(sx_fit_season)
 sx_playoff_leverage <- plot_playoff_leverage(sx_simulated_standings)
 sx_schedule_luck <- plot_schedule_luck(sx_schedule, sx_scores, sx_owners, sims = 1000)
 
+# to-do
+# save plot_simulated_rank(sx_simulated_standings, "grid") and add to simulate season tab
+
 # Save Data ---------------------------------------------------------------
 
 save(sx_schedule, 
