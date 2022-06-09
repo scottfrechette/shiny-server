@@ -2,7 +2,7 @@
 
 library(shiny)
 library(tidyverse)
-library(crosstalk)
+# library(crosstalk)
 library(plotly)
 
 gas_raw <- read_csv("https://www.eia.gov/totalenergy/data/browser/csv.php?tbl=T09.04", 
