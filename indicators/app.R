@@ -4,6 +4,7 @@ library(shiny)
 library(tidyverse)
 # library(crosstalk)
 library(plotly)
+library(DT)
 
 gas_raw <- read_csv("https://www.eia.gov/totalenergy/data/browser/csv.php?tbl=T09.04", 
                     show_col_types = F,
@@ -36,15 +37,15 @@ gas <- bind_rows(gas_raw %>%
                                    from = "1991-01-21") %>%
                    select(date, gas = price))
 
-wage_raw <- read_html('https://www.dol.gov/agencies/whd/minimum-wage/history/chart') %>% 
-  html_table() %>% 
+wage_raw <- rvest::read_html('https://www.dol.gov/agencies/whd/minimum-wage/history/chart') %>% 
+  rvest::html_table() %>% 
   .[[1]] %>% 
   select(date = 1, wage = 2) %>%
   filter(wage != "") %>%
   mutate(date = lubridate::mdy(str_sub(date, end = 12)), 
          wage = as.numeric(str_extract(wage, "\\d.\\d\\d")))
 
-wage <- tibble(date = seq.Date(from = min(historical_wage$date), 
+wage <- tibble(date = seq.Date(from = min(wage_raw$date), 
                                to = Sys.Date(), 
                                by = 'day')) %>% 
   left_join(wage_raw, by = "date") %>% 
