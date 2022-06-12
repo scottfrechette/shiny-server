@@ -6,18 +6,23 @@ library(tidyverse)
 library(plotly)
 library(DT)
 
-gas_raw <- read_csv("https://www.eia.gov/totalenergy/data/browser/csv.php?tbl=T09.04", 
+gas_eia <- read_csv("https://www.eia.gov/totalenergy/data/browser/csv.php?tbl=T09.04", 
                     show_col_types = F,
                     progress = F)
 
-gas <- bind_rows(gas_raw %>%
+gas_fred <- read_csv('https://fred.stlouisfed.org/series/GASREGW/downloaddata/GASREGW.csv') %>% 
+  transmute(date = DATE,
+            gas = as.numeric(VALUE)) %>% 
+  filter(date >= '1991-01-21')
+
+gas <- bind_rows(gas_eia %>%
                    filter(MSN == "RLUCUUS",
                           !Value %in% c("Not Applicable", "Not Available"),
                           !str_detect(YYYYMM, "13$"),
                           YYYYMM < 197401) %>%
                    transmute(date = lubridate::ym(YYYYMM),
                              gas = as.numeric(Value)),
-                 gas_raw %>%
+                 gas_eia %>%
                    filter(MSN == "RLUCUUS",
                           !Value %in% c("Not Applicable", "Not Available"),
                           !str_detect(YYYYMM, "13$"),
@@ -25,17 +30,14 @@ gas <- bind_rows(gas_raw %>%
                           YYYYMM < 197601) %>%
                    transmute(date = lubridate::ym(YYYYMM),
                              gas = as.numeric(Value)),
-                 gas_raw %>% 
+                 gas_eia %>% 
                    filter(MSN == 'RUUCUUS',
                           !str_detect(YYYYMM, "13$"),
                           !Value %in% c("Not Applicable", "Not Available"),
-                          YYYYMM <= 199012) %>% 
-                   transmute(gas = as.numeric(Value),
-                             date = lubridate::ym(YYYYMM)),
-                 tidyquant::tq_get("GASREGW",
-                                   get = "economic.data",
-                                   from = "1991-01-21") %>%
-                   select(date, gas = price))
+                          YYYYMM <= 199101) %>% 
+                   transmute(date = lubridate::ym(YYYYMM),
+                             gas = as.numeric(Value)),
+                 gas_fred)
 
 wage_raw <- rvest::read_html('https://www.dol.gov/agencies/whd/minimum-wage/history/chart') %>% 
   rvest::html_table() %>% 
