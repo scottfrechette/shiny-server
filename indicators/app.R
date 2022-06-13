@@ -39,7 +39,7 @@ gas <- bind_rows(gas_eia %>%
                              gas = as.numeric(Value)),
                  gas_fred)
 
-wage_raw <- rvest::read_html('https://www.dol.gov/agencies/whd/minimum-wage/history/chart') %>% 
+min_wage_raw <- rvest::read_html('https://www.dol.gov/agencies/whd/minimum-wage/history/chart') %>% 
   rvest::html_table() %>% 
   .[[1]] %>% 
   select(date = 1, wage = 2) %>%
@@ -47,17 +47,35 @@ wage_raw <- rvest::read_html('https://www.dol.gov/agencies/whd/minimum-wage/hist
   mutate(date = lubridate::mdy(str_sub(date, end = 12)), 
          wage = as.numeric(str_extract(wage, "\\d.\\d\\d")))
 
-wage <- tibble(date = seq.Date(from = min(wage_raw$date), 
-                               to = Sys.Date(), 
-                               by = 'day')) %>% 
-  left_join(wage_raw, by = "date") %>% 
+min_wage <- tibble(date = seq.Date(from = min(wage_raw$date), 
+                                   to = Sys.Date(), 
+                                   by = 'day')) %>% 
+  left_join(min_wage_raw, by = "date") %>% 
   fill(wage)
 
-gas_wage <- left_join(gas, wage, by = 'date') %>%
+gas_min_wage <- left_join(gas, min_wage, by = 'date') %>%
   mutate(gallons = round(wage / gas, 2)) %>% 
   rename(Date = 1, 
          `Avg Gas Price` = 2,
          `Federal Min Wage` = 3,
+         Gallons = 4)
+
+median_wage_fred <- read_csv('https://fred.stlouisfed.org/series/LEU0252881500Q/downloaddata/LEU0252881500Q.csv') %>% 
+  transmute(date = DATE,
+            wage = VALUE)
+
+gas_median_wage <- median_wage_fred %>% 
+  left_join(gas_eia %>%
+              filter(MSN == "RUUCUUS",
+                     !Value %in% c("Not Applicable", "Not Available"),
+                     !str_detect(YYYYMM, "13$")) %>% 
+              transmute(date = lubridate::ym(YYYYMM),
+                        gas = as.numeric(Value)), 
+            by = "date") %>%
+  mutate(gallons = round(wage / 40 / gas, 2)) %>% 
+  select(Date = 1, 
+         `Avg Gas Price` = 3,
+         `Median Salary` = 2,
          Gallons = 4)
 
 # sd_gas_wage_all <- SharedData$new(gas_wage)
@@ -69,24 +87,30 @@ ui <- fluidPage(
   titlePanel("Frech Indicators"),
   
   navlistPanel(
-    tabPanel("Wage-to-Gas Ratio",
-             plotlyOutput("gas_wage_plot"),
-             DTOutput("gas_wage_table")),
+    "Wage-to-Gas Ratios",
+    tabPanel("Minimum Wage",
+             # plotlyOutput("gas_wage_plot"),
+             plotOutput("gas_min_wage_plot"),
+             DTOutput("gas_min_wage_table")),
+    tabPanel("Median Salary",
+             # plotlyOutput("gas_wage_plot"),
+             plotOutput("gas_median_wage_plot"),
+             DTOutput("gas_median_wage_table")),
     widths = c(3,9), well = F
   )
   
 )
 
 server <- function(input, output) {
-  
-  output$gas_wage_plot <- renderPlotly({
-    p <- gas_wage %>% 
+
+  output$gas_min_wage_plot <- renderPlot({
+    gas_min_wage %>% 
       ggplot(aes(Date, Gallons)) + 
       geom_line(aes(group = 1), alpha = 0.4, size = 0.4) + 
-      geom_point(data = filter(gas_wage, `Federal Min Wage` - lag(`Federal Min Wage`) != 0),
+      geom_point(data = filter(gas_min_wage, `Federal Min Wage` - lag(`Federal Min Wage`) != 0),
                  color = '#004F71',
                  size = 2) +
-      geom_text(data = filter(gas_wage, `Federal Min Wage` - lag(`Federal Min Wage`) != 0)[1,],
+      geom_text(data = filter(gas_min_wage, `Federal Min Wage` - lag(`Federal Min Wage`) != 0)[1,],
                 aes(x = Date, y = Gallons + 0.7),
                 label = "Wage\nincreases",
                 color = "#004F71") +
@@ -100,16 +124,40 @@ server <- function(input, output) {
            # title = "Wage-to-Gas Ratio",
            # subtitle = "How many gallons of gas can an hour of minimum wage work buy?",
            caption = "Source: FRED and EIA") +
-      ggthemes::theme_clean() + 
-      theme(panel.grid.major.y = element_line(linetype = 2, color = 'grey90'))
+      ggthemes::theme_clean() #+ 
+      #     theme(panel.grid.major.y = element_line(linetype = 2, color = 'grey90'))
+      #   
+      #   ggplotly(p)
     
-    ggplotly(p)
   })
   
-  output$gas_wage_table <- renderDT({
-    datatable(gas_wage,
+  output$gas_min_wage_table <- renderDT({
+    datatable(gas_min_wage,
               options = list(dom = 'tlp'))}, 
     server = F)
+  
+  output$gas_median_wage_plot <- renderPlot({
+    gas_median_wage %>% 
+      ggplot(aes(Date, Gallons)) + 
+      geom_line(alpha = 0.4, size = 0.4) + 
+      scale_x_date(date_breaks = "5 years",
+                   date_labels = "%Y") +
+      scale_y_continuous(limits = c(0, 15),
+                         expand = c(0, NA)) +
+      labs(x = NULL,
+           y = "Gallons Earned per Hour Worked",
+           title = "How many gallons of gas can an hour of median salary work buy?",
+           # title = "Wage-to-Gas Ratio",
+           # subtitle = "How many gallons of gas can an hour of minimum wage work buy?",
+           caption = "Source: FRED and EIA") +
+      ggthemes::theme_clean()
+  })
+  
+  output$gas_median_wage_table <- renderDT({
+    datatable(gas_median_wage,
+              options = list(dom = 'tlp'))}, 
+    server = F)
+
   
 }
 
