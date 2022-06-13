@@ -47,7 +47,7 @@ min_wage_raw <- rvest::read_html('https://www.dol.gov/agencies/whd/minimum-wage/
   mutate(date = lubridate::mdy(str_sub(date, end = 12)), 
          wage = as.numeric(str_extract(wage, "\\d.\\d\\d")))
 
-min_wage <- tibble(date = seq.Date(from = min(wage_raw$date), 
+min_wage <- tibble(date = seq.Date(from = min(min_wage_raw$date), 
                                    to = Sys.Date(), 
                                    by = 'day')) %>% 
   left_join(min_wage_raw, by = "date") %>% 
