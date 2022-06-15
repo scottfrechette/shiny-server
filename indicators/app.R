@@ -18,6 +18,14 @@ gas_fred <- read_csv('https://fred.stlouisfed.org/series/GASREGW/downloaddata/GA
 gas <- bind_rows(gas_eia %>%
                    filter(MSN == "RLUCUUS",
                           !Value %in% c("Not Applicable", "Not Available"),
+                          YYYYMM < 197314) %>%
+                   transmute(date = if_else(str_detect(YYYYMM, '13'), 
+                                            as.Date(paste0(str_sub(YYYYMM, end = 4), '-01-01')),
+                                            lubridate::ym(YYYYMM)),
+                             gas = as.numeric(Value)),
+                 gas_eia %>%
+                   filter(MSN == "RLUCUUS",
+                          !Value %in% c("Not Applicable", "Not Available"),
                           !str_detect(YYYYMM, "13$"),
                           YYYYMM < 197401) %>%
                    transmute(date = lubridate::ym(YYYYMM),
@@ -64,14 +72,14 @@ median_wage_fred <- read_csv('https://fred.stlouisfed.org/series/LEU0252881500Q/
   transmute(date = DATE,
             wage = VALUE)
 
-gas_median_wage <- median_wage_fred %>% 
-  left_join(gas_eia %>%
-              filter(MSN == "RUUCUUS",
-                     !Value %in% c("Not Applicable", "Not Available"),
-                     !str_detect(YYYYMM, "13$")) %>% 
-              transmute(date = lubridate::ym(YYYYMM),
-                        gas = as.numeric(Value)), 
-            by = "date") %>%
+gas_median_wage <- bind_rows(tibble(date = seq.Date(as.Date('1968-01-01'), as.Date('1978-01-01'), 'year'),
+                                    wage = round(c(7005.0, 7683, 8330, 8700, 9000, 9648,
+                                             10378, 11000, 11700, 12604, 13500) / 52, 2)),
+                             median_wage_fred) %>% 
+  left_join(gas %>% 
+              mutate(date = lubridate::floor_date(date, 'quarter')) %>% 
+              distinct(date, .keep_all = T), 
+            by = 'date') %>%
   mutate(gallons = round(wage / 40 / gas, 2)) %>% 
   select(Date = 1, 
          `Avg Gas Price` = 3,
@@ -89,11 +97,12 @@ ui <- fluidPage(
   navlistPanel(
     "Wage-to-Gas Ratios",
     tabPanel("Minimum Wage",
-             # plotlyOutput("gas_wage_plot"),
+             h4('How many gallons of gas can an hour of minimum wage work buy?'),
              plotOutput("gas_min_wage_plot"),
              DTOutput("gas_min_wage_table")),
     tabPanel("Median Salary",
-             # plotlyOutput("gas_wage_plot"),
+             h4("How many gallons of gas can an hour of median salary work buy?"),
+             p("Assuming a typical worker earning median salary works 40 hours/week"),
              plotOutput("gas_median_wage_plot"),
              DTOutput("gas_median_wage_table")),
     widths = c(3,9), well = F
@@ -110,24 +119,23 @@ server <- function(input, output) {
       geom_point(data = filter(gas_min_wage, `Federal Min Wage` - lag(`Federal Min Wage`) != 0),
                  color = '#004F71',
                  size = 2) +
-      geom_text(data = filter(gas_min_wage, `Federal Min Wage` - lag(`Federal Min Wage`) != 0)[1,],
+      geom_text(data = filter(gas_min_wage, `Federal Min Wage` - lag(`Federal Min Wage`) != 0)[6,],
                 aes(x = Date, y = Gallons + 0.7),
                 label = "Wage\nincreases",
                 color = "#004F71") +
+      geom_text(data = bind_rows(slice_max(gas_min_wage, order_by = Gallons, n = 1),
+                                 slice_min(gas_min_wage, order_by = Gallons, n = 1),
+                                 slice_tail(gas_min_wage, n = 1)),
+                aes(x = Date, y = Gallons, label = Gallons),
+                color = "grey50", vjust = 'outward') +
       scale_x_date(date_breaks = "5 years",
                    date_labels = "%Y") +
       scale_y_continuous(limits = c(0, 6),
                          expand = c(0, NA)) +
       labs(x = NULL,
            y = "Gallons Earned per Hour Worked",
-           title = "How many gallons of gas can an hour of minimum wage work buy?",
-           # title = "Wage-to-Gas Ratio",
-           # subtitle = "How many gallons of gas can an hour of minimum wage work buy?",
            caption = "Source: FRED and EIA") +
-      ggthemes::theme_clean() #+ 
-      #     theme(panel.grid.major.y = element_line(linetype = 2, color = 'grey90'))
-      #   
-      #   ggplotly(p)
+      ggthemes::theme_clean()
     
   })
   
@@ -140,15 +148,17 @@ server <- function(input, output) {
     gas_median_wage %>% 
       ggplot(aes(Date, Gallons)) + 
       geom_line(alpha = 0.4, size = 0.4) + 
+      geom_text(data = bind_rows(slice_max(gas_median_wage, order_by = Gallons, n = 1),
+                                 slice_min(gas_median_wage, order_by = Gallons, n = 1),
+                                 slice_tail(gas_median_wage, n = 1)),
+                aes(x = Date, y = Gallons, label = Gallons),
+                color = "grey50", vjust = 'outward') +
       scale_x_date(date_breaks = "5 years",
                    date_labels = "%Y") +
       scale_y_continuous(limits = c(0, 15),
                          expand = c(0, NA)) +
       labs(x = NULL,
            y = "Gallons Earned per Hour Worked",
-           title = "How many gallons of gas can an hour of median salary work buy?",
-           # title = "Wage-to-Gas Ratio",
-           # subtitle = "How many gallons of gas can an hour of minimum wage work buy?",
            caption = "Source: FRED and EIA") +
       ggthemes::theme_clean()
   })
