@@ -25,7 +25,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 2
+frech_stats <- 3
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -65,32 +65,25 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Hopefully I won't cause the Bama kicker to be distracted anymore now that the Commish is up to 4th strongest team"
+               "So far we're not seeing a lot of wild upsets and rankings seem reasonably related to team strength through 3 weeks"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Just like the records suggest we got 2 good teams, 2 bad teams, and a whole lotta parity in the middle"
+               "Josh's team might be slightly underrated so maybe he sneaks back up into the 2nd tier here if he can taken down the surging Commish"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "German's team would be looking a lot better if he didn't leave so many points on his bench last week though"
+               "The marquee game this week appears to be PFinn and me, so will he be the one to finally topple the reigning champ?"
              } else {
                "TBD"
              }
            ),
-           # tags$li(
-           #   if(weeks_played == frech_stats) {
-           #     ""
-           #   } else {
-           #     "TBD"
-           #   }
-           # ),
            hr(),
            # h5("Playoff Projections", align = "center"),
            # br(),
