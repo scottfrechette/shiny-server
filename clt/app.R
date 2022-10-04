@@ -25,7 +25,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 3
+frech_stats <- 4
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -65,21 +65,21 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "So far we're not seeing a lot of wild upsets and rankings seem reasonably related to team strength through 3 weeks"
+               "It's crazy to me that an average team would have a 1% chance of doing as well as David's autodraft team so far. Maybe we're all overthinking this whole thing."
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Josh's team might be slightly underrated so maybe he sneaks back up into the 2nd tier here if he can taken down the surging Commish"
+               "I got an angry Cameo about underrating our Commish but now FVOA seems to have overcorrected because he's really benefitting from having the easiest schedule so far"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "The marquee game this week appears to be PFinn and me, so will he be the one to finally topple the reigning champ?"
+               "The good news is everyone has at least a 1-in-12 shot of making playoffs still so plenty of opportunity for chaos to reign"
              } else {
                "TBD"
              }
