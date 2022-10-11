@@ -25,7 +25,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 4
+frech_stats <- 5
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -65,21 +65,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "It's crazy to me that an average team would have a 1% chance of doing as well as David's autodraft team so far. Maybe we're all overthinking this whole thing."
+               "David's autodraft squad has been passed as 2nd best by Diaz's surging team, though David has a chance to take down the reigning and undefeated champ this week"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "I got an angry Cameo about underrating our Commish but now FVOA seems to have overcorrected because he's really benefitting from having the easiest schedule so far"
+               "You know Fantasy Football is chaotic when an 0-5 team is still given a 1-in-25 chance to make the playoffs"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "The good news is everyone has at least a 1-in-12 shot of making playoffs still so plenty of opportunity for chaos to reign"
+               "No one's saying Commish's team is officially overrated but he has still had the easiest schedule, but a big matchup with PFinn who is ranked lower but FVOA likes more could balance the scales"
+             } else {
+               "TBD"
+             }
+           ),
+           tags$li(
+             if(weeks_played == frech_stats) {
+               "It's definitely a weird season because only 3 teams would be favored over a historically-average team although another 2 are just below a coin-flip so there's still a chance"
              } else {
                "TBD"
              }
