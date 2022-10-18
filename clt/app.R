@@ -25,7 +25,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 5
+frech_stats <- 6
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -65,28 +65,21 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "David's autodraft squad has been passed as 2nd best by Diaz's surging team, though David has a chance to take down the reigning and undefeated champ this week"
+               "What a weird, ugly season - both weeks 3 and 6 were the lowest ever for their respective weeks and with another we will tie 2017 as the lowest season ever through 7 weeks"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "You know Fantasy Football is chaotic when an 0-5 team is still given a 1-in-25 chance to make the playoffs"
+               "Well now it seems Commish is firmly in the Overrated category, and frankly I owe it all to the karma of affecting our precious kicker when he needed focus most"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "No one's saying Commish's team is officially overrated but he has still had the easiest schedule, but a big matchup with PFinn who is ranked lower but FVOA likes more could balance the scales"
-             } else {
-               "TBD"
-             }
-           ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "It's definitely a weird season because only 3 teams would be favored over a historically-average team although another 2 are just below a coin-flip so there's still a chance"
+               "I love that German's 0-6 team still has a 3% chance of making playoffs...really highlights the ugliness we've seen so far"
              } else {
                "TBD"
              }
