@@ -65,21 +65,20 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "What a weird, ugly season - both weeks 3 and 6 were the lowest ever for their respective weeks and with another we will tie 2017 as the lowest season ever through 7 weeks"
+               ""
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Well now it seems Commish is firmly in the Overrated category, and frankly I owe it all to the karma of affecting our precious kicker when he needed focus most"
+               ""
              } else {
                "TBD"
              }
-           ),
-           tags$li(
+           ),           tags$li(
              if(weeks_played == frech_stats) {
-               "I love that German's 0-6 team still has a 3% chance of making playoffs...really highlights the ugliness we've seen so far"
+               ""
              } else {
                "TBD"
              }
