@@ -76,7 +76,7 @@ ui  <- navbarPage(
              } else {
                "TBD"
              }
-           ),           t
+           ),
            tags$li(
              if(weeks_played == frech_stats) {
                ""
