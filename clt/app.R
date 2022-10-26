@@ -25,7 +25,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 6
+frech_stats <- 7
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -65,21 +65,21 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               ""
+               "Well ain't that something - after 7 weeks only 1 team would be favored over a historically average team"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               ""
+               HTML("<u><strong>Commish Corner</strong></u> - somehow the 7th best team is in 2nd place. According to analytics he would only have this record in 20 of 1,000 randomized schedules so what a lucky break. On top of that an average team has a 95% chance of doing as well as he has so far, so he's failing upward somehow.")
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               ""
+               "On the flip side, congratulations to German for his first win and ensuring he still has a 1-in-20 chance of making the playoffs. To his credit an average team would only have a 74% chance to do as well as he has, and if we head open play instead of head-to-head he'd have won 43% of his games."
              } else {
                "TBD"
              }
