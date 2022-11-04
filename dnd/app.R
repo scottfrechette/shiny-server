@@ -15,7 +15,7 @@ roll_attack <- function(horde_size, attack_bonus, roll_type) {
 }
 roll_damage <- function(horde_size, damage_die, damage_bonus) {
   
-  sample(1:size_damage_die, horde_size, replace = T) + damage_bonus
+  sample(1:damage_die, horde_size, replace = T) + damage_bonus
   
 }
 calc_total_ac <- function(ac, buffs, shield) {ac + buffs + (shield * 5)}
@@ -57,61 +57,61 @@ sim_many_attacks <- function(sims = 100,
 }
 
 ui <- fluidPage(
-
-    titlePanel("Horde Simulation"),
-
-    sidebarLayout(
-        sidebarPanel(
-            ## PC
-            numericInput("ac", "AC", 15),
-            numericInput("buffs", "Buffs/Debuffs", 0),
-            checkboxInput("shield", "Shield"),
-
-            ## Horde
-            numericInput("horde_size", "Horde Size", 10),
-            selectInput("roll_type", "Roll Type", c("Advantage", "Normal", "Disadvantage"), selected = "Normal"),
-            numericInput("attack_bonus", "Attack Bonus", 4),
-            numericInput("num_damage_die", "# Damage Die", 1),
-            numericInput("size_damage_die", "Damage Die", 6),
-            numericInput("damage_bonus", "Damage Bonus", 0)#,
-            
-            ## Submit
-            # submitButton("Roll Die")
-
-        ),
-
-        mainPanel(textOutput("attack"),
-                  hr(),
-                  plotOutput("sim_plot"))
-    )
+  
+  titlePanel("Horde Simulation"),
+  
+  sidebarLayout(
+    sidebarPanel(
+      ## PC
+      numericInput("ac", "AC", 15),
+      numericInput("buffs", "Buffs/Debuffs", 0),
+      checkboxInput("shield", "Shield"),
+      
+      ## Horde
+      numericInput("horde_size", "Horde Size", 10),
+      selectInput("roll_type", "Roll Type", c("Advantage", "Normal", "Disadvantage"), selected = "Normal"),
+      numericInput("attack_bonus", "Attack Bonus", 4),
+      # numericInput("num_damage_die", "# Damage Die", 1),
+      numericInput("size_damage_die", "Damage Die", 6),
+      numericInput("damage_bonus", "Damage Bonus", 0)#,
+      
+      ## Submit
+      # submitButton("Roll Die")
+      
+    ),
+    
+    mainPanel(textOutput("attack"),
+              hr(),
+              plotOutput("sim_plot"))
+  )
 )
 
 server <- function(input, output) {
-
-    sim <- reactive(sim_attack(input$horde_size, input$roll_type, input$attack_bonus,
-                                  input$size_damage_die, input$damage_bonus,
-                                  input$ac, input$buffs, input$shield,
-                                  verbose = T))
+  
+  sim <- reactive(sim_attack(input$horde_size, input$roll_type, input$attack_bonus,
+                             input$size_damage_die, input$damage_bonus,
+                             input$ac, input$buffs, input$shield,
+                             verbose = T))
+  
+  sims <- reactive(sim_many_attacks(sims = 1e4,
+                                    input$horde_size, input$roll_type, input$attack_bonus,
+                                    input$size_damage_die, input$damage_bonus,
+                                    input$ac, input$buffs, input$shield))
+  
+  output$attack <- renderText(sim()[2])
+  
+  output$sim_plot <- renderPlot({
     
-    sims <- reactive(sim_many_attacks(sims = 1e4,
-                                      input$horde_size, input$roll_type, input$attack_bonus,
-                                      input$size_damage_die, input$damage_bonus,
-                                      input$ac, input$buffs, input$shield))
+    hist(sims(),
+         breaks = max(sims()) - min(sims()),
+         border = 'white',
+         xlab = "Damage",
+         ylab = NULL,
+         yaxt = "n",
+         main = "Where does this roll fall among 10,000 simulations?")
+    abline(v = as.integer(sim()[1]), col="red", lwd=3)
     
-    output$attack <- renderText(sim()[2])
-    
-    output$sim_plot <- renderPlot({
-      
-      hist(sims(),
-           breaks = max(sims()) - min(sims()),
-           border = 'white',
-           xlab = "Damage",
-           ylab = NULL,
-           yaxt = "n",
-           main = "Where does this roll fall among 10,000 simulations?")
-      abline(v = as.integer(sim()[1]), col="red", lwd=3)
-      
-    })
+  })
   
 }
 
