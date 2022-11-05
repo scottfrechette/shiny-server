@@ -1,9 +1,9 @@
 library(shiny)
 
-roll_attack <- function(horde_size, attack_bonus, roll_type) {
+roll_attack <- function(horde_size, roll_type) {
   
-  attack_rolls_a <- sample(1:20, horde_size, replace = T) + attack_bonus
-  attack_rolls_b <- sample(1:20, horde_size, replace = T) + attack_bonus
+  attack_rolls_a <- sample(1:20, horde_size, replace = T) #+ attack_bonus
+  attack_rolls_b <- sample(1:20, horde_size, replace = T) #+ attack_bonus
   ifelse(roll_type == "Normal", 
          attack_rolls <- attack_rolls_a,
          ifelse(roll_type == "Disadvantage", 
@@ -13,6 +13,7 @@ roll_attack <- function(horde_size, attack_bonus, roll_type) {
   return(attack_rolls)
   
 }
+add_attack_bonus <- function(attack_rolls, attack_bonus) {attack_rolls + attack_bonus}
 roll_damage <- function(horde_size, damage_die, damage_bonus) {
   
   sample(1:damage_die, horde_size, replace = T) + damage_bonus
@@ -30,11 +31,12 @@ sim_attack <- function(horde_size, roll_type, attack_bonus,
                        ac, buffs, shield,
                        verbose = F) {
   
-  attack_rolls <- roll_attack(horde_size, attack_bonus, roll_type)
+  attack_rolls <- roll_attack(horde_size, roll_type)
+  total_attack <- add_attack_bonus(attack_rolls, attack_bonus)
   damage_rolls <- roll_damage(horde_size, damage_die, damage_bonus)
   total_ac <- calc_total_ac(ac, buffs, shield)
-  hits <- calc_num_hits(attack_rolls, total_ac)
-  damage <- calc_damage(attack_rolls, total_ac, damage_rolls)
+  hits <- calc_num_hits(total_attack, total_ac)
+  damage <- calc_damage(total_attack, total_ac, damage_rolls)
   
   out <- c(damage,
            paste(hits, "enemies landed a blow for total damage of", damage))
@@ -55,10 +57,6 @@ sim_many_attacks <- function(sims = 100,
                        ac, buffs, shield))
   
 }
-getmode <- function(v) {
-  uniqv <- unique(v)
-  uniqv[which.max(tabulate(match(v, uniqv)))]
-}
 
 ui <- fluidPage(
   
@@ -71,17 +69,16 @@ ui <- fluidPage(
                   c("Cad Bury", "Kirk Saurpike", "Mac Silveen",
                     "Rick Dresden", "Toblakai")),
       htmlOutput("ac"),
-      # numericInput("ac", "AC", 15),
       numericInput("buffs", "AC Modifiers (Buff/Debuff)", 0),
-      checkboxInput("shield", "PC casts Shield"),
+      checkboxInput("shield", "Character casts Shield"),
       htmlOutput("mod_ac"),
+      
       ## Horde
       numericInput("horde_size", "Horde Size", 10),
       selectInput("roll_type", "Roll Type", c("Advantage", "Normal", "Disadvantage"), selected = "Normal"),
       numericInput("attack_bonus", "Attack Bonus", 4),
-      # numericInput("num_damage_die", "# Damage Die", 1),
       numericInput("damage_die", "Damage Die (1dx)", 6),
-      numericInput("damage_bonus", "Damage Bonus", 0)#,
+      numericInput("damage_bonus", "Damage Bonus", 0)
       
       ## Submit
       # submitButton("Roll Die")
@@ -89,6 +86,8 @@ ui <- fluidPage(
     ),
     
     mainPanel(htmlOutput("sim"),
+              htmlOutput("nat1"),
+              htmlOutput("nat20"),
               br(),
               htmlOutput("default"),
               hr(),
@@ -110,11 +109,12 @@ server <- function(input, output) {
                            `Rick Dresden` = 13,
                            `Toblakai` = 18))
   
-  attack_rolls <- reactive(roll_attack(input$horde_size, input$attack_bonus, input$roll_type))
+  attack_rolls <- reactive(roll_attack(input$horde_size, input$roll_type))
+  total_attack <- reactive(add_attack_bonus(attack_rolls(), input$attack_bonus))
   damage_rolls <- reactive(roll_damage(input$horde_size, input$damage_die, input$damage_bonus))
   total_ac <- reactive(calc_total_ac(pc_ac(), input$buffs, input$shield))
-  hits <- reactive(calc_num_hits(attack_rolls(), total_ac()))
-  damage <- reactive(calc_damage(attack_rolls(), total_ac(), damage_rolls()))
+  hits <- reactive(calc_num_hits(total_attack(), total_ac()))
+  damage <- reactive(calc_damage(total_attack(), total_ac(), damage_rolls()))
   
   default_damage <- reactive(floor(input$horde_size * 0.25) * (sample(1:input$damage_die, 1) + input$damage_bonus))
   
@@ -133,6 +133,9 @@ server <- function(input, output) {
   
   output$sim <- renderText(paste("<b>Simulation</b>:", hits(), 
                                  "enemies land a blow for total damage of", damage(), "(red line)"))
+  
+  output$nat1 <- renderText(paste0("<b>Nat 1 rolls</b> :", sum(attack_rolls() == 1), " (expected ", input$horde_size / 20, ")"))
+  output$nat20 <- renderText(paste0("<b>Crit rolls</b>: ", sum(attack_rolls() == 20), " (expected ", input$horde_size / 20, ")"))
   
   output$default <- renderText(paste("<b>Default rules</b>:", floor(input$horde_size * 0.25), 
                                      "enemies hit for", default_damage(), "total damage (blue line)"))
