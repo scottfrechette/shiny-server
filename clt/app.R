@@ -25,7 +25,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 8
+frech_stats <- 9
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -65,21 +65,21 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "I think we now all understand the power of Regression to the Mean, because that was a hell of a change last weekend. The weekly scores almost did a flip across the league average somehow and lot of teams jumped up a good bit, including a new season-high score."
+               ""
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "German's chances took a bit of a hit but he's still not mathematically eliminated somehow. We've also got 3 other teams that are sitting on an outsider's chance hoping for some injury luck to break their way in coming weeks so they don't join him."
+               ""
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               HTML("<u><strong>Commish Corner</strong></u> - well, well well...it seems no one is immune to the lucky streak our Commish is on. Teams have scored 72 points less on him than next lowest and he still has 7th highest PF. Moreover, teams have scored average of 21 points lower against him than their other matchups, and no one else is above 10. Given how badly teams seem to play him he still has the easiest schedule and an average team would have a 95% chance of having the same record or better. Almost any other schedule would have his ranking in range of 6-8, in fact only 2% of randomized schedules would he still be in 2nd place. His team is also sitting alone squarely in the middle of the Overrated quadrant based on rank and PF.")
+               HTML("<u><strong>Commish Corner</strong></u> - ")
              } else {
                "TBD"
              }
