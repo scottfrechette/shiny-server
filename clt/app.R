@@ -27,6 +27,7 @@ current_week <- today_week - start_week
 weeks_played <- current_week - 1
 frech_stats <- 9
 
+
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
 
@@ -65,21 +66,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               ""
+               "We still have no one ruled out of playoffs, though 3 teams have <10% chance at this point. "
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               ""
+               "Big matchup this week between myself and the surging Bobby team, built largely on the back of recently unleashed CMC"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               HTML("<u><strong>Commish Corner</strong></u> - ")
+               "The chart showing rankings across randomly generated schedules is starting to get wonky now after weeks of only a couple teams being out of place, showing that finally this season is starting to get wild and we might have a weird finish here"
+             } else {
+               "TBD"
+             }
+           ),
+           tags$li(
+             if(weeks_played == frech_stats) {
+               HTML("<u><strong>Commish Corner</strong></u> - This week our beloved Commish slipped a spot in both rankings and FVOA")
              } else {
                "TBD"
              }
