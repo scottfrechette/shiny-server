@@ -2,8 +2,8 @@ library(shiny)
 
 roll_attack <- function(horde_size, roll_type) {
   
-  attack_rolls_a <- sample(1:20, horde_size, replace = T) #+ attack_bonus
-  attack_rolls_b <- sample(1:20, horde_size, replace = T) #+ attack_bonus
+  attack_rolls_a <- sample(1:20, horde_size, replace = T) 
+  attack_rolls_b <- sample(1:20, horde_size, replace = T) 
   ifelse(roll_type == "Normal", 
          attack_rolls <- attack_rolls_a,
          ifelse(roll_type == "Disadvantage", 
@@ -58,96 +58,144 @@ sim_many_attacks <- function(sims = 100,
   
 }
 
-ui <- fluidPage(
+
+ui  <- navbarPage(
   
-  titlePanel("Horde Simulation"),
+  collapsible = T,
+  inverse = F,
   
-  sidebarLayout(
-    sidebarPanel(
-      ## PC
-      selectInput("pc", "Select Character:",
-                  c("Cad Bury", "Kirk Saurpike", "Mac Silveen",
-                    "Rick Dresden", "Toblakai")),
-      htmlOutput("ac"),
-      numericInput("buffs", "AC Modifiers (Buff/Debuff)", 0),
-      checkboxInput("shield", "Character casts Shield"),
-      htmlOutput("mod_ac"),
-      
-      ## Horde
-      numericInput("horde_size", "Horde Size", 10),
-      selectInput("roll_type", "Roll Type", c("Advantage", "Normal", "Disadvantage"), selected = "Normal"),
-      numericInput("attack_bonus", "Attack Bonus", 4),
-      numericInput("damage_die", "Damage Die (1dx)", 6),
-      numericInput("damage_bonus", "Damage Bonus", 0)
-      
-      ## Submit
-      # submitButton("Roll Die")
-      
-    ),
-    
-    mainPanel(htmlOutput("sim"),
-              htmlOutput("nat1"),
-              htmlOutput("nat20"),
-              br(),
-              htmlOutput("default"),
-              hr(),
-              plotOutput("sim_plot"),
-              htmlOutput("median"),
-              htmlOutput("mode"),
-              htmlOutput("range50"),
-              htmlOutput("range95"),
-              htmlOutput("range100"))
+  title = "Horde Simulation",
+  
+  tabPanel("Attacks",
+           sidebarLayout(
+             sidebarPanel(
+               ## PC
+               p(strong("Character Inputs:")),
+               selectInput("attack_pc", "Select Character:", c("Cad Bury", "Kirk Saurpike", "Mac Silveen", "Rick Dresden", "Toblakai")),
+               htmlOutput("attack_ac"),
+               numericInput("attack_buffs", "AC Modifiers (Buff/Debuff)", 0),
+               checkboxInput("attack_shield", "Character casts Shield"),
+               htmlOutput("attack_mod_ac"),
+               hr(),
+               
+               ## Horde
+               p(strong("Horde Inputs:")),
+               numericInput("attack_horde_size", "Horde Size", 10),
+               # sliderInput("attack_horde_size", "Horde Size", min = 1, max = 100, value = 10),
+               selectInput("attack_roll_type", "Roll Type", c("Advantage", "Normal", "Disadvantage"), selected = "Normal"),
+               numericInput("attack_attack_bonus", "Attack Bonus", 4),
+               numericInput("attack_damage_die", "Damage Die (1dx)", 6),
+               numericInput("attack_damage_bonus", "Damage Bonus", 0),
+               
+               ## Submit
+               actionButton("attack_dice_roll", "Roll Die", icon = icon("dice-d20"))
+               
+             ),
+             
+             mainPanel(htmlOutput("attack_sim"),
+                       htmlOutput("attack_nat1"),
+                       htmlOutput("attack_nat20"),
+                       br(),
+                       htmlOutput("attack_default"),
+                       hr(),
+                       plotOutput("attack_sim_plot"),
+                       htmlOutput("attack_median"),
+                       htmlOutput("attack_mode"),
+                       htmlOutput("attack_range50"),
+                       htmlOutput("attack_range95"),
+                       htmlOutput("attack_range100")
+             )
+           )
+  ),
+  
+  tabPanel("Saves", 
+           sidebarLayout(
+             sidebarPanel(
+               selectInput("saves_pc", "Select Character:", c("Cad Bury", "Kirk Saurpike", "Mac Silveen", "Rick Dresden")),
+               htmlOutput("saves_dc"),
+               numericInput("saves_horde_size", "Horde Size", 10),
+               # numericInput("saves_dc", "Character Spell DC", 13),
+               numericInput("saves_mod", "Horde Saving Throw Modifier", 0),
+               checkboxInput("saves_resistance", "Resistance?"),
+               numericInput("saves_damage", "Damage Rolled", 10),
+               actionButton("saves_dice_roll", "Roll Die", icon = icon("dice-d20"))
+             ),
+             
+             mainPanel(htmlOutput("saves"),
+                       htmlOutput("damage"))
+           )
+  ),
+  
+  tabPanel("HP", 
+           sidebarLayout(
+             sidebarPanel("TBD"),
+             
+             mainPanel("TBD")
+           )
   )
 )
 
 server <- function(input, output) {
   
-  pc_ac <- reactive(switch(input$pc,
+  
+  # Attacks -----------------------------------------------------------------
+  
+  pc_ac <- reactive(switch(input$attack_pc,
                            `Cad Bury` = 16,
                            `Kirk Saurpike` = 20,
                            `Mac Silveen` = 19,
                            `Rick Dresden` = 13,
                            `Toblakai` = 18))
   
-  attack_rolls <- reactive(roll_attack(input$horde_size, input$roll_type))
-  total_attack <- reactive(add_attack_bonus(attack_rolls(), input$attack_bonus))
-  damage_rolls <- reactive(roll_damage(input$horde_size, input$damage_die, input$damage_bonus))
-  total_ac <- reactive(calc_total_ac(pc_ac(), input$buffs, input$shield))
-  hits <- reactive(calc_num_hits(total_attack(), total_ac()))
-  damage <- reactive(calc_damage(total_attack(), total_ac(), damage_rolls()))
+  attack_data <- reactiveValues(attack_rolls = roll_attack(10, "Normal"),
+                                damange_rolls = roll_damage(10, 6, 0),
+                                horde_size = 10,
+                                roll_type = "Normal")
   
-  default_damage <- reactive(floor(input$horde_size * 0.25) * (sample(1:input$damage_die, 1) + input$damage_bonus))
+  observeEvent(input$attack_dice_roll, {
+    attack_data$attack_rolls <- roll_attack(input$attack_horde_size, input$attack_roll_type)
+    attack_data$damage_rolls <- roll_damage(input$attack_horde_size, input$attack_damage_die, input$attack_damage_bonus)
+    attack_data$horde_size = input$attack_horde_size
+    attack_data$roll_type <- input$attack_roll_type
+  })
+  
+  total_attack <- reactive(add_attack_bonus(attack_data$attack_rolls, input$attack_attack_bonus))
+  total_ac <- reactive(calc_total_ac(pc_ac(), input$attack_buffs, input$attack_shield))
+  hits <- reactive(calc_num_hits(total_attack(), total_ac()))
+  damage <- reactive(calc_damage(total_attack(), total_ac(), attack_data$damage_rolls))
+  
+  default_damage <- reactive(floor(attack_data$horde_size * 0.25) * (sample(1:input$attack_damage_die, 1) + input$attack_damage_bonus))
   
   sims <- reactive(sim_many_attacks(sims = 1e4,
-                                    input$horde_size, input$roll_type, input$attack_bonus,
-                                    input$damage_die, input$damage_bonus,
-                                    pc_ac(), input$buffs, input$shield))
+                                    attack_data$horde_size, attack_data$roll_type, input$attack_attack_bonus,
+                                    input$attack_damage_die, input$attack_damage_bonus,
+                                    pc_ac(), input$attack_buffs, input$attack_shield))
   
   lower50 <- reactive(pmax(0, round(qnorm(0.25, mean(sims()), sd(sims())))))
   upper50 <- reactive(pmax(0, round(qnorm(0.75, mean(sims()), sd(sims())))))
   lower95 <- reactive(pmax(0, round(qnorm(0.025, mean(sims()), sd(sims())))))
   upper95 <- reactive(pmax(0, round(qnorm(0.975, mean(sims()), sd(sims())))))
   
-  output$ac <- renderText(paste("<i>AC</i>:", pc_ac()))
-  output$mod_ac <- renderText(paste("<i>Modified AC</i>:", total_ac()))
+  output$attack_ac <- renderText(paste("<i>AC</i>:", pc_ac()))
+  output$attack_mod_ac <- renderText(paste("<i>Modified AC</i>:", total_ac()))
   
-  output$sim <- renderText(paste("<b>Simulation</b>:", hits(), 
-                                 "enemies land a blow for total damage of", damage(), "(red line)"))
+  output$attack_sim <- renderText(paste("<b>Simulation</b>:", hits(), 
+                                        "enemies land a blow for total damage of", damage(), "(red line)"))
   
-  output$nat1 <- renderText(paste0("<b>Nat 1 rolls</b> :", sum(attack_rolls() == 1), " (expected ", input$horde_size / 20, ")"))
-  output$nat20 <- renderText(paste0("<b>Crit rolls</b>: ", sum(attack_rolls() == 20), " (expected ", input$horde_size / 20, ")"))
+  output$attack_nat1 <- renderText(paste0("<i>Nat 1 rolls</i> :", sum(attack_data$attack_rolls == 1), " (expected ", attack_data$horde_size / 20, ")"))
+  output$attack_nat20 <- renderText(paste0("<i>Crit rolls</i>: ", sum(attack_data$attack_rolls == 20), " (expected ", attack_data$horde_size / 20, ")"))
   
-  output$default <- renderText(paste("<b>Default rules</b>:", floor(input$horde_size * 0.25), 
-                                     "enemies hit for", default_damage(), "total damage (blue line)"))
+  output$attack_default <- renderText(paste("<b>Default rules</b>:", floor(attack_data$horde_size * 0.25), 
+                                            "enemies hit for", default_damage(), "total damage (blue line)"))
   
-  output$median <- renderText(paste("<b>Median damage:</b>", pmax(0, median(sims()))))
-  output$mode <- renderText(paste("<b>Most likely damage:</b>", 
-                                  pmax(0, unique(sims())[which.max(tabulate(match(sims(), unique(sims()))))])))
-  output$range50 <- renderText(paste0("<b>Typical range: </b>", lower50(), "-", upper50()))
-  output$range95 <- renderText(paste0("<b>Credible range: </b>", lower95(), "-", upper95()))
-  output$range100 <- renderText(paste0("<b>Full range: </b>", pmax(0, min(sims())), "-", max(sims())))
+  output$attack_median <- renderText(paste("<b>Median damage:</b>", pmax(0, median(sims()))))
+  output$attack_mode <- renderText(paste("<b>Most likely damage:</b>", 
+                                         pmax(0, unique(sims())[which.max(tabulate(match(sims(), unique(sims()))))])))
+  output$attack_range50 <- renderText(paste0("<b>Typical range: </b>", lower50(), "-", upper50()))
+  output$attack_range95 <- renderText(paste0("<b>Credible range: </b>", lower95(), "-", upper95()))
+  output$attack_range100 <- renderText(paste0("<b>Full range: </b>", pmax(0, min(sims())), "-", max(sims())))
   
-  output$sim_plot <- renderPlot({
+  output$attack_sim_plot <- renderPlot({
     
     hist(sims(),
          breaks = max(sims()) - min(sims()),
@@ -160,6 +208,33 @@ server <- function(input, output) {
     abline(v = default_damage(), col = 'blue', lwd = 3)
     
   })
+  
+  
+  # Saves -------------------------------------------------------------------
+  
+  save_dc <- reactive(switch(input$saves_pc,
+                             `Cad Bury` = 16,
+                             `Kirk Saurpike` = 16,
+                             `Mac Silveen` = 15,
+                             `Rick Dresden` = 14))
+  
+  save_spell_ability <- reactive(switch(input$saves_pc,
+                                        `Cad Bury` = "INT",
+                                        `Kirk Saurpike` = "CHA",
+                                        `Mac Silveen` = "WIS",
+                                        `Rick Dresden` = "CHA"))
+  
+  saves_data <- reactiveValues(saves_dc_success = sample(1:20, 10, replace = T) >= 13 - 0)
+  
+  observeEvent(input$saves_dice_roll, {
+    saves_data$saves_dc_success <- sample(1:20, input$saves_horde_size, replace = T) >= save_dc() - input$saves_mod
+  })
+  
+  horde_damage <- reactive(sum(input$saves_damage * (1 / (saves_data$saves_dc_success + 1)) * (1 / (input$saves_resistance + 1))))
+  
+  output$saves_dc <- renderText(paste("<i>DC</i>:", save_dc()))
+  output$saves <- renderText(paste0("<b>Horde Saves: </b>", sum(saves_data$saves_dc_success), " enemies pass their saving throws and ", sum(!saves_data$saves_dc_success), " fail"))
+  output$damage <- renderText(paste0("<b>Horde Damage: </b>", horde_damage()))
   
 }
 
