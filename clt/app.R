@@ -25,7 +25,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 9
+frech_stats <- 10
 
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
@@ -66,28 +66,21 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "We still have no one ruled out of playoffs, though 3 teams have <10% chance at this point. "
+               "German no longer has the slimmest chance to make the playoffs - PFinn is now lower (albeit a rounding error) probability though neither is out yet"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "Big matchup this week between myself and the surging Bobby team, built largely on the back of recently unleashed CMC"
+               "David has had a wild season, where an average team would only have a 6% chance to do as well as he has despite him only being in 6th because he's had the hardest schedule"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "The chart showing rankings across randomly generated schedules is starting to get wonky now after weeks of only a couple teams being out of place, showing that finally this season is starting to get wild and we might have a weird finish here"
-             } else {
-               "TBD"
-             }
-           ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               HTML("<u><strong>Commish Corner</strong></u> - This week our beloved Commish slipped a spot in both rankings and FVOA")
+               HTML("<u><strong>Commish Corner</strong></u> - I'm 0-3 since I started this section so I might be retiring it so I don't somehow start 7-0 and miss the playoffs")
              } else {
                "TBD"
              }
