@@ -25,7 +25,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 10
+frech_stats <- 11
 
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
@@ -66,21 +66,21 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               "German no longer has the slimmest chance to make the playoffs - PFinn is now lower (albeit a rounding error) probability though neither is out yet"
+               ""
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               "David has had a wild season, where an average team would only have a 6% chance to do as well as he has despite him only being in 6th because he's had the hardest schedule"
+               ""
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               HTML("<u><strong>Commish Corner</strong></u> - I'm 0-3 since I started this section so I might be retiring it so I don't somehow start 7-0 and miss the playoffs")
+               HTML("<u><strong>Commish Corner</strong></u> - I crunched some numbers based on PBM's Slack comments and he's had the easiest schedule so far even with Justin's league-high score but does have the 3rd hardest remaining")
              } else {
                "TBD"
              }
