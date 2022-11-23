@@ -66,21 +66,28 @@ ui  <- navbarPage(
            p(str_glue("Week {weeks_played}:")),
            tags$li(
              if(weeks_played == frech_stats) {
-               ""
+               "Josh now has the misfortune of being in 7th place despite having the 3rd strongest team after a narrow loss to yours truly. That said he has a big matchup with Diaz this week that could vault him back into 4th place"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               ""
+               "It's great that all 4 teams that are 6-5 are playing each other, which is a huge buffer for my team that's 1-3 in the last 4 weeks"
              } else {
                "TBD"
              }
            ),
            tags$li(
              if(weeks_played == frech_stats) {
-               HTML("<u><strong>Commish Corner</strong></u> - I crunched some numbers based on PBM's Slack comments and he's had the easiest schedule so far even with Justin's league-high score but does have the 3rd hardest remaining")
+               "I am genuinely shocked that it's not German but rather Pat who barely registers in the playoff chances. While he's not technically eliminated yet he only made it in 26 of 10,000 simulations. I didn't check but I can't even imagine the chaos that ensued in those simulations to allow him to sneak in."
+             } else {
+               "TBD"
+             }  
+           ),
+           tags$li(
+             if(weeks_played == frech_stats) {
+               HTML("<u><strong>Commish Corner</strong></u> - I crunched some numbers based on PBM's Slack comments and he's had the easiest schedule so far even with Justin's week-high score last week but does have the 3rd hardest remaining")
              } else {
                "TBD"
              }
