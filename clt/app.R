@@ -64,48 +64,10 @@ ui  <- navbarPage(
            h5(""),
            hr(),
            p(str_glue("Week {weeks_played}:")),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "We are starting to see the finish line and have 2 teams with their fates decided because PFinn is eliminated and it appears there's no scenario 4 teams can take out Najee by Nature. Coincidentally those teams play this week so it has an Importance score of 0 because there are absolutely no playoff implications despite 3 weeks still to go."
-             } else {
-               "TBD"
-             }
-           ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "Diaz has joined Barrett as an overrated team despite 61% chance of making playoffs, and Justin is now flirting inside those lines. We know this season is wild because Justin is giving 3 points to an average team yet has gone from 11% to 58% chance of making playoffs in 4 weeks. To be fair I suspect FVOA needs to be tweaked to weigh recency a little more than I am because I would take the points for Justin going forward based on recent games."
-             } else {
-               "TBD"
-             }
-           ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "Bobby is in a 4-way race of teams currently 7-5 yet has a much better chance of making the playoffs because his team is 1 of 2 teams favored over average team. I would have thought his matchup with Justin this week could seal it but there's too much time for anything to get decided this week alone."
-             } else {
-               "TBD"
-             }
-           ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "Josh is somehow the 3rd strongest team but only has an 18% chance of making the playoffs. But to be fair his team would be a pickem against an average team."
-             } else {
-               "TBD"
-             }
-           ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               "David has the 4th best roster but has had an insanely hard schedule where his opponents have average a -10 spread against an average team. Only German (-9.8) and PFinn (-8) come close. For reference Justin is 4th at -1.9."
-             } else {
-               "TBD"
-             }
-           ),
-           tags$li(
-             if(weeks_played == frech_stats) {
-               HTML("<u><strong>Commish Corner</strong></u> - Team PBM still has a 50/50 shot of making playoffs despite being the 3rd worst team")
-             } else {
-               "TBD"
-             }
-           ),
+           tags$li("Not too much changed since last week except Bobby and Barrett pulled ahead of the playoff pack slightly. No one new locked a playoff spot or completely lost their chance - German somehow still has a 1.4% chance despite being 5-8 with 2 games to go."),
+           tags$li("David has had terrible schedule luck because despite being 4th strongest he has played the hardest schedule and might keep him out of the playoffs. That said he has the easiest remaining schedule so we could see a late surge to vault him ahead of Justin and Diaz."),
+           tags$li("Poor Josh. He has the 3rd strongest team but is somehow in 8th place with barely over a 1 in 100 chance in making the playoffs. He's like the inverse PBM."),
+           tags$li(HTML("<u><strong>Commish Corner</strong></u> - I dunno man....8th best team but in 3rd place with 80% chance of making the playoffs. Not to mention he would be getting almost a TD against an average team. What are we even doing here anymore? And why will he take me out in round 1 of the playoffs at this rate?")),
            hr(),
            # h5("Playoff Projections", align = "center"),
            # br(),
