@@ -64,10 +64,22 @@ ui  <- navbarPage(
            h5(""),
            hr(),
            p(str_glue("Week {weeks_played}:")),
-           tags$li("Not too much changed since last week except Bobby and Barrett pulled ahead of the playoff pack slightly. No one new locked a playoff spot or completely lost their chance - German somehow still has a 1.4% chance despite being 5-8 with 2 games to go."),
-           tags$li("David has had terrible schedule luck because despite being 4th strongest he has played the hardest schedule and might keep him out of the playoffs. That said he has the easiest remaining schedule so we could see a late surge to vault him ahead of Justin and Diaz."),
-           tags$li("Poor Josh. He has the 3rd strongest team but is somehow in 8th place with barely over a 1 in 100 chance in making the playoffs. He's like the inverse PBM."),
-           tags$li(HTML("<u><strong>Commish Corner</strong></u> - I dunno man....8th best team but in 3rd place with 80% chance of making the playoffs. Not to mention he would be getting almost a TD against an average team. What are we even doing here anymore? And why will he take me out in round 1 of the playoffs at this rate?")),
+           tags$li("4 teams are now fighting for the final 3 playoff spots, so let's explore some scenarios:"),
+           tags$ul(
+             tags$li("Bobby - too early for Yahoo to call but FVOA has him locked because he's in if he wins and also in if he loses unless 2 teams outscore him by 100+ points"),
+             tags$li(HTML("<u><strong>Commish Corner</strong></u> - If he wins he's in. If he loses he needs either Diaz or Justin to lose OR outscore Diaz by 40 points. As a result of his options he somehow has a 7-in-8 chance despite still being the 3rd worst team.")),
+             tags$li("Justin has a 4-in-5 chance because what would keep him out is losing with Commish and Diaz winning OR being outscored by Diaz by 80+ points"),
+             tags$li("This leaves Diaz with the outside yet still reasonable track to making playoffs. There's almost no chance if he loses, but he also needs either Barrett or Justin to lose which leaves him with a roughly 1-in-3 shot of making it."),
+             tags$li("Now let's put some numbers on the various simualtions for final 2 teams:"),
+             tags$ol(
+               tags$li("65% chance it's Barrett and Justin"),
+               tags$li("22% chance it's Barrett and Diaz"),
+               tags$li("13% chance it's Justin and Diaz")
+             )
+           ),
+           tags$li("Looking to our other teams there's somehow a 0% chance the consistently 3rd best team will make the playoffs purely because of the hardest schedule, so I'm sorry David I won't be seeing you in the finals again this year"),
+           tags$li("Josh's 5th strongest team is also underrated so we'll pour a few sips out for him too as with 22% of simulated schedules he'd be in top 4 at this point"),
+           tags$li("This year has been particularly rough, and somehow only 2 teams in the entire league are above-average"),
            hr(),
            # h5("Playoff Projections", align = "center"),
            # br(),
