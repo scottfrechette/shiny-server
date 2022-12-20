@@ -64,32 +64,22 @@ ui  <- navbarPage(
            h5(""),
            hr(),
            p(str_glue("Week {weeks_played}:")),
-           tags$li("4 teams are now fighting for the final 3 playoff spots, so let's explore some scenarios:"),
-           tags$ul(
-             tags$li("Bobby - too early for Yahoo to call but FVOA has him locked because he's in if he wins and also in if he loses unless 2 teams outscore him by 100+ points"),
-             tags$li(HTML("<u><strong>Commish Corner</strong></u> - If he wins he's in. If he loses he needs either Diaz or Justin to lose OR outscore Diaz by 40 points. As a result of his options he somehow has a 7-in-8 chance despite still being the 3rd worst team.")),
-             tags$li("Justin has a 4-in-5 chance because what would keep him out is losing with Commish and Diaz winning OR being outscored by Diaz by 80+ points"),
-             tags$li("This leaves Diaz with the outside yet still reasonable track to making playoffs. There's almost no chance if he loses, but he also needs either Barrett or Justin to lose which leaves him with a roughly 1-in-3 shot of making it."),
-             tags$li("Now let's put some numbers on the various simualtions for final 2 teams:"),
-             tags$ol(
-               tags$li("65% chance it's Barrett and Justin"),
-               tags$li("22% chance it's Barrett and Diaz"),
-               tags$li("13% chance it's Justin and Diaz")
-             )
-           ),
-           tags$li("Looking to our other teams there's somehow a 0% chance the consistently 3rd best team will make the playoffs purely because of the hardest schedule, so I'm sorry David I won't be seeing you in the finals again this year"),
-           tags$li("Josh's 5th strongest team is also underrated so we'll pour a few sips out for him too as with 22% of simulated schedules he'd be in top 4 at this point"),
-           tags$li("This year has been particularly rough, and somehow only 2 teams in the entire league are above-average"),
+           tags$li("At the end of the season the top 3 teams made it...as did the 7th best"),
+           tags$li("Because of seeding no one has an easy path to victory, though as always FVOA doesn't see player-level injuries in advance so Hurts going down could swing things more"),
+           tags$li("What's interesting is the top 4 teams based on Colley rating all made it, which is one of the models the old BCS systems used that's basically just W-L record balanced with strength of schedule. I haven't thought about that rating in a long time because it's automated but happened to see it was most predictive this year."),
+           tags$li(HTML("<u><strong>Commish Corner</strong></u> - out Commish would have finished 2nd in only 3% of randomly simulated schedules and made playoffs in 17% of them without factoring in seed")),
+           tags$li("Similarly, Josh and David would have each made it in 2 of 5 random schedules, so that's some tough luck"),
+           tags$li("FVOA ended up with 54% accuracy across all possible matchups over the season, compared to Yahoo's 60% that get to see lineup at time of kickoff. Not bad for team-wide prediction and good enough to win big in Vegas so I'll take it."),
            hr(),
-           # h5("Playoff Projections", align = "center"),
+           h5("Playoff Projections", align = "center"),
+           br(),
+           fluidRow(tableOutput("playoffs"), align = "center"),
+           # h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
            # br(),
-           # fluidRow(tableOutput("playoffs"), align = "center"),
-           h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
-           br(),
-           fluidRow(tableOutput("weekly"), align="center"),
-           h5("Season Projections", align = "center"),
-           br(),
-           fluidRow(tableOutput("simulation"), align = "center"),
+           # fluidRow(tableOutput("weekly"), align="center"),
+           # h5("Season Projections", align = "center"),
+           # br(),
+           # fluidRow(tableOutput("simulation"), align = "center"),
            hr(),
            p("FVOA Assumptions:"),
            tags$ol(
@@ -147,16 +137,16 @@ ui  <- navbarPage(
                       p("Just because you aren't matched up doesn't mean you can't still gamble on any spread:"),
                       fluidRow(tableOutput("lines"), align = 'center')
                       
-             ),
-             tabPanel("Season",
-                      h3("Playoff Leverage"),
-                      h5("How much will winning/losing your next game affect your playoff chances?"),
-                      fluidRow(plotOutput("playoff_leverage", width = "700px", height = "600px"), align = 'center'),
-                      fluidRow(plotOutput("playoff_leverage_legend", width = "700px", height = "100px"), align = 'center')#,
-                      # fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center"),
-                      # fluidRow(plotOutput("playoff_leverage_legend", width = "80%", height = "100px"), align = "center")
-
-             )
+             )#,
+             # tabPanel("Season",
+             #          h3("Playoff Leverage"),
+             #          h5("How much will winning/losing your next game affect your playoff chances?"),
+             #          fluidRow(plotOutput("playoff_leverage", width = "700px", height = "600px"), align = 'center'),
+             #          fluidRow(plotOutput("playoff_leverage_legend", width = "700px", height = "100px"), align = 'center')#,
+             #          # fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center"),
+             #          # fluidRow(plotOutput("playoff_leverage_legend", width = "80%", height = "100px"), align = "center")
+             # 
+             # )
   ),
   
   # Skill v Luck ------------------------------------------------------------
@@ -259,10 +249,10 @@ server <- function(input, output, session) {
   }, align = 'c', digits = 1)
   
   output$playoffs <- renderTable({
-    tibble(Winner = c("Scott", "David", "Eric", "German"),
-           Percent = c("29%", "27%", "23%", "16%"),
-           Odds = c("7:2", "7:2", "9:2", "13:2"),
-           BettingLine = c("+250", "+275", "+350", "+525"))
+    tibble(Winner = c("Scott", "Bobby", "Justin", "Barrett"),
+           Percent = c("35%", "27%", "17%", "14%"),
+           Odds = c("3:1", "7:2", "11:2", "7:1"),
+           BettingLine = c("+175", "+275", "+475", "+625"))
   }, align = "c")
   
   # Rankings ----------------------------------------------------------------
