@@ -1,4 +1,5 @@
 library(shiny)
+library(tidyverse)
 
 roll_attack <- function(horde_size, roll_type) {
   
@@ -64,9 +65,25 @@ ui  <- navbarPage(
   collapsible = T,
   inverse = F,
   
-  title = "Horde Simulation",
+  title = "DND Simulation",
   
-  tabPanel("Attacks",
+  tabPanel("Skill Challenge", 
+           
+           sidebarLayout(
+             sidebarPanel(
+               sliderInput("skill_mod_range", "Modifier Range", 1, 20, 
+                           value = c(4, 12), step = 1, ticks = F),
+               sliderInput("skill_dc_range", "DC Range", 1, 40, 
+                           value = c(10, 25), step = 1, ticks = F),
+               checkboxInput("skill_advantage", "Advantage"),
+               checkboxInput("skill_guidance", "Guidance")
+             ),
+             
+             mainPanel(plotOutput("skill_sim_plot"))
+           )
+  ),
+  
+  tabPanel("Horde Attacks",
            sidebarLayout(
              sidebarPanel(
                ## PC
@@ -108,7 +125,7 @@ ui  <- navbarPage(
            )
   ),
   
-  tabPanel("Saves", 
+  tabPanel("Horde Saves", 
            sidebarLayout(
              sidebarPanel(
                selectInput("saves_pc", "Select Character:", c("Cad Bury", "Kirk Saurpike", "Mac Silveen", "Rick Dresden")),
@@ -116,7 +133,7 @@ ui  <- navbarPage(
                numericInput("saves_horde_size", "Horde Size", 10),
                # numericInput("saves_dc", "Character Spell DC", 13),
                numericInput("saves_mod", "Horde Saving Throw Modifier", 0),
-               checkboxInput("saves_resistance", "Resistance?"),
+               checkboxInput("saves_resistance", "Resistance"),
                numericInput("saves_damage", "Damage Rolled", 10),
                actionButton("saves_dice_roll", "Roll Die", icon = icon("dice-d20"))
              ),
@@ -137,6 +154,47 @@ ui  <- navbarPage(
 
 server <- function(input, output) {
   
+  
+  # Skill Challenge ---------------------------------------------------------
+  
+  skill_rolls <- sample(1:20, 1e4, replace = T)
+  skill_adv_rolls <- sample(1:20, 1e4, replace = T)
+  skill_guidance <- sample(1:4, 1e4, replace = T)
+  
+  skill_total_rolls <- reactive(pmax(skill_rolls, 
+                                     skill_adv_rolls * input$skill_advantage) + 
+                                  skill_guidance * input$skill_guidance)
+
+  skill_chances <- reactive(crossing(mod = input$skill_mod_range[1]:input$skill_mod_range[2],
+                                     dc = input$skill_dc_range[1]:input$skill_dc_range[2]) %>% 
+                              mutate(pct = map2_dbl(mod, dc, 
+                                                    ~mean(skill_total_rolls() + .x > .y))))
+  
+  output$skill_sim_plot <- renderPlot(
+    
+    skill_chances() %>% 
+      ggplot(aes(x = dc, y = mod)) + 
+      geom_tile(aes(fill = pct), alpha = 0.5, na.rm = FALSE) + 
+      geom_text(aes(label = scales::percent(pct, accuracy = 1))) +
+      scale_x_continuous(breaks = input$skill_dc_range[1]:input$skill_dc_range[2], 
+                         expand = c(0, 0)) +
+      scale_y_reverse(breaks = input$skill_mod_range[2]:input$skill_mod_range[1], 
+                      expand = c(0, 0)) +
+      scale_fill_gradient(low = "white", high = "#0072B2", limits = c(0, 1)) +
+      guides(fill = "none") +
+      theme_minimal() +
+      theme(axis.text.y = element_text(face = "bold"),
+            axis.text.x = element_text(face = "bold", size = 12),
+            panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank()) +
+      labs(title = 'Simulated success rate of skill challenge',
+           subtitle = "Based on 10,000 simulations within selected range of skill modifier and DC",
+           x = "DC",
+           y = "Skill Modifier"),
+    
+    res = 96
+    
+  )
   
   # Attacks -----------------------------------------------------------------
   
