@@ -25,7 +25,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 12
+frech_stats <- 1
 
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
@@ -64,22 +64,19 @@ ui  <- navbarPage(
            h5(""),
            hr(),
            p(str_glue("Week {weeks_played}:")),
-           tags$li("At the end of the season the top 3 teams made it...as did the 7th best"),
-           tags$li("Because of seeding no one has an easy path to victory, though as always FVOA doesn't see player-level injuries in advance so Hurts going down could swing things more"),
-           tags$li("What's interesting is the top 4 teams based on Colley rating all made it, which is one of the models the old BCS systems used that's basically just W-L record balanced with strength of schedule. I haven't thought about that rating in a long time because it's automated but happened to see it was most predictive this year."),
-           tags$li(HTML("<u><strong>Commish Corner</strong></u> - out Commish would have finished 2nd in only 3% of randomly simulated schedules and made playoffs in 17% of them without factoring in seed")),
-           tags$li("Similarly, Josh and David would have each made it in 2 of 5 random schedules, so that's some tough luck"),
-           tags$li("FVOA ended up with 54% accuracy across all possible matchups over the season, compared to Yahoo's 60% that get to see lineup at time of kickoff. Not bad for team-wide prediction and good enough to win big in Vegas so I'll take it."),
+           tags$li("Welcome back to another season of FVOA madness, and in particular I hope you all enjoy jumping on the week 1 model overreaction bandwagon"),
+           tags$li("Bobby is out to a commanding lead and FVOA is clearly disgusted with the performance from those of us that couldn't even get to 90 points"),
+           tags$li(HTML("<u><strong>Commish Corner</strong></u> - so no lie...I spent a good 30 minutes trying to debug my model when it kept spitting out our Commish wasn't favored over an average team given he scored just above our historical average. I eventually gave up and am just assuming FVOA remembers last season more than I programmed it to, and should probably be more concerned than I am.")),
            hr(),
-           h5("Playoff Projections", align = "center"),
+           # h5("Playoff Projections", align = "center"),
+           # br(),
+           # fluidRow(tableOutput("playoffs"), align = "center"),
+           h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
            br(),
-           fluidRow(tableOutput("playoffs"), align = "center"),
-           # h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
-           # br(),
-           # fluidRow(tableOutput("weekly"), align="center"),
-           # h5("Season Projections", align = "center"),
-           # br(),
-           # fluidRow(tableOutput("simulation"), align = "center"),
+           fluidRow(tableOutput("weekly"), align="center"),
+           h5("Season Projections", align = "center"),
+           br(),
+           fluidRow(tableOutput("simulation"), align = "center"),
            hr(),
            p("FVOA Assumptions:"),
            tags$ol(
@@ -137,16 +134,16 @@ ui  <- navbarPage(
                       p("Just because you aren't matched up doesn't mean you can't still gamble on any spread:"),
                       fluidRow(tableOutput("lines"), align = 'center')
                       
-             )#,
-             # tabPanel("Season",
-             #          h3("Playoff Leverage"),
-             #          h5("How much will winning/losing your next game affect your playoff chances?"),
-             #          fluidRow(plotOutput("playoff_leverage", width = "700px", height = "600px"), align = 'center'),
-             #          fluidRow(plotOutput("playoff_leverage_legend", width = "700px", height = "100px"), align = 'center')#,
-             #          # fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center"),
-             #          # fluidRow(plotOutput("playoff_leverage_legend", width = "80%", height = "100px"), align = "center")
-             # 
-             # )
+             ),
+             tabPanel("Season",
+                      h3("Playoff Leverage"),
+                      h5("How much will winning/losing your next game affect your playoff chances?"),
+                      fluidRow(plotOutput("playoff_leverage", width = "700px", height = "600px"), align = 'center'),
+                      fluidRow(plotOutput("playoff_leverage_legend", width = "700px", height = "100px"), align = 'center')#,
+                      # fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center"),
+                      # fluidRow(plotOutput("playoff_leverage_legend", width = "80%", height = "100px"), align = "center")
+
+             )
   ),
   
   # Skill v Luck ------------------------------------------------------------
@@ -202,14 +199,14 @@ ui  <- navbarPage(
   # Model Evaluation Tab ----------------------------------------------------
   
   navbarMenu("Evaluate",
-             tabPanel("FVOA Evaluation",
-                      h3("How well is the FVOA model performing?"),
-                      hr(),
-                      fluidRow(plotOutput("eval_fvoa_plot", width = "600px", height = "300px"), align = "center"),
-                      br(),
-                      # p("Which teams screwed my model last week?"),
-                      fluidRow(plotOutput("eval_fvoa_team", width = "600px", height = "400px"), align = "center")
-             ),
+             # tabPanel("FVOA Evaluation",
+             #          h3("How well is the FVOA model performing?"),
+             #          hr(),
+             #          fluidRow(plotOutput("eval_fvoa_plot", width = "600px", height = "300px"), align = "center"),
+             #          br(),
+             #          # p("Which teams screwed my model last week?"),
+             #          fluidRow(plotOutput("eval_fvoa_team", width = "600px", height = "400px"), align = "center")
+             # ),
              tabPanel("Yahoo Evaluation",
                       h3("How well are Yahoo projections performing?"),
                       hr(),
@@ -615,7 +612,7 @@ server <- function(input, output, session) {
   
   output$eval_proj_plot <- renderPlot({
     evaluate_projections(clt_proj) %>% 
-      filter(week > 1) %>% 
+      # filter(week > 1) %>% 
       plot_projection_eval()
   }, res = 96)
   

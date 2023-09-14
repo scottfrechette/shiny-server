@@ -21,7 +21,7 @@ current_season <- year(today())
 
 clt_con <- dbConnect(SQLite(), here::here("clt", "clt.sqlite"))
 
-clt_team_tmp <- get_team(weeks_played, 'yahoo', leagueID = 56749) %>% 
+clt_team_tmp <- get_team(weeks_played, 'yahoo', leagueID = 102347) %>% 
   mutate(season = current_season, .before = 1)
 
 if(exists("clt_team_tmp")) {
@@ -38,7 +38,7 @@ if(exists("clt_team_tmp")) {
 
 Sys.sleep(60)
 
-clt_wp_tmp <- get_win_prob(current_week, leagueID = 56749) %>% 
+clt_wp_tmp <- get_win_prob(current_week, leagueID = 102347) %>% 
   mutate(season = current_season,
          week = current_week, .before = 1)
 
@@ -71,7 +71,7 @@ clt_wp <- clt_wp_tmp %>%
 
 clt_fit_season <- fit_team_season(clt_scores)
 clt_fit <- slice_tail(clt_fit_season, n = 1)$model[[1]]
-clt_draws <- fvoa:::extract_team_draws(distinct(clt_scores, team), clt_fit)
+clt_draws <- fvoa:::extract_team_draws(clt_fit)
 
 # Run Simulations ---------------------------------------------------------
 
@@ -99,7 +99,7 @@ clt_lines <- compare_league(clt_fit) %>%
 clt_lineup_eval <- clt_team %>% 
   evaluate_lineup(flex = 0) %>% 
   plot_roster_skills()
-clt_model_eval <- evaluate_model(clt_fit_season)
+# clt_model_eval <- evaluate_model(clt_fit_season)
 clt_playoff_leverage <- plot_playoff_leverage(clt_simulated_standings)
 clt_schedule_luck <- plot_schedule_luck(clt_schedule, clt_scores, clt_owners, sims = 1000)
 
@@ -112,9 +112,9 @@ save(clt_schedule,
      clt_rankings,
      clt_lines,
      clt_fvoa_season,
-     clt_model_eval,
-     # clt_current_matchups,
+     # clt_model_eval,
+     clt_current_matchups,
      clt_lineup_eval,
-     # clt_playoff_leverage,
+     clt_playoff_leverage,
      clt_schedule_luck,
      file = here::here("clt", "clt-data.RData"))
