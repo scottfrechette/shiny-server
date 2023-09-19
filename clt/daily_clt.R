@@ -99,7 +99,7 @@ clt_lines <- compare_league(clt_fit) %>%
 clt_lineup_eval <- clt_team %>% 
   evaluate_lineup(flex = 0) %>% 
   plot_roster_skills()
-# clt_model_eval <- evaluate_model(clt_fit_season)
+clt_model_eval <- evaluate_model(clt_fit_season)
 clt_playoff_leverage <- plot_playoff_leverage(clt_simulated_standings)
 clt_schedule_luck <- plot_schedule_luck(clt_schedule, clt_scores, clt_owners, sims = 1000)
 
@@ -112,7 +112,7 @@ save(clt_schedule,
      clt_rankings,
      clt_lines,
      clt_fvoa_season,
-     # clt_model_eval,
+     clt_model_eval,
      clt_current_matchups,
      clt_lineup_eval,
      clt_playoff_leverage,

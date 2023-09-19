@@ -25,7 +25,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 1
+frech_stats <- 2
 
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
@@ -64,9 +64,10 @@ ui  <- navbarPage(
            h5(""),
            hr(),
            p(str_glue("Week {weeks_played}:")),
-           tags$li("Welcome back to another season of FVOA madness, and in particular I hope you all enjoy jumping on the week 1 model overreaction bandwagon"),
-           tags$li("Bobby is out to a commanding lead and FVOA is clearly disgusted with the performance from those of us that couldn't even get to 90 points"),
-           tags$li(HTML("<u><strong>Commish Corner</strong></u> - so no lie...I spent a good 30 minutes trying to debug my model when it kept spitting out our Commish wasn't favored over an average team given he scored just above our historical average. I eventually gave up and am just assuming FVOA remembers last season more than I programmed it to, and should probably be more concerned than I am.")),
+           tags$li("You know it's going to be a wild season when two winless teams have 4th and 6th best playoff odds"),
+           tags$li("Not to mention Josh's undefeated squad is considered 3rd weakest with 22% chance of making playoffs"),
+           tags$li("Bobby is doing a great job highlighting why FVOA factors in regression to mean and recency to try and minimize impact of early outliers, though there's lots of uncertainty on his team strength still given it's only been 2 weeks so easy to bounce back to dominance"),
+           tags$li(HTML("<u><strong>Commish Corner</strong></u> - FVOA recognizes Commish as the strongest team yet still gives Bobby an edge to make playoffs. I find that amusing.")),
            hr(),
            # h5("Playoff Projections", align = "center"),
            # br(),
@@ -199,14 +200,14 @@ ui  <- navbarPage(
   # Model Evaluation Tab ----------------------------------------------------
   
   navbarMenu("Evaluate",
-             # tabPanel("FVOA Evaluation",
-             #          h3("How well is the FVOA model performing?"),
-             #          hr(),
-             #          fluidRow(plotOutput("eval_fvoa_plot", width = "600px", height = "300px"), align = "center"),
-             #          br(),
-             #          # p("Which teams screwed my model last week?"),
-             #          fluidRow(plotOutput("eval_fvoa_team", width = "600px", height = "400px"), align = "center")
-             # ),
+             tabPanel("FVOA Evaluation",
+                      h3("How well is the FVOA model performing?"),
+                      hr(),
+                      fluidRow(plotOutput("eval_fvoa_plot", width = "600px", height = "300px"), align = "center"),
+                      br(),
+                      # p("Which teams screwed my model last week?"),
+                      fluidRow(plotOutput("eval_fvoa_team", width = "600px", height = "400px"), align = "center")
+             ),
              tabPanel("Yahoo Evaluation",
                       h3("How well are Yahoo projections performing?"),
                       hr(),
