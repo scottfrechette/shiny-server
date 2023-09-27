@@ -25,7 +25,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 2
+frech_stats <- 3
 
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
@@ -64,10 +64,10 @@ ui  <- navbarPage(
            h5(""),
            hr(),
            p(str_glue("Week {weeks_played}:")),
-           tags$li("You know it's going to be a wild season when two winless teams have 4th and 6th best playoff odds"),
-           tags$li("Not to mention Josh's undefeated squad is considered 3rd weakest with 22% chance of making playoffs"),
-           tags$li("Bobby is doing a great job highlighting why FVOA factors in regression to mean and recency to try and minimize impact of early outliers, though there's lots of uncertainty on his team strength still given it's only been 2 weeks so easy to bounce back to dominance"),
-           tags$li(HTML("<u><strong>Commish Corner</strong></u> - FVOA recognizes Commish as the strongest team yet still gives Bobby an edge to make playoffs. I find that amusing.")),
+           tags$li("Josh's team might already be breaking the season by being the last undefeated team and considered 2nd strongest by FVOA but somehow 5th in points"),
+           tags$li("The weakest teams in FVOA, Justin and PFinn, are both 2-1 but right now have worst chances of making playoffs so that luck may not last"),
+           tags$li("All that said, there's no clear dominant team so far and every team is taking turns having a monster week or having a team that barely showed up to play"),
+           tags$li(HTML("<u><strong>Commish Corner</strong></u> - Commish took a bit hit this week with playoff chances with the week's lowest score")),
            hr(),
            # h5("Playoff Projections", align = "center"),
            # br(),
