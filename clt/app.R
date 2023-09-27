@@ -96,12 +96,17 @@ ui  <- navbarPage(
   # Rankings Tab-------------------------------------------------------------
   
   tabPanel("Rankings",
-           sidebarLayout(
-             sidebarPanel(
-               uiOutput("sorting")
-             ), 
-             mainPanel(tableOutput("rankings"))
-           ),
+           # sidebarLayout(
+           #   sidebarPanel(
+           #     uiOutput("sorting")
+           #   ),
+           #   mainPanel(tableOutput("rankings"))
+           # ),
+           fluidRow(
+             column(2),
+             column(8, dataTableOutput("rankings1")),
+             column(2)),
+           # fluidRow(dataTableOutput("rankings1"), align = 'center'),
            hr(),
            h5("Ranking Notes:"),
            tags$ol(
@@ -261,23 +266,38 @@ server <- function(input, output, session) {
   })
   
   output$rankings <- renderTable({
-    
-    rankings <- clt_rankings %>% 
-      select(1:8, SOS = 14, `SOS Rank` = 16, 20:23) %>% 
+
+    rankings <- clt_rankings %>%
+      select(1:8, SOS = 14, `SOS Rank` = 16, 20:23) %>%
       mutate(SOR = percent(SOR, accuracy = 1))
-    
+
     sort <- sorting[[input$sorting]]
-    
+
     rank_sort <- arrange(rankings, rankings[[sort]])
-    
+
     point_sort <- arrange(rankings, desc(rankings[[sort]]))
-    
+
     if (sort %in% c("PF", "PA")) {
       point_sort
     } else {
       rank_sort
     }
   }, align = 'c', digits = 2)
+  
+  output$rankings1 <- renderDataTable({
+    
+    clt_rankings %>% 
+      select(1:8, SOS = 14, `SOS Rank` = 16, 20:23) %>% 
+      mutate(SOR = percent(SOR, accuracy = 1),
+             FVOA = round(FVOA, 2),
+             `Colley Rating` = round(`Colley Rating`, 2))
+
+  }, 
+  options = list(
+    dom = 't',
+    columnDefs = list(width = '200px', className = 'dt-center', targets = "_all"),
+    autoWidth = TRUE
+    ))
   
   # H2H Matchups ------------------------------------------------------------
   
