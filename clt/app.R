@@ -25,7 +25,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 4
+frech_stats <- 5
 
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
@@ -64,10 +64,11 @@ ui  <- navbarPage(
            h5(""),
            hr(),
            p(str_glue("Week {weeks_played}:")),
-           tags$li("FVOA is getting wild now with some of these spreads, even if the line looks more reasonable"),
-           tags$li("Looks like David left over 50 points on his bench, though he still got the W so he caught a break there"),
-           tags$li("It's a rough day when a 2-2 team has a worse chance of making playoffs than a winless team, but guess that happens when you barely put up 40 points"),
-           tags$li(HTML("<u><strong>Commish Corner</strong></u> - Commish is in the running for luckiest team ever by somehow being in 2nd with the 3rd weakest team")),
+           tags$li("Well that was a hell of a week for fantasy. I'm not sure I can remember a week causing this much chaos for both FVOA and Yahoo before end of season."),
+           tags$li("Congrats to German and PFinn for defying expectations and keeping their seasons alive"),
+           tags$li("Losses for Bobby, Commish, and myself also helped caused a really large regression to mean of team FVOA strength"),
+           tags$li("Except David, looks like we're all going gay this season at the rate his team is playing"),
+           tags$li(HTML("<u><strong>Commish Corner</strong></u> - Commish still sitting in 4th with the 3rd weakest team. And he took it out on me by not letting me pick up a player once games started.")),
            hr(),
            # h5("Playoff Projections", align = "center"),
            # br(),
@@ -104,7 +105,7 @@ ui  <- navbarPage(
            # ),
            fluidRow(
              column(2),
-             column(8, dataTableOutput("rankings1")),
+             column(8, dataTableOutput("rankings")),
              column(2)),
            # fluidRow(dataTableOutput("rankings1"), align = 'center'),
            hr(),
@@ -127,8 +128,8 @@ ui  <- navbarPage(
   
   # Simulate ----------------------------------------------------------------
   
-  navbarMenu("Simulate",
-             tabPanel("Matchups",
+  # navbarMenu("Simulate",
+             tabPanel("Simulate",#"Matchups",
                       h3("Head-to-Head Matchups"),
                       p("Simulate any potential matchup:"),
                       fluidRow(column(2, offset = 4,
@@ -140,16 +141,16 @@ ui  <- navbarPage(
                       p("Just because you aren't matched up doesn't mean you can't still gamble on any spread:"),
                       fluidRow(tableOutput("lines"), align = 'center')
                       
-             ),
-             tabPanel("Season",
-                      h3("Playoff Leverage"),
-                      h5("How much will winning/losing your next game affect your playoff chances?"),
-                      fluidRow(plotOutput("playoff_leverage", width = "700px", height = "600px"), align = 'center'),
-                      fluidRow(plotOutput("playoff_leverage_legend", width = "700px", height = "100px"), align = 'center')#,
-                      # fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center"),
-                      # fluidRow(plotOutput("playoff_leverage_legend", width = "80%", height = "100px"), align = "center")
-
-             )
+             # ),
+             # tabPanel("Season",
+             #          h3("Playoff Leverage"),
+             #          h5("How much will winning/losing your next game affect your playoff chances?"),
+             #          fluidRow(plotOutput("playoff_leverage", width = "700px", height = "600px"), align = 'center'),
+             #          fluidRow(plotOutput("playoff_leverage_legend", width = "700px", height = "100px"), align = 'center')#,
+             #          # fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center"),
+             #          # fluidRow(plotOutput("playoff_leverage_legend", width = "80%", height = "100px"), align = "center")
+             # 
+             # )
   ),
   
   # Skill v Luck ------------------------------------------------------------
@@ -260,31 +261,31 @@ server <- function(input, output, session) {
   
   # Rankings ----------------------------------------------------------------
   
-  output$sorting <- renderUI({
-    selectInput("sorting", "Sort Rankings By:", 
-                c(ranking_methods, "PF", "PA"))
-  })
+  # output$sorting <- renderUI({
+  #   selectInput("sorting", "Sort Rankings By:", 
+  #               c(ranking_methods, "PF", "PA"))
+  # })
+  # 
+  # output$rankings <- renderTable({
+  # 
+  #   rankings <- clt_rankings %>%
+  #     select(1:8, SOS = 14, `SOS Rank` = 16, 20:23) %>%
+  #     mutate(SOR = percent(SOR, accuracy = 1))
+  # 
+  #   sort <- sorting[[input$sorting]]
+  # 
+  #   rank_sort <- arrange(rankings, rankings[[sort]])
+  # 
+  #   point_sort <- arrange(rankings, desc(rankings[[sort]]))
+  # 
+  #   if (sort %in% c("PF", "PA")) {
+  #     point_sort
+  #   } else {
+  #     rank_sort
+  #   }
+  # }, align = 'c', digits = 2)
   
-  output$rankings <- renderTable({
-
-    rankings <- clt_rankings %>%
-      select(1:8, SOS = 14, `SOS Rank` = 16, 20:23) %>%
-      mutate(SOR = percent(SOR, accuracy = 1))
-
-    sort <- sorting[[input$sorting]]
-
-    rank_sort <- arrange(rankings, rankings[[sort]])
-
-    point_sort <- arrange(rankings, desc(rankings[[sort]]))
-
-    if (sort %in% c("PF", "PA")) {
-      point_sort
-    } else {
-      rank_sort
-    }
-  }, align = 'c', digits = 2)
-  
-  output$rankings1 <- renderDataTable({
+  output$rankings <- renderDataTable({
     
     clt_rankings %>% 
       select(1:8, SOS = 14, `SOS Rank` = 16, 20:23) %>% 
@@ -297,7 +298,8 @@ server <- function(input, output, session) {
     dom = 't',
     columnDefs = list(width = '200px', className = 'dt-center', targets = "_all"),
     autoWidth = TRUE
-    ))
+    )
+  )
   
   # H2H Matchups ------------------------------------------------------------
   
