@@ -25,7 +25,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 5
+frech_stats <- 6
 
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
@@ -33,7 +33,7 @@ fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
 
 # Load Data ---------------------------------------------------------------
 
-load(here::here("clt", "clt-data.RData"))
+load("clt-data.RData")
 
 clt_scores <- extract_scores(clt_team)
 clt_proj <- extract_projections(clt_team)
@@ -63,12 +63,11 @@ ui  <- navbarPage(
            h3("The Frechest of Takes"),
            h5(""),
            hr(),
-           p(str_glue("Week {weeks_played}:")),
-           tags$li("Well that was a hell of a week for fantasy. I'm not sure I can remember a week causing this much chaos for both FVOA and Yahoo before end of season."),
-           tags$li("Congrats to German and PFinn for defying expectations and keeping their seasons alive"),
-           tags$li("Losses for Bobby, Commish, and myself also helped caused a really large regression to mean of team FVOA strength"),
-           tags$li("Except David, looks like we're all going gay this season at the rate his team is playing"),
-           tags$li(HTML("<u><strong>Commish Corner</strong></u> - Commish still sitting in 4th with the 3rd weakest team. And he took it out on me by not letting me pick up a player once games started.")),
+           tags$li("Another week of chaos has resulted in some regression to historical average for most teams with no clear outliers"),
+           tags$li("Congrats to German though for being the 5th strongest team after two strong weeks, hooray for recency bias in the model"),
+           tags$li("PFinn on the other hand is clearly flagged as Overrated by being 3rd weakest team despite his 4th place ranking"),
+           tags$li("Bobby's team is clearly good and David's team is clearly bad but most other teams haven't settled quite yet so this season is gonna be wild"),
+           tags$li(HTML("<u><strong>Commish Corner</strong></u> - Looks like the records finally caught up to FVOA where he's now in 7th, so of course I look forward to his team whooping my ass this week")),
            hr(),
            # h5("Playoff Projections", align = "center"),
            # br(),
