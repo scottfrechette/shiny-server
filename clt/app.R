@@ -25,7 +25,7 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 6
+frech_stats <- 7
 
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
@@ -63,11 +63,11 @@ ui  <- navbarPage(
            h3("The Frechest of Takes"),
            h5(""),
            hr(),
-           tags$li("Another week of chaos has resulted in some regression to historical average for most teams with no clear outliers"),
-           tags$li("Congrats to German though for being the 5th strongest team after two strong weeks, hooray for recency bias in the model"),
-           tags$li("PFinn on the other hand is clearly flagged as Overrated by being 3rd weakest team despite his 4th place ranking"),
-           tags$li("Bobby's team is clearly good and David's team is clearly bad but most other teams haven't settled quite yet so this season is gonna be wild"),
-           tags$li(HTML("<u><strong>Commish Corner</strong></u> - Looks like the records finally caught up to FVOA where he's now in 7th, so of course I look forward to his team whooping my ass this week")),
+           tags$li("At about the halfway point of season it appears we have 4 good teams, 4 bad teams, a mediocre team, and a single overrated team"),
+           tags$li("Interestingly enough week 7 was all chalk and reduced some of the chaos affecting rankings the last few weeks to get us back on track"),
+           tags$li("FVOA and Yahoo are starting to settle into same rankings aside from PFinn's team somehow still in a 4-way tie for most wins despite fewest points over the season"),
+           tags$li("FVOA is really liking Justin's chances of making playoffs because scores are trending way up not to mention the easiest remaining schedule"),
+           tags$li(HTML("<u><strong>Commish Corner</strong></u> - this team is now considered the weakest team according to FVOA despite still being in 7th and only 3rd worst PF because of a strong downward trend of points over the first 7 weeks")),
            hr(),
            # h5("Playoff Projections", align = "center"),
            # br(),
