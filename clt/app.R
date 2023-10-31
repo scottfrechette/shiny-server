@@ -25,8 +25,6 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
-frech_stats <- 7
-
 
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
@@ -63,11 +61,10 @@ ui  <- navbarPage(
            h3("The Frechest of Takes"),
            h5(""),
            hr(),
-           tags$li("At about the halfway point of season it appears we have 4 good teams, 4 bad teams, a mediocre team, and a single overrated team"),
-           tags$li("Interestingly enough week 7 was all chalk and reduced some of the chaos affecting rankings the last few weeks to get us back on track"),
-           tags$li("FVOA and Yahoo are starting to settle into same rankings aside from PFinn's team somehow still in a 4-way tie for most wins despite fewest points over the season"),
-           tags$li("FVOA is really liking Justin's chances of making playoffs because scores are trending way up not to mention the easiest remaining schedule"),
-           tags$li(HTML("<u><strong>Commish Corner</strong></u> - this team is now considered the weakest team according to FVOA despite still being in 7th and only 3rd worst PF because of a strong downward trend of points over the first 7 weeks")),
+           tags$li("This season is wild. Somehow the 2nd and 3rd weakest teams are sitting in 3rd/4th place and 5th strongest team is in last. That or maybe we somehow broke FVOA?"),
+           tags$li("Someone is going to need to do a documentary on how my team has been top-scoring all season until just being passed by Bobby and has the lowest points against by a considerable amount and am somehow in 5th place?? Seriously, how the hell have I managed that? I'd be top-4 in 75% of randomly simulated schedules but somehow I get the easiest schedule and have lost half my games. Maybe this is why FVOA is starting to wear down on us."),
+           tags$li("That said I think we are really starting to see Bobby and Justin pull away from the pack with some consistenly strong performances lately."),
+           tags$li(HTML("<u><strong>Commish Corner</strong></u> - still considered the weakest team, has now slipped to 8th place, and currently sitting at worst chances to make playoffs. I can only imagine typing these words somehow comes back to haunt me.")),
            hr(),
            # h5("Playoff Projections", align = "center"),
            # br(),
@@ -342,7 +339,7 @@ server <- function(input, output, session) {
         x <- ggplot(clt_scores, aes(week, score)) +
           geom_line(alpha = 0.5, aes(group=team, color=team), size = 1.5) +
           geom_point(aes(group=team, color=team)) +
-          geom_segment(x = 1, y = 115, xend = max_weeks, yend = 115, color = "darkgrey", linetype = 2) +
+          geom_segment(x = 1, y = 110, xend = max_weeks, yend = 110, color = "darkgrey", linetype = 2) +
           scale_y_continuous(breaks = pretty_breaks(n = 5)) +
           scale_x_continuous(breaks = c(1:max_weeks), limits = c(1, max_weeks)) +
           labs(y = "Score", x = "Week", title = "Weekly Scores") +
@@ -361,7 +358,7 @@ server <- function(input, output, session) {
           geom_line(alpha = 0.2, aes(group=team, color=team), size = 1.5) +
           geom_line(data = tm, aes(group=team, color=team), size = 2) + 
           geom_point(aes(group=team, color=team)) +
-          geom_segment(x = 1, y = 115, xend = max_weeks, yend = 115, color = "darkgrey", linetype = 2) +
+          geom_segment(x = 1, y = 110, xend = max_weeks, yend = 110, color = "darkgrey", linetype = 2) +
           scale_y_continuous(breaks = pretty_breaks(n = 5)) +
           scale_x_continuous(breaks = c(1:max_weeks), limits = c(1, max_weeks)) +
           labs(y = "Score", x = "Week", title = "Weekly Scores") +
@@ -463,7 +460,7 @@ server <- function(input, output, session) {
           ggplot(aes(week, points)) +
           geom_line(alpha = 0.5, aes(group=team, color=team), size = 1.5) +
           geom_point(aes(group=team, color=team)) +
-          geom_segment(x = 1, y = 115 * max_weeks, xend = max_weeks, yend = 115 * max_weeks, color = "darkgrey", linetype = 2) +
+          geom_segment(x = 1, y = 110 * max_weeks, xend = max_weeks, yend = 110 * max_weeks, color = "darkgrey", linetype = 2) +
           scale_y_continuous(breaks = pretty_breaks(n = 5)) +
           scale_x_continuous(breaks = c(1:max_weeks), limits = c(1, max_weeks)) +
           labs(y = "Points", x = "Week", title = "Projected Total Points by Week") +
@@ -484,7 +481,7 @@ server <- function(input, output, session) {
           geom_line(alpha = 0.2, aes(group=team, color=team), size = 1.5) +
           geom_line(data = tm, aes(y = pf, group=team, color=team), size = 2) + 
           geom_point(aes(group=team, color=team)) +
-          geom_segment(x = 1, y = 115 * max_weeks, xend = max_weeks, yend = 115 * max_weeks, color = "darkgrey", linetype = 2) +
+          geom_segment(x = 1, y = 110 * max_weeks, xend = max_weeks, yend = 110 * max_weeks, color = "darkgrey", linetype = 2) +
           scale_y_continuous(breaks = pretty_breaks(n = 5)) +
           scale_x_continuous(breaks = c(1:max_weeks), limits = c(1, max_weeks)) +
           labs(y = "Points", x = "Week", title = "Projected Total Points by Week") +
