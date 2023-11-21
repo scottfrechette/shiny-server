@@ -61,11 +61,11 @@ ui  <- navbarPage(
            h3("The Frechest of Takes"),
            h5(""),
            hr(),
-           tags$li("There are only 2 teams with positive FVOA, and my team would have to round up to be giving a whole point to an average team"),
-           tags$li("PFinn is 3rd weakest team, is averaging 99 points/game, and would be getting more than field goal against an average team and yet is somehow now in 2nd place. In almost every other random schedule he'd be one of the lowest places but somehow he struck gold with this simulation. There's still a 1 in 3 chance he misses playoffs but come - would anyone actually take that bet at this point"),
-           tags$li("In other ways we broke FVOA by somehow losing to PFinn German went from almost even odds to worst chances of making playoffs"),
-           tags$li("Eric on the other hand has 5th strongest team and yet is in 9th place and is squarely in an underrated position"),
-           tags$li(HTML("<u><strong>Commish Corner</strong></u> - at this point of the season we can probably retire this because Commish's corner is now appropriately rated in 8th place with 2nd weakest team")),
+           tags$li("I'm not sure how this is possible but there's no a single team after 11 weeks that would be favored against a historically average team? I'm not sure if FVOA is broken or this season."),
+           tags$li("With 4 weeks to go we now have Bobby almost guaranteed to make the playoffs and Eric/German with basically no shot. That's somehow despite them having 5th/7th strongest teams respectively."),
+           tags$li("PFinn now has the weakest team but is still sitting in 3rd place with a 36% chance to hold on to that top-4 finish. In fact in half of randomly simulated schedules he'd be in last place but someone clearly broke this simulation years ago."),
+           tags$li("FVOA is predicting some really close games this week and also sees a lot on the line for playoff hopes with how much leverage these games have, so get ready to yell at your phones constantly around family this weekend"),
+           tags$li(HTML("<u><strong>Commish Corner</strong></u> - I would have retired this but Dirty Scott can't quit now. Team is in 8th place and has 2nd weakest team but somehow still with a 1-in-12 shot of making playoffs")),
            hr(),
            # h5("Playoff Projections", align = "center"),
            # br(),
@@ -125,8 +125,8 @@ ui  <- navbarPage(
   
   # Simulate ----------------------------------------------------------------
   
-  # navbarMenu("Simulate",
-             tabPanel("Simulate",#"Matchups",
+  navbarMenu("Simulate",
+             tabPanel("Matchups",#"Simulate",
                       h3("Head-to-Head Matchups"),
                       p("Simulate any potential matchup:"),
                       fluidRow(column(2, offset = 4,
@@ -138,16 +138,16 @@ ui  <- navbarPage(
                       p("Just because you aren't matched up doesn't mean you can't still gamble on any spread:"),
                       fluidRow(tableOutput("lines"), align = 'center')
                       
-             # ),
-             # tabPanel("Season",
-             #          h3("Playoff Leverage"),
-             #          h5("How much will winning/losing your next game affect your playoff chances?"),
-             #          fluidRow(plotOutput("playoff_leverage", width = "700px", height = "600px"), align = 'center'),
-             #          fluidRow(plotOutput("playoff_leverage_legend", width = "700px", height = "100px"), align = 'center')#,
-             #          # fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center"),
-             #          # fluidRow(plotOutput("playoff_leverage_legend", width = "80%", height = "100px"), align = "center")
-             # 
-             # )
+             ),
+             tabPanel("Season",
+                      h3("Playoff Leverage"),
+                      h5("How much will winning/losing your next game affect your playoff chances?"),
+                      fluidRow(plotOutput("playoff_leverage", width = "700px", height = "600px"), align = 'center'),
+                      fluidRow(plotOutput("playoff_leverage_legend", width = "700px", height = "100px"), align = 'center')#,
+                      # fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center"),
+                      # fluidRow(plotOutput("playoff_leverage_legend", width = "80%", height = "100px"), align = "center")
+
+             )
   ),
   
   # Skill v Luck ------------------------------------------------------------
