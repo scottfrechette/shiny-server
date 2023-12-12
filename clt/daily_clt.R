@@ -82,7 +82,8 @@ clt_simulated_records <- simulate_final_standings_season(clt_fit_season, clt_sch
 
 # Run Calculations --------------------------------------------------------
 
-clt_current_matchups <- compare_current_matchups(clt_schedule, clt_fit, clt_wp, quality = T, clt_simulated_standings)
+clt_current_matchups <- compare_current_matchups(clt_schedule, clt_fit, clt_wp, quality = T, clt_simulated_standings) %>% 
+  select(-Yahoo)
 clt_fvoa_season <- calculate_fvoa_season(clt_fit_season)
 clt_rankings <- calculate_rankings(clt_schedule, clt_fit) %>% 
   set_names("Team", "PF", "PA", 
