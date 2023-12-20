@@ -61,31 +61,24 @@ ui  <- navbarPage(
            h3("The Frechest of Takes"),
            h5(""),
            hr(),
-           tags$li("For some reason it's funny to me that the 4 teams that are out of the playoffs are playing each other, which means they don't even have potential for playoff spoiler. Though these 4 teams have won weekly high-score 6 out of 14 weeks, so they've still got that going for them."),
-           tags$li("To make it even worse Eric's team is now the 3rd strongest and he's somehow in last place. In almost any other randomly simulated schedule he'd still be fighting for a playoff spot if not already secured but somehow he and PFinn got mixed up in our current simulation."),
-           tags$li("But for the real reason you're all here, let's explore the various scenarios of playoffs based on the other 3 games:"),
-           tags$ul(
-             tags$li("There are 22 possible outcomes for the final rankings of playoff teams, with the most likely being only 16%"),
-             tags$li("Just over half the simulations end up with Bobby/David/Justin/Scott in some order, followed by roughly even chances of PFinn taking place of Bobby/David/Justin, followed by chaos scenarios where Josh somehow takes out Justin or David."),
-             tags$li("My team is guaranteed, though in 1.5% of simulations Bobby is able to make up the 65-point margin and take the 1st seed"),
-             tags$li("I can't believe I'm typing this but - PFinn controls his own destiny. The weakest team is in with a win regardless of any other outcome."),
-             tags$li("The winner of Bobby v David is rubber-stamped to the playoffs"),
-             tags$li("Even if Bobby loses he's in unless PFinn wins AND either Justin wins or makes up the 50-point margin"),
-             tags$li("David needs PFinn or Justin to lose AND maintain his edge on points over other 8-win teams"),
-             tags$li("Justin has three scenarios to make it: 1) win and he's in; 2) Josh wins and Justin maintains lead in total points; OR 3) PFinn wins and Justin makes up points margin with loser of Bobby v David"),
-             tags$li("Josh is the real chaos agent here. Assuming he wins either David or Justin would need to lose AND Josh needs to outscore them by 60+ points to make up the current point differential")
-           ),
-           tags$li(HTML("<u><strong>Commish Corner</strong></u> - at this point I'll just use this to petition that next season we don't have defensive players because I don't see where they're doing much to make it more fun or distinguish better team managers when it just feels like noise")),
+           tags$li("That was a hell of an ending to the season. There was a 10% chance of getting the playoffs teams in this order (4th most likely), but there was a 60% chance going into MNF. Of course where it got really fun was when PFinn had 95% chance of making playoffs with 2 minutes to go until chaos reigned down from Seahawks."),
+           tags$li("What's also interesting about this is these were the most likely teams based on 1,000 randomly simulated schedules Yahoo could have chosen, so it's certainly the most fair from that perspective"),
+           tags$li("The first 3 teams are the 3 strongest but Bobby has somehow gone from strongest team to 4th weakest in last few weeks, to the point that he's now weaker than a league-average team somehow. But that's only because FVOA adds a trend to the algorithm, Bobby is still top-3 in overall points because of his dominance until the end of the season"),
+           tags$li("That said the playoff odds are pretty even and anyone could still take this year's trophy"),
+           tags$li("I still can't figure out how the 4th and 5th strongest teams ended up 8th and 10th respectively"),
+           tags$li("Given the CFP controversy this year (Roll Tide) I feel compelled to point out the final Colley ranking lines up pretty closely with Yahoo, which is interesting because that's one of the 3 models that was used during the BCS days that is based on win-loss record while adjusting for strength of schedule"),
+           tags$li("This game is a fucking crapshoot but in effort to be transparent I want to point out FVOA was 51% accurate, which is good enough to stay alive in Vegas but not amazing. Yahoo was 54% accurate but they get advantage of knowing final lineup and having predicted scores for each individual player factored in. But, if I throw away the first few weeks when FVOA hasn't gotten each team's signal the accuracy matches Yahoo at 54%, so I'll take that."),
+           tags$li(HTML("<u><strong>Commish Corner</strong></u> - well PFinn can at least take solace that in the final week Commish took his seat upon the weakest team throne")),
            hr(),
-           # h5("Playoff Projections", align = "center"),
+           h5("Playoff Projections", align = "center"),
+           br(),
+           fluidRow(tableOutput("playoffs"), align = "center"),
+           # h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
            # br(),
-           # fluidRow(tableOutput("playoffs"), align = "center"),
-           h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
-           br(),
-           fluidRow(tableOutput("weekly"), align="center"),
-           h5("Season Projections", align = "center"),
-           br(),
-           fluidRow(tableOutput("simulation"), align = "center"),
+           # fluidRow(tableOutput("weekly"), align="center"),
+           # h5("Season Projections", align = "center"),
+           # br(),
+           # fluidRow(tableOutput("simulation"), align = "center"),
            hr(),
            p("FVOA Assumptions:"),
            tags$ol(
@@ -148,16 +141,16 @@ ui  <- navbarPage(
                       p("Just because you aren't matched up doesn't mean you can't still gamble on any spread:"),
                       fluidRow(tableOutput("lines"), align = 'center')
                       
-             ),
-             tabPanel("Season",
-                      h3("Playoff Leverage"),
-                      h5("How much will winning/losing your next game affect your playoff chances?"),
-                      fluidRow(plotOutput("playoff_leverage", width = "700px", height = "600px"), align = 'center'),
-                      fluidRow(plotOutput("playoff_leverage_legend", width = "700px", height = "100px"), align = 'center')#,
-                      # fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center"),
-                      # fluidRow(plotOutput("playoff_leverage_legend", width = "80%", height = "100px"), align = "center")
-
-             )
+             )#,
+             # tabPanel("Season",
+             #          h3("Playoff Leverage"),
+             #          h5("How much will winning/losing your next game affect your playoff chances?"),
+             #          fluidRow(plotOutput("playoff_leverage", width = "700px", height = "600px"), align = 'center'),
+             #          fluidRow(plotOutput("playoff_leverage_legend", width = "700px", height = "100px"), align = 'center')#,
+             #          # fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center"),
+             #          # fluidRow(plotOutput("playoff_leverage_legend", width = "80%", height = "100px"), align = "center")
+             # 
+             # )
   ),
   
   # Skill v Luck ------------------------------------------------------------
@@ -260,10 +253,11 @@ server <- function(input, output, session) {
   }, align = 'c', digits = 1)
   
   output$playoffs <- renderTable({
-    tibble(Winner = c("Scott", "Bobby", "Justin", "Barrett"),
-           Percent = c("35%", "27%", "17%", "14%"),
-           Odds = c("3:1", "7:2", "11:2", "7:1"),
-           BettingLine = c("+175", "+275", "+475", "+625"))
+    rename(clt_playoffs, Line = BettingLine)
+    # tibble(Winner = c("Scott", "Bobby", "Justin", "Barrett"),
+    #        Percent = c("35%", "27%", "17%", "14%"),
+    #        Odds = c("3:1", "7:2", "11:2", "7:1"),
+    #        BettingLine = c("+175", "+275", "+475", "+625"))
   }, align = "c")
   
   # Rankings ----------------------------------------------------------------
