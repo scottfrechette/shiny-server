@@ -29,6 +29,8 @@ weeks_played <- current_week - 1
 fvoa_colors <- c("#0055AA", "#C40003", "#00C19B", "#EAC862", "#894FC6",
                  "#7FD2FF", "#b2df8a", "#FF9D1E", "#C3EF00", "#cab2d6")
 
+options(shiny.legacy.datatable = TRUE)
+
 # Load Data ---------------------------------------------------------------
 
 load("clt-data.RData")
@@ -61,24 +63,22 @@ ui  <- navbarPage(
            h3("The Frechest of Takes"),
            h5(""),
            hr(),
-           tags$li("That was a hell of an ending to the season. There was a 10% chance of getting the playoffs teams in this order (4th most likely), but there was a 60% chance going into MNF. Of course where it got really fun was when PFinn had 95% chance of making playoffs with 2 minutes to go until chaos reigned down from Seahawks."),
-           tags$li("What's also interesting about this is these were the most likely teams based on 1,000 randomly simulated schedules Yahoo could have chosen, so it's certainly the most fair from that perspective"),
-           tags$li("The first 3 teams are the 3 strongest but Bobby has somehow gone from strongest team to 4th weakest in last few weeks, to the point that he's now weaker than a league-average team somehow. But that's only because FVOA adds a trend to the algorithm, Bobby is still top-3 in overall points because of his dominance until the end of the season"),
-           tags$li("That said the playoff odds are pretty even and anyone could still take this year's trophy"),
-           tags$li("I still can't figure out how the 4th and 5th strongest teams ended up 8th and 10th respectively"),
-           tags$li("Given the CFP controversy this year (Roll Tide) I feel compelled to point out the final Colley ranking lines up pretty closely with Yahoo, which is interesting because that's one of the 3 models that was used during the BCS days that is based on win-loss record while adjusting for strength of schedule"),
-           tags$li("This game is a fucking crapshoot but in effort to be transparent I want to point out FVOA was 51% accurate, which is good enough to stay alive in Vegas but not amazing. Yahoo was 54% accurate but they get advantage of knowing final lineup and having predicted scores for each individual player factored in. But, if I throw away the first few weeks when FVOA hasn't gotten each team's signal the accuracy matches Yahoo at 54%, so I'll take that."),
-           tags$li(HTML("<u><strong>Commish Corner</strong></u> - well PFinn can at least take solace that in the final week Commish took his seat upon the weakest team throne")),
+           tags$li("We're back, baby! Well, really we were back last week but I sort of forgot to publish the changes until the week 2 games had started, so my bad."),
+           tags$li("It's fun to see PFinn has already gotten to single-digits chances of making the playoffs...FVOA really never likes his team"),
+           tags$li("Poor Justin...he has the 4th-strongest team through 2 weeks yet is 0-2 and in 8th place"),
+           tags$li("Looks like Bobby and German each left 30+ points on their benches this week...which cost Bobby $30 and German a W"),
+           tags$li("Diaz is currently 2-0 and sitting in 3rd but FVOA isn't quite sold on that squad yet"),
+           # tags$li(HTML("<u><strong>Commish Corner</strong></u> - well PFinn can at least take solace that in the final week Commish took his seat upon the weakest team throne")),
            hr(),
-           h5("Playoff Projections", align = "center"),
+           # h5("Playoff Projections", align = "center"),
+           # br(),
+           # fluidRow(tableOutput("playoffs"), align = "center"),
+           h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
            br(),
-           fluidRow(tableOutput("playoffs"), align = "center"),
-           # h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
-           # br(),
-           # fluidRow(tableOutput("weekly"), align="center"),
-           # h5("Season Projections", align = "center"),
-           # br(),
-           # fluidRow(tableOutput("simulation"), align = "center"),
+           fluidRow(tableOutput("weekly"), align="center"),
+           h5("Season Projections", align = "center"),
+           br(),
+           fluidRow(tableOutput("simulation"), align = "center"),
            hr(),
            p("FVOA Assumptions:"),
            tags$ol(
@@ -103,10 +103,14 @@ ui  <- navbarPage(
            #   ),
            #   mainPanel(tableOutput("rankings"))
            # ),
-           fluidRow(
-             column(2),
-             column(8, dataTableOutput("rankings")),
-             column(2)),
+           # fluidRow(
+           #   column(2),
+           #   column(6, dataTableOutput("rankings")),
+           #   column(2)),
+           # fluidRow(dataTableOutput("rankings"), align = "center"),
+           dataTableOutput("rankings"),
+           # div(dataTableOutput("rankings"), style = "font-size:50%", align = 'center'),
+           # fluidRow(DT::dataTableOutput("rankings",width='500px')),
            # fluidRow(dataTableOutput("rankings1"), align = 'center'),
            hr(),
            h5("Ranking Notes:"),
@@ -141,16 +145,16 @@ ui  <- navbarPage(
                       p("Just because you aren't matched up doesn't mean you can't still gamble on any spread:"),
                       fluidRow(tableOutput("lines"), align = 'center')
                       
-             )#,
-             # tabPanel("Season",
-             #          h3("Playoff Leverage"),
-             #          h5("How much will winning/losing your next game affect your playoff chances?"),
-             #          fluidRow(plotOutput("playoff_leverage", width = "700px", height = "600px"), align = 'center'),
-             #          fluidRow(plotOutput("playoff_leverage_legend", width = "700px", height = "100px"), align = 'center')#,
-             #          # fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center"),
-             #          # fluidRow(plotOutput("playoff_leverage_legend", width = "80%", height = "100px"), align = "center")
-             # 
-             # )
+             ),
+             tabPanel("Season",
+                      h3("Playoff Leverage"),
+                      h5("How much will winning/losing your next game affect your playoff chances?"),
+                      fluidRow(plotOutput("playoff_leverage", width = "700px", height = "600px"), align = 'center'),
+                      fluidRow(plotOutput("playoff_leverage_legend", width = "700px", height = "100px"), align = 'center')#,
+                      # fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center"),
+                      # fluidRow(plotOutput("playoff_leverage_legend", width = "80%", height = "100px"), align = "center")
+
+             )
   ),
   
   # Skill v Luck ------------------------------------------------------------
@@ -201,28 +205,28 @@ ui  <- navbarPage(
              tags$li("Zoom in on any part of the chart by dragging box over that area (double-click to return)"),
              tags$li(textOutput("weekly_text"))
            )
-  ),
+  )#,
   
   # Model Evaluation Tab ----------------------------------------------------
-  
-  navbarMenu("Evaluate",
-             tabPanel("FVOA Evaluation",
-                      h3("How well is the FVOA model performing?"),
-                      hr(),
-                      fluidRow(plotOutput("eval_fvoa_plot", width = "600px", height = "300px"), align = "center"),
-                      br(),
-                      # p("Which teams screwed my model last week?"),
-                      fluidRow(plotOutput("eval_fvoa_team", width = "600px", height = "400px"), align = "center")
-             ),
-             tabPanel("Yahoo Evaluation",
-                      h3("How well are Yahoo projections performing?"),
-                      hr(),
-                      fluidRow(plotOutput("eval_proj_plot", width = "600px", height = "300px"), align = "center"),
-                      br(),
-                      # h5("How did your team perform against Yahoo projections?"),
-                      fluidRow(plotOutput("projected", width = "600px", height = "400px"), align = "center")
-             )
-  )
+  # 
+  # navbarMenu("Evaluate",
+  #            tabPanel("FVOA Evaluation",
+  #                     h3("How well is the FVOA model performing?"),
+  #                     hr(),
+  #                     fluidRow(plotOutput("eval_fvoa_plot", width = "600px", height = "300px"), align = "center"),
+  #                     br(),
+  #                     # p("Which teams screwed my model last week?"),
+  #                     fluidRow(plotOutput("eval_fvoa_team", width = "600px", height = "400px"), align = "center")
+  #            ),
+  #            tabPanel("Yahoo Evaluation",
+  #                     h3("How well are Yahoo projections performing?"),
+  #                     hr(),
+  #                     fluidRow(plotOutput("eval_proj_plot", width = "600px", height = "300px"), align = "center"),
+  #                     br(),
+  #                     # h5("How did your team perform against Yahoo projections?"),
+  #                     fluidRow(plotOutput("projected", width = "600px", height = "400px"), align = "center")
+  #            )
+  # )
   
   
   # End of navbarPage
@@ -297,8 +301,9 @@ server <- function(input, output, session) {
   }, 
   options = list(
     dom = 't',
-    columnDefs = list(width = '200px', className = 'dt-center', targets = "_all"),
-    autoWidth = TRUE
+    searching = F,
+    columnDefs = list(width = '10px', className = 'dt-center', targets = "_all"),
+    autoWidth = F
     )
   )
   

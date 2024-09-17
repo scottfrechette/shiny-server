@@ -21,7 +21,7 @@ current_season <- year(today())
 
 clt_con <- dbConnect(SQLite(), here::here("clt", "clt.sqlite"))
 
-clt_team_tmp <- get_team(weeks_played, 'yahoo', leagueID = 102347) %>% 
+clt_team_tmp <- get_team(weeks_played, 'yahoo', leagueID = 95701, season = current_season) %>% 
   mutate(season = current_season, .before = 1)
 
 if(exists("clt_team_tmp")) {
@@ -38,7 +38,7 @@ if(exists("clt_team_tmp")) {
 
 # Sys.sleep(60)
 
-clt_wp_tmp <- get_win_prob(current_week, leagueID = 102347) %>% 
+clt_wp_tmp <- get_win_prob(current_week, leagueID = 95701) %>% 
   mutate(season = current_season,
          week = current_week, .before = 1)
 
@@ -75,16 +75,16 @@ clt_draws <- fvoa:::extract_team_draws(clt_fit)
 
 # Run Simulations ---------------------------------------------------------
 
-# clt_simulated_scores <- simulate_season_scores(clt_schedule, clt_fit)
-# clt_simulated_standings <- simulate_season_standings(clt_simulated_scores)
-# clt_simulated_final_standings <- simulate_final_standings(clt_simulated_standings)
-# clt_simulated_records <- simulate_final_standings_season(clt_fit_season, clt_schedule)
+clt_simulated_scores <- simulate_season_scores(clt_schedule, clt_fit)
+clt_simulated_standings <- simulate_season_standings(clt_simulated_scores)
+clt_simulated_final_standings <- simulate_final_standings(clt_simulated_standings)
+clt_simulated_records <- simulate_final_standings_season(clt_fit_season, clt_schedule)
 
 # Run Calculations --------------------------------------------------------
 
-# clt_current_matchups <- compare_current_matchups(clt_schedule, clt_fit, clt_wp, quality = T, clt_simulated_standings) %>% 
-#   select(-Yahoo)
-clt_playoffs <- compare_playoff_teams(clt_fit, "Scott", "David", "Justin", "Bobby")
+clt_current_matchups <- compare_current_matchups(clt_schedule, clt_fit, clt_wp, quality = T, clt_simulated_standings) %>%
+  select(-Yahoo)
+# clt_playoffs <- compare_playoff_teams(clt_fit, "Scott", "David", "Justin", "Bobby")
 clt_fvoa_season <- calculate_fvoa_season(clt_fit_season)
 clt_rankings <- calculate_rankings(clt_schedule, clt_fit) %>% 
   set_names("Team", "PF", "PA", 
@@ -102,22 +102,34 @@ clt_lineup_eval <- clt_team %>%
   evaluate_lineup(flex = 0) %>% 
   plot_roster_skills()
 clt_model_eval <- evaluate_model(clt_fit_season)
-# clt_playoff_leverage <- plot_playoff_leverage(clt_simulated_standings)
+clt_playoff_leverage <- plot_playoff_leverage(clt_simulated_standings)
 clt_schedule_luck <- plot_schedule_luck(clt_schedule, clt_scores, clt_owners, sims = 1000)
+clt_sim_standings_df <- crossing(team = unique(clt_scores$team), 
+                                 rank = 1:10L) %>% 
+  left_join(count(clt_simulated_standings, team, rank),
+            by = c("team", "rank")) %>% 
+  replace_na(list(n = 0)) %>% 
+  mutate(pct = n / sum(n),
+         .by = "team") %>% 
+  select(-n) %>% 
+  # mutate(pct = scales::percent(pct)) %>% 
+  spread(rank, pct) %>% 
+  arrange(-`1`, -`2`, -`3`, -`4`)
 
 # Save Data ---------------------------------------------------------------
 
 save(clt_schedule, 
      clt_team, 
      clt_draws, 
-     # clt_simulated_records, 
+     clt_simulated_records,
      clt_rankings,
      clt_lines,
      clt_fvoa_season,
-     clt_model_eval,
-     # clt_current_matchups,
-     clt_playoffs,
+     # clt_model_eval,
+     clt_current_matchups,
+     # clt_playoffs,
      clt_lineup_eval,
-     # clt_playoff_leverage,
+     clt_playoff_leverage,
      clt_schedule_luck,
+     clt_sim_standings_df,
      file = here::here("clt", "clt-data.RData"))
