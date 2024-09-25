@@ -11,6 +11,7 @@ library(plotly)
 library(scales)
 library(lubridate)
 library(rlang)
+# library(formattable)
 
 ### Initial Settings ###
 
@@ -63,12 +64,11 @@ ui  <- navbarPage(
            h3("The Frechest of Takes"),
            h5(""),
            hr(),
-           tags$li("We're back, baby! Well, really we were back last week but I sort of forgot to publish the changes until the week 2 games had started, so my bad."),
-           tags$li("It's fun to see PFinn has already gotten to single-digits chances of making the playoffs...FVOA really never likes his team"),
-           tags$li("Poor Justin...he has the 4th-strongest team through 2 weeks yet is 0-2 and in 8th place"),
-           tags$li("Looks like Bobby and German each left 30+ points on their benches this week...which cost Bobby $30 and German a W"),
-           tags$li("Diaz is currently 2-0 and sitting in 3rd but FVOA isn't quite sold on that squad yet"),
-           # tags$li(HTML("<u><strong>Commish Corner</strong></u> - well PFinn can at least take solace that in the final week Commish took his seat upon the weakest team throne")),
+           tags$li("Well...I did say PFinn's season had a lot riding on last week. He lost but put up a good score so FVOA now has some faith in him if he can dig himself out of the 0-3 start."),
+           tags$li("Justin is also somehow 0-3 despite having the 4th strongest team, so FVOA likes his chances to catch back up"),
+           tags$li("On the other hand my team's 3-0 start looks pretty flimsy, and is only bolstered by getting the weekly high score last week...which is why FVOA is a little skeptical of my ability to go the distance"),
+           tags$li("I've added a new chart to the Simulate->Season page that shows simulated chances of final standings for every team"),
+           tags$li(HTML("<u><strong>Commish Corner</strong></u> - things are not looking great for our tireless Commish...he's 0-3 and an average team would be a TD-favorite over him")),
            hr(),
            # h5("Playoff Projections", align = "center"),
            # br(),
@@ -147,6 +147,11 @@ ui  <- navbarPage(
                       
              ),
              tabPanel("Season",
+                      h3("Final Standings"),
+                      h5("How do the simulations see the season playing out for you?"),
+                      # fluidRow(dataTableOutput("simulated_standings")),
+                      fluidRow(plotOutput("simulated_standings", width = "700px", height = "600px"), align = 'center'),
+                      hr(),
                       h3("Playoff Leverage"),
                       h5("How much will winning/losing your next game affect your playoff chances?"),
                       fluidRow(plotOutput("playoff_leverage", width = "700px", height = "600px"), align = 'center'),
@@ -205,28 +210,28 @@ ui  <- navbarPage(
              tags$li("Zoom in on any part of the chart by dragging box over that area (double-click to return)"),
              tags$li(textOutput("weekly_text"))
            )
-  )#,
+  ),
   
   # Model Evaluation Tab ----------------------------------------------------
-  # 
-  # navbarMenu("Evaluate",
-  #            tabPanel("FVOA Evaluation",
-  #                     h3("How well is the FVOA model performing?"),
-  #                     hr(),
-  #                     fluidRow(plotOutput("eval_fvoa_plot", width = "600px", height = "300px"), align = "center"),
-  #                     br(),
-  #                     # p("Which teams screwed my model last week?"),
-  #                     fluidRow(plotOutput("eval_fvoa_team", width = "600px", height = "400px"), align = "center")
-  #            ),
-  #            tabPanel("Yahoo Evaluation",
-  #                     h3("How well are Yahoo projections performing?"),
-  #                     hr(),
-  #                     fluidRow(plotOutput("eval_proj_plot", width = "600px", height = "300px"), align = "center"),
-  #                     br(),
-  #                     # h5("How did your team perform against Yahoo projections?"),
-  #                     fluidRow(plotOutput("projected", width = "600px", height = "400px"), align = "center")
-  #            )
-  # )
+
+  navbarMenu("Evaluate",
+             tabPanel("FVOA Evaluation",
+                      h3("How well is the FVOA model performing?"),
+                      hr(),
+                      fluidRow(plotOutput("eval_fvoa_plot", width = "600px", height = "300px"), align = "center"),
+                      br(),
+                      # p("Which teams screwed my model last week?"),
+                      fluidRow(plotOutput("eval_fvoa_team", width = "600px", height = "400px"), align = "center")
+             ),
+             tabPanel("Yahoo Evaluation",
+                      h3("How well are Yahoo projections performing?"),
+                      hr(),
+                      fluidRow(plotOutput("eval_proj_plot", width = "600px", height = "300px"), align = "center"),
+                      br(),
+                      # h5("How did your team perform against Yahoo projections?"),
+                      fluidRow(plotOutput("projected", width = "600px", height = "400px"), align = "center")
+             )
+  )
   
   
   # End of navbarPage
@@ -315,6 +320,59 @@ server <- function(input, output, session) {
   # League Comparison -------------------------------------------------------
   
   output$lines <- renderTable(clt_lines, align = 'c')
+  
+
+  # Simulated Standings------------------------------------------------------
+
+  output$simulated_standings <- renderPlot({
+    clt_sim_standings_df %>%
+      gather(rank, pct, -team) %>%
+      mutate(rank = as.integer(rank)) %>%
+      arrange(rank, pct) %>%
+      mutate(team = fct_inorder(team),
+             p = case_when(
+               pct == 0 ~ "0%",
+               pct < 0.005 ~ "<1%",
+               TRUE ~ scales::percent(pct, accuracy = 1)
+             )) %>%
+      ggplot(aes(rank, team)) +
+      geom_tile(aes(fill = pct), alpha = 0.5, na.rm = F) +
+      geom_text(aes(label = p)) +
+      scale_x_continuous(breaks = 1:n_distinct(clt_sim_standings_df$team), expand = c(0, 0)) +
+      scale_fill_gradient(low = "white", high = "#0072B2") +
+      guides(fill = "none") +
+      theme_minimal() +
+      theme(axis.text.y = element_text(face = "bold"),
+            axis.text.x = element_text(face = "bold", size = 12),
+            panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank()) +
+      labs(title = 'Simulated final standings',
+           # subtitle = sprintf('Based on %s unique schedules', scales::comma(sims)),
+           x = "Rank",
+           y = NULL)
+  })
+  
+  # output$simulated_standings <- renderDataTable(
+  #   df %>%
+  #     spread(rank, pct) %>%
+  #     # arrange(-`1`, -`2`, -`3`, -`4`, -`5`, -`6`, -`7`, -`8`, -`9`, -`10`) %>%
+  #     arrange(-`1st`, -`2nd`, -`3rd`, -`4th`, -`5th`, -`6th`, -`7th`, -`8th`, -`9th`, -`10th`) %>%
+  #     formattable(
+  #       align = 'c',
+  #       list(
+  #         # area(col = c(2:11)) ~ color_bar("lightblue", fun = perc_scale)
+  #         # area(col = c(2:11)) ~ color_tile('white', "lightblue")
+  #         area(col = c(2:11)) ~ formatter("span",
+  #                                         style = function(x){
+  #                                           style(display = "block",
+  #                                                 padding = "0 4px",
+  #                                                 `border-radius` = "4px",
+  #                                                 `background-color` = colors)})
+  #         # `1` = color_bar('#0072B2'),
+  #         # `2`= color_tile(customGreen, customGreen0)
+  #       )) %>%
+  #     as.datatable()
+  # )
   
   # Weekly Charts -----------------------------------------------------------
   
