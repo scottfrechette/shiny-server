@@ -114,7 +114,7 @@ clt_sim_standings_df <- crossing(team = unique(clt_scores$team),
   select(-n) %>% 
   # mutate(pct = scales::percent(pct)) %>% 
   spread(rank, pct) %>% 
-  arrange(-`1`, -`2`, -`3`, -`4`)
+  arrange(-`1`, -`2`, -`3`, -`4`, -`5`, -`6`, -`7`, -`8`, -`9`, -`10`)
 
 # Save Data ---------------------------------------------------------------
 

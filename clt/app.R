@@ -64,12 +64,12 @@ ui  <- navbarPage(
            h3("The Frechest of Takes"),
            h5(""),
            hr(),
-           tags$li("The player with biggest difference in rank and FVOA is...me. FVOA really doesn't get how I'm undefeated despite having the 5th best team."),
-           tags$li("On the flip side PFinn continues to be winless despite only having the 3rd worst team, but FVOA thinks there's still time for him to maybe turn it around so his season isn't over yet"),
-           tags$li("Bobby on the other hand is not looking so hot to FVOA the last few weeks, and has now dipped below 1% chance to make playoffs based on current direction"),
-           tags$li("Diaz is skating on thin ice with the 7th best team in 4th place, but maybe it's just been a few injuries that will clear up and he'll be back in the running"),
-           tags$li("I also need to watch for Eric, Josh, and German coming up to take my overrated team out"),
-           tags$li(HTML("<u><strong>Commish Corner</strong></u> - I didn't get to build Did I Even Have a Chance?, but yes...yes you did")),
+           tags$li("David's team continues to be a monster, and he'd be more than a TD favorite over an average team"),
+           tags$li("Only two other teams would even be favored over an average team, including my fraudulent unbeaten team"),
+           tags$li("Diaz is holding onto 3rd but is still trending in the wrong direction and FVOA is starting to get worried about his ability to make it down the stretch"),
+           tags$li("PFinn continues to have the season from hell, with PA over 50 points higher than next highest and still unable to squeak out a win anywhere"),
+           tags$li("Eric's team is quickly moving up in FVOA, and Josh's team has now hit underrated status"),
+           # tags$li(HTML("<u><strong>Commish Corner</strong></u> - I didn't get to build Did I Even Have a Chance?, but yes...yes you did")),
            hr(),
            # h5("Playoff Projections", align = "center"),
            # br(),
@@ -327,11 +327,12 @@ server <- function(input, output, session) {
 
   output$simulated_standings <- renderPlot({
     clt_sim_standings_df %>%
+      mutate(team = fct_inorder(team),
+             team = fct_rev(team)) %>% 
       gather(rank, pct, -team) %>%
       mutate(rank = as.integer(rank)) %>%
       arrange(rank, pct) %>%
-      mutate(team = fct_inorder(team),
-             p = case_when(
+      mutate(p = case_when(
                pct == 0 ~ "0%",
                pct < 0.005 ~ "<1%",
                TRUE ~ scales::percent(pct, accuracy = 1)
@@ -348,10 +349,10 @@ server <- function(input, output, session) {
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank()) +
       labs(title = 'Simulated final standings',
-           # subtitle = sprintf('Based on %s unique schedules', scales::comma(sims)),
+           subtitle = 'Based on 1,000 simulated seasons',
            x = "Rank",
            y = NULL)
-  })
+  }, res = 96)
   
   # output$simulated_standings <- renderDataTable(
   #   df %>%
