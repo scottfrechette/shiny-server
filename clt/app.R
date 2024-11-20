@@ -64,15 +64,13 @@ ui  <- navbarPage(
            h3("The Frechest of Takes"),
            h5(""),
            hr(),
-           tags$li("As expected, it's time for the chaos of a power bottom climax for this season"),
-           tags$li("With almost no chance of playoff run our Commish is still somehow not the worst team in the league, that's reserved for 6th place German"),
-           tags$li("I have no idea how this has happened but the formerly winless PFinn now has the 4th strongest team and a 1-in-20 chance of making playoffs"),
-           tags$li("Bobby's 8th place team somehow has an astonishing 1-in-3 chance to make playoffs"),
-           tags$li("FVOA really doesn't trust Justin's 5th place team because he's had the 2nd easiest schedule and has not managed to do enough with it"),
-           tags$li("The formerly terrifying David has continued the downward trend last couple weeks and is a coin flip to make playoffs"),
-           tags$li("Eric remains the team to be scared of coming down the stretch"),
-           tags$li("FVOA thinks I'm a lock for playoffs but Yahoo suggests there's still a slim chance I can get passed somehow"),
-           # tags$li(HTML("<u><strong>Commish Corner</strong></u> - I didn't get to build Did I Even Have a Chance?, but yes...yes you did")),
+           tags$li("Diaz and German are in 4th and 5th place despite being 4th worst and worst team in the league, respectively. Explains why FVOA thinks they're the two overrated teams this season."),
+           tags$li("Luckily for Josh and Justin they're only a game back, which is why their better teams each have better chance of making playoffs than Diaz or German"),
+           tags$li("There's a big matchup this week between the two best teams, though FVOA thinks no matter the outcome there's a good chance we'll see each other again in the playoffs"),
+           tags$li("Bobby's team is one of the more confusing I can remember seeing...he basically is either the best or worst team each week with little in-between"),
+           tags$li("David looked unstoppable for the first half of the season but has had a pretty big dropoff now and really needs to win at least 2 of his remaining games to have a strong chance"),
+           tags$li("PFinn is somehow in last place despite having the 4th best team, but there was exactly 1 simulation where he won out and still makes the playoffs. Let chaos reign."),
+           tags$li(HTML("<u><strong>Commish Corner</strong></u> - well...somehow there's still a chance he makes the playoffs with 2nd worst team? Like PFinn there's exactly 1 simulation where he wins out and squeaks in.")),
            hr(),
            # h5("Playoff Projections", align = "center"),
            # br(),
@@ -101,6 +99,7 @@ ui  <- navbarPage(
   # Rankings Tab-------------------------------------------------------------
   
   tabPanel("Rankings",
+           dataTableOutput("rankings"),
            # sidebarLayout(
            #   sidebarPanel(
            #     uiOutput("sorting")
@@ -112,7 +111,6 @@ ui  <- navbarPage(
            #   column(6, dataTableOutput("rankings")),
            #   column(2)),
            # fluidRow(dataTableOutput("rankings"), align = "center"),
-           dataTableOutput("rankings"),
            # div(dataTableOutput("rankings"), style = "font-size:50%", align = 'center'),
            # fluidRow(DT::dataTableOutput("rankings",width='500px')),
            # fluidRow(dataTableOutput("rankings1"), align = 'center'),
@@ -137,19 +135,6 @@ ui  <- navbarPage(
   # Simulate ----------------------------------------------------------------
   
   navbarMenu("Simulate",
-             tabPanel("Matchups",#"Simulate",
-                      h3("Head-to-Head Matchups"),
-                      p("Simulate any potential matchup:"),
-                      fluidRow(column(2, offset = 4,
-                                      selectInput("team1", "Team 1:", teams, selected = teams[[1]])),
-                               column(2, selectInput("team2", "Team 2:", teams, selected = teams[[2]]))),
-                      fluidRow(plotOutput("matchup_plot", width = "600px", height = "600px"), align = 'center'),
-                      hr(),
-                      h3("League Gambling"),
-                      p("Just because you aren't matched up doesn't mean you can't still gamble on any spread:"),
-                      fluidRow(tableOutput("lines"), align = 'center')
-                      
-             ),
              tabPanel("Season",
                       h3("Final Standings"),
                       h5("How do the simulations see the season playing out for you?"),
@@ -162,7 +147,20 @@ ui  <- navbarPage(
                       fluidRow(plotOutput("playoff_leverage_legend", width = "700px", height = "100px"), align = 'center')#,
                       # fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center"),
                       # fluidRow(plotOutput("playoff_leverage_legend", width = "80%", height = "100px"), align = "center")
-
+                      
+             ),
+             tabPanel("Matchups",#"Simulate",
+                      h3("Head-to-Head Matchups"),
+                      p("Simulate any potential matchup:"),
+                      fluidRow(column(2, offset = 4,
+                                      selectInput("team1", "Team 1:", teams, selected = teams[[1]])),
+                               column(2, selectInput("team2", "Team 2:", teams, selected = teams[[2]]))),
+                      fluidRow(plotOutput("matchup_plot", width = "600px", height = "600px"), align = 'center'),
+                      hr(),
+                      h3("League Gambling"),
+                      p("Just because you aren't matched up doesn't mean you can't still gamble on any spread:"),
+                      fluidRow(tableOutput("lines"), align = 'center')
+                      
              )
   ),
   
@@ -311,9 +309,12 @@ server <- function(input, output, session) {
   options = list(
     dom = 't',
     searching = F,
-    columnDefs = list(width = '10px', className = 'dt-center', targets = "_all"),
+    # autoWidth = T,
+    columnDefs = list(list(className = "dt-center", targets = "_all"),
+                      list(width = "10px", targets = "_all")),
+    # columnDefs = list(width = '10px', className = 'dt-center', targets = '_all'),
     autoWidth = F
-    )
+  )
   )
   
   # H2H Matchups ------------------------------------------------------------
