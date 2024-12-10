@@ -64,17 +64,31 @@ ui  <- navbarPage(
            h3("The Frechest of Takes"),
            h5(""),
            hr(),
-           tags$li("With two weeks to go we have two teams already in and another that is basically guaranteed, which realistically leaves a single final spot left"),
-           tags$li("Those three teams are in top-4 FVOA and also have top-3 SOR (though I'm not thrilled I've got the 4th strongest team now)"),
-           tags$li("In sad news while German still has a remote chance he has essentially been added to the outcast pile with Bobby, Barrett, and PFinn. Coincidentally these are the four teams in the Bad quadrant."),
-           tags$li("One interesting note is Bobby has the 4th best SOR because although he's already eliminated he had the hardest schedule but has done better than expected with it because he's got the 6th strongest team"),
-           tags$li("Let's break down the chances for the remaining 3 contenders:"),
+           tags$li("And now we're down to the final week. Let's quickly summarize who's definitely in or out."),
            tags$ul(
-             tags$li("Justin has 3rd strongest team, Josh the 5th, and Diaz the 7th"),
-             tags$li("Josh has now moved up to Good quadrant, whereas Diaz is still in Overrated and Justin in Underrated"),
-             tags$li("Josh and Diaz are head-to-head this week, making it a critical matchup to watch"),
-             tags$li("This week is basically must-win for Diaz and Justin based on season simulations, whereas Josh still has a small cushion with a loss"),
-             tags$li("For those that want chaos you should root for German to best Eric, PFinn to take out David, and Diaz to barely defeat Josh")
+             tags$li("Eric, David, and myself have all guaranteed a spot, though seeding is still up for grabs (thanksfully Tee Higgins did nothing last night so I could retain my fraudulent hold on 1st place)"),
+             tags$li("PFinn, Barrett, Bobby are all eliminated from contention")
+           ),
+           tags$li("German technically still has a shot, but the scenario includes him scoring at least 150 points more than other 7-loss teams, so FVOA went and ahead and adjusted his chances down to 0 for all our sakes"),
+           tags$li("This leaves three teams fighting for that final spot in the playoffs. Sadly none of these teams play each other to create a sudden death scenario, so let's run through the scenarios:"),
+           tags$ul(
+             tags$li("Diaz (60%):"),
+             tags$ul(
+               tags$li("His monster win last week really helped him out here by increasing his chances from 24% to 60% while also moving his team from Overrated to squarely Good"),
+               tags$li("Simplest and mostly likely outcome - either he wins or Josh and Justin both lose to guarantee his spot"),
+               tags$li("If he loses and at least one of them wins he needs to outscore Justin by 15 or not let Josh make up the 3-point differential")
+             ),
+             tags$li("Justin (26%):"),
+             tags$ul(
+               tags$li("Needs to win and Diaz to lose while maintaining his 15-point differential over Diaz"),
+               tags$li("If Josh also wins he needs to maintain his 18-point differential over him as well")
+             ),
+             tags$li("Josh (14%):"),
+             tags$ul(
+               tags$li("Needs to win and Diaz to lose while scoring at least 3 points more than Diaz"),
+               tags$li("If Justin also wins he needs to score at least 18 points more than him as well"),
+               tags$li("While least likely scenario Josh is the only team I would be favored in round 1 so here's hoping")
+             )
            ),
            # tags$li(HTML("<u><strong>Commish Corner</strong></u> - well...somehow there's still a chance he makes the playoffs with 2nd worst team? Like PFinn there's exactly 1 simulation where he wins out and squeaks in.")),
            hr(),

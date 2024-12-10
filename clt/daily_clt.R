@@ -75,9 +75,11 @@ clt_draws <- fvoa:::extract_team_draws(clt_fit)
 
 # Run Simulations ---------------------------------------------------------
 
-clt_simulated_scores <- simulate_season_scores(clt_schedule, clt_fit)#, sims = 5000)
+set.seed(42)
+clt_simulated_scores <- simulate_season_scores(clt_schedule, clt_fit)
 clt_simulated_standings <- simulate_season_standings(clt_simulated_scores)
 clt_simulated_final_standings <- simulate_final_standings(clt_simulated_standings)
+set.seed(42)
 clt_simulated_records <- simulate_final_standings_season(clt_fit_season, clt_schedule)
 
 # Run Calculations --------------------------------------------------------
