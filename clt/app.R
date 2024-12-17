@@ -64,43 +64,26 @@ ui  <- navbarPage(
            h3("The Frechest of Takes"),
            h5(""),
            hr(),
-           tags$li("And now we're down to the final week. Let's quickly summarize who's definitely in or out."),
-           tags$ul(
-             tags$li("Eric, David, and myself have all guaranteed a spot, though seeding is still up for grabs (thanksfully Tee Higgins did nothing last night so I could retain my fraudulent hold on 1st place)"),
-             tags$li("PFinn, Barrett, Bobby are all eliminated from contention")
-           ),
-           tags$li("German technically still has a shot, but the scenario includes him scoring at least 150 points more than other 7-loss teams, so FVOA went and ahead and adjusted his chances down to 0 for all our sakes"),
-           tags$li("This leaves three teams fighting for that final spot in the playoffs. Sadly none of these teams play each other to create a sudden death scenario, so let's run through the scenarios:"),
-           tags$ul(
-             tags$li("Diaz (60%):"),
-             tags$ul(
-               tags$li("His monster win last week really helped him out here by increasing his chances from 24% to 60% while also moving his team from Overrated to squarely Good"),
-               tags$li("Simplest and mostly likely outcome - either he wins or Josh and Justin both lose to guarantee his spot"),
-               tags$li("If he loses and at least one of them wins he needs to outscore Justin by 15 or not let Josh make up the 3-point differential")
-             ),
-             tags$li("Justin (26%):"),
-             tags$ul(
-               tags$li("Needs to win and Diaz to lose while maintaining his 15-point differential over Diaz"),
-               tags$li("If Josh also wins he needs to maintain his 18-point differential over him as well")
-             ),
-             tags$li("Josh (14%):"),
-             tags$ul(
-               tags$li("Needs to win and Diaz to lose while scoring at least 3 points more than Diaz"),
-               tags$li("If Justin also wins he needs to score at least 18 points more than him as well"),
-               tags$li("While least likely scenario Josh is the only team I would be favored in round 1 so here's hoping")
-             )
-           ),
+           tags$li("Coming into the final week Justin had the tiebreaker over Diaz by 15 points, but Justin crashed so hard there was a 43-point swing that let Diaz coast into the playoffs even with a loss and Justin winning (somehow)"),
+           tags$li("As you can see below there's a lot of parity in playoff teams with no clear favorite like we usually see"),
+           tags$li("FVOA ended the season with 53% accuracy compared to Yahoo's 60% accuracy as of start of games, which sounds worse except FVOA is calculated before lineups are set and 53% will make you a millionaire in Vegas"),
+           tags$li("The top-4 teams in FVOA all made the playoffs and the next 2 were the final contenders, so safe to say FVOA had a pretty good season"),
+           tags$li("3 of the top 4 teams in Strength of Record made playoffs, where Eric was 7th because he should have done more with the easiest schedule and Justin was 3rd and would have made it in with even an average performance in final week"),
+           tags$li("With most schedules David and I would have swapped 1st and 3rd places, and PFinn would move from last to 8th, but 4-7 were all in line with expectations"),
+           tags$li("We ended the season with 5 good teams (4 in playoffs + Justin), 1 underrated team in Josh, and 4 bad teams we all got to beat up on"),
+           tags$li("One final interesting note is every team but German's ended up with a positive FVOA rating, which means they'd be favored over a historically-average team. It's definitely felt like scores have been higher this season, particularly the back half. Though it also seems like it's beem boom-or-bust with team scores, but I haven't run any analysis to confirm that hunch."),
+           # tags$ul(tags$li("")),
            # tags$li(HTML("<u><strong>Commish Corner</strong></u> - well...somehow there's still a chance he makes the playoffs with 2nd worst team? Like PFinn there's exactly 1 simulation where he wins out and squeaks in.")),
            hr(),
-           # h5("Playoff Projections", align = "center"),
+           h5("Playoff Projections", align = "center"),
+           br(),
+           fluidRow(tableOutput("playoffs"), align = "center"),
+           # h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
            # br(),
-           # fluidRow(tableOutput("playoffs"), align = "center"),
-           h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
-           br(),
-           fluidRow(tableOutput("weekly"), align="center"),
-           h5("Season Projections", align = "center"),
-           br(),
-           fluidRow(tableOutput("simulation"), align = "center"),
+           # fluidRow(tableOutput("weekly"), align="center"),
+           # h5("Season Projections", align = "center"),
+           # br(),
+           # fluidRow(tableOutput("simulation"), align = "center"),
            hr(),
            p("FVOA Assumptions:"),
            tags$ol(

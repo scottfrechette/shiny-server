@@ -86,7 +86,7 @@ clt_simulated_records <- simulate_final_standings_season(clt_fit_season, clt_sch
 
 clt_current_matchups <- compare_current_matchups(clt_schedule, clt_fit, clt_wp, quality = T, clt_simulated_standings) %>%
   select(-Yahoo)
-# clt_playoffs <- compare_playoff_teams(clt_fit, "Scott", "David", "Justin", "Bobby")
+clt_playoffs <- compare_playoff_teams(clt_fit, "Scott", "Eric", "David", "Diaz")
 clt_fvoa_season <- calculate_fvoa_season(clt_fit_season)
 clt_rankings <- calculate_rankings(clt_schedule, clt_fit) %>% 
   set_names("Team", "PF", "PA", 
@@ -129,7 +129,7 @@ save(clt_schedule,
      clt_fvoa_season,
      clt_model_eval,
      clt_current_matchups,
-     # clt_playoffs,
+     clt_playoffs,
      clt_lineup_eval,
      clt_playoff_leverage,
      clt_schedule_luck,
