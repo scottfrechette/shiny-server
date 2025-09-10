@@ -64,26 +64,23 @@ ui  <- navbarPage(
            h3("The Frechest of Takes"),
            h5(""),
            hr(),
-           tags$li("Coming into the final week Justin had the tiebreaker over Diaz by 15 points, but Justin crashed so hard there was a 43-point swing that let Diaz coast into the playoffs even with a loss and Justin winning (somehow)"),
-           tags$li("As you can see below there's a lot of parity in playoff teams with no clear favorite like we usually see"),
-           tags$li("FVOA ended the season with 53% accuracy compared to Yahoo's 60% accuracy as of start of games, which sounds worse except FVOA is calculated before lineups are set and 53% will make you a millionaire in Vegas"),
-           tags$li("The top-4 teams in FVOA all made the playoffs and the next 2 were the final contenders, so safe to say FVOA had a pretty good season"),
-           tags$li("3 of the top 4 teams in Strength of Record made playoffs, where Eric was 7th because he should have done more with the easiest schedule and Justin was 3rd and would have made it in with even an average performance in final week"),
-           tags$li("With most schedules David and I would have swapped 1st and 3rd places, and PFinn would move from last to 8th, but 4-7 were all in line with expectations"),
-           tags$li("We ended the season with 5 good teams (4 in playoffs + Justin), 1 underrated team in Josh, and 4 bad teams we all got to beat up on"),
-           tags$li("One final interesting note is every team but German's ended up with a positive FVOA rating, which means they'd be favored over a historically-average team. It's definitely felt like scores have been higher this season, particularly the back half. Though it also seems like it's beem boom-or-bust with team scores, but I haven't run any analysis to confirm that hunch."),
+           tags$li("Welcome back to another season of FVOA"),
+           tags$li("For those that are new, FVOA is the indisputable model that tells us beyond a shadow of doubt who is the strongest and who deserves to be put in the corner and shamed
+                   "),
+           tags$li("Admittedly the model might need some tweaking because it's already pretty confident it knows who's headed to playoffs even though week 1 was some shitty gameplay out there in real world"),
+           tags$li("The only real takeaway is that FVOA knows my win was pretty suspect and thinks Eric is slightly stronger"),
            # tags$ul(tags$li("")),
            # tags$li(HTML("<u><strong>Commish Corner</strong></u> - well...somehow there's still a chance he makes the playoffs with 2nd worst team? Like PFinn there's exactly 1 simulation where he wins out and squeaks in.")),
            hr(),
-           h5("Playoff Projections", align = "center"),
+           # h5("Playoff Projections", align = "center"),
+           # br(),
+           # fluidRow(tableOutput("playoffs"), align = "center"),
+           h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
            br(),
-           fluidRow(tableOutput("playoffs"), align = "center"),
-           # h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
-           # br(),
-           # fluidRow(tableOutput("weekly"), align="center"),
-           # h5("Season Projections", align = "center"),
-           # br(),
-           # fluidRow(tableOutput("simulation"), align = "center"),
+           fluidRow(tableOutput("weekly"), align="center"),
+           h5("Season Projections", align = "center"),
+           br(),
+           fluidRow(tableOutput("simulation"), align = "center"),
            hr(),
            p("FVOA Assumptions:"),
            tags$ol(
@@ -215,28 +212,28 @@ ui  <- navbarPage(
              tags$li("Zoom in on any part of the chart by dragging box over that area (double-click to return)"),
              tags$li(textOutput("weekly_text"))
            )
-  ),
+  )#,
   
   # Model Evaluation Tab ----------------------------------------------------
 
-  navbarMenu("Evaluate",
-             tabPanel("FVOA Evaluation",
-                      h3("How well is the FVOA model performing?"),
-                      hr(),
-                      fluidRow(plotOutput("eval_fvoa_plot", width = "600px", height = "300px"), align = "center"),
-                      br(),
-                      # p("Which teams screwed my model last week?"),
-                      fluidRow(plotOutput("eval_fvoa_team", width = "600px", height = "400px"), align = "center")
-             ),
-             tabPanel("Yahoo Evaluation",
-                      h3("How well are Yahoo projections performing?"),
-                      hr(),
-                      fluidRow(plotOutput("eval_proj_plot", width = "600px", height = "300px"), align = "center"),
-                      br(),
-                      # h5("How did your team perform against Yahoo projections?"),
-                      fluidRow(plotOutput("projected", width = "600px", height = "400px"), align = "center")
-             )
-  )
+  # navbarMenu("Evaluate",
+  #            tabPanel("FVOA Evaluation",
+  #                     h3("How well is the FVOA model performing?"),
+  #                     hr(),
+  #                     fluidRow(plotOutput("eval_fvoa_plot", width = "600px", height = "300px"), align = "center"),
+  #                     br(),
+  #                     # p("Which teams screwed my model last week?"),
+  #                     fluidRow(plotOutput("eval_fvoa_team", width = "600px", height = "400px"), align = "center")
+  #            ),
+  #            tabPanel("Yahoo Evaluation",
+  #                     h3("How well are Yahoo projections performing?"),
+  #                     hr(),
+  #                     fluidRow(plotOutput("eval_proj_plot", width = "600px", height = "300px"), align = "center"),
+  #                     br(),
+  #                     # h5("How did your team perform against Yahoo projections?"),
+  #                     fluidRow(plotOutput("projected", width = "600px", height = "400px"), align = "center")
+  #            )
+  # )
   
   
   # End of navbarPage
