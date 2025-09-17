@@ -64,13 +64,13 @@ ui  <- navbarPage(
            h3("The Frechest of Takes"),
            h5(""),
            hr(),
-           tags$li("Welcome back to another season of FVOA"),
-           tags$li("For those that are new, FVOA is the indisputable model that tells us beyond a shadow of doubt who is the strongest and who deserves to be put in the corner and shamed
-                   "),
-           tags$li("Admittedly the model might need some tweaking because it's already pretty confident it knows who's headed to playoffs even though week 1 was some shitty gameplay out there in real world"),
-           tags$li("The only real takeaway is that FVOA knows my win was pretty suspect and thinks Eric is slightly stronger"),
+           tags$li("Scores were higher this week but FVOA still doesn't think our league is up to historical standards quite yet"),
+           tags$li("Playoff odds spread out a little bit so we're seeing a little bit better balance at least"),
+           tags$li("Despite the loss FVOA is digging Justin's team - it thinks he's the only one that would be favored over an average team and gives him the best chances of making playoffs despite there still being 3 undefeated teams"),
+           tags$li("Not to be outdone FVOA hasn't given up on the Eric's winless team and thinks he's just gotten unlucky so far but will bounce back"),
+           tags$li("I'm sorry to have to say our new friend seems to have taken German's mantle and is going to need to step up to run with the big dogs"),
            # tags$ul(tags$li("")),
-           # tags$li(HTML("<u><strong>Commish Corner</strong></u> - well...somehow there's still a chance he makes the playoffs with 2nd worst team? Like PFinn there's exactly 1 simulation where he wins out and squeaks in.")),
+           tags$li(HTML("<u><strong>Commish Corner</strong></u> - congrats on a strong game and FVOA acknowledges you're not bottom barrel, but it clearly needs to see a little more to really say you can sustain that (which of course doesn't bode well for me this week)")),
            hr(),
            # h5("Playoff Projections", align = "center"),
            # br(),
@@ -212,28 +212,28 @@ ui  <- navbarPage(
              tags$li("Zoom in on any part of the chart by dragging box over that area (double-click to return)"),
              tags$li(textOutput("weekly_text"))
            )
-  )#,
+  ),
   
   # Model Evaluation Tab ----------------------------------------------------
 
-  # navbarMenu("Evaluate",
-  #            tabPanel("FVOA Evaluation",
-  #                     h3("How well is the FVOA model performing?"),
-  #                     hr(),
-  #                     fluidRow(plotOutput("eval_fvoa_plot", width = "600px", height = "300px"), align = "center"),
-  #                     br(),
-  #                     # p("Which teams screwed my model last week?"),
-  #                     fluidRow(plotOutput("eval_fvoa_team", width = "600px", height = "400px"), align = "center")
-  #            ),
-  #            tabPanel("Yahoo Evaluation",
-  #                     h3("How well are Yahoo projections performing?"),
-  #                     hr(),
-  #                     fluidRow(plotOutput("eval_proj_plot", width = "600px", height = "300px"), align = "center"),
-  #                     br(),
-  #                     # h5("How did your team perform against Yahoo projections?"),
-  #                     fluidRow(plotOutput("projected", width = "600px", height = "400px"), align = "center")
-  #            )
-  # )
+  navbarMenu("Evaluate",
+             tabPanel("FVOA Evaluation",
+                      h3("How well is the FVOA model performing?"),
+                      hr(),
+                      fluidRow(plotOutput("eval_fvoa_plot", width = "600px", height = "300px"), align = "center"),
+                      br(),
+                      # p("Which teams screwed my model last week?"),
+                      fluidRow(plotOutput("eval_fvoa_team", width = "600px", height = "400px"), align = "center")
+             ),
+             tabPanel("Yahoo Evaluation",
+                      h3("How well are Yahoo projections performing?"),
+                      hr(),
+                      fluidRow(plotOutput("eval_proj_plot", width = "600px", height = "300px"), align = "center"),
+                      br(),
+                      # h5("How did your team perform against Yahoo projections?"),
+                      fluidRow(plotOutput("projected", width = "600px", height = "400px"), align = "center")
+             )
+  )
   
   
   # End of navbarPage
