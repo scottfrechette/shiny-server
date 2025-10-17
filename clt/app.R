@@ -23,7 +23,7 @@ sorting <- c("Yahoo Rank", "FVOA Rank", "SOS Rank", "SOR Rank", "Colley Rank", "
 today_week <- today() %>%
   floor_date(unit = "week", week_start = 2) %>%
   week()
-start_week <- 35
+start_week <- 34
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
 
@@ -64,12 +64,11 @@ ui  <- navbarPage(
            h3("The Frechest of Takes"),
            h5(""),
            hr(),
-           tags$li("After losing by a half-point to me Justin's team is knocked off its pedestal with PFinn taking not only 1st place but also highest FVOA rating and best chances to make playoffs"),
-           tags$li("That said, the best teams are still in top-4 (even if FVOA thinks my team is shaky at best)"),
-           tags$li("FVOA is unclear how David has a winning record despite having the worst team (and in fact the only one that would be an underdog to historically-average team"),
-           tags$li("Chris' team seems to be surging and is the 6th strongest team and yet can't seem to find a win anywhere...so of course I get the matchup"),
-           tags$li("Diaz team is slipping with 3rd worst team now despite still hanging on to 5th, but a matchup with PFinn will tell us if he's ready to make the push to top-4"),
-           tags$li(HTML("<u><strong>Commish Corner</strong></u> - congrats on the 2nd best SOR?")),
+           tags$li("The average difference in team's actual and FVOA rank is 3, which is huge and shows this has been a crazy season so far"),
+           tags$li("Much of this is because there's no truly dominant team for now and a lot of teams bunched up with decent chances of making playoffs"),
+           tags$li("Though we may have broken FVOA because every team is favored over a neutral team? Maybe I need to look into that more..."),
+           tags$li("It's not fun to see my team being particularly egregious with being in 4th for now with 3rd worst team and basically 1-in-4 shot of making playoffs with my current roster. At least David is also considered overrated with me so I'm not alone."),
+           tags$li(HTML("<u><strong>Commish Corner</strong></u> - what a roller coaster it's been...now the weakest team and barely hanging on to any playoff hopes.")),
            hr(),
            # h5("Playoff Projections", align = "center"),
            # br(),
