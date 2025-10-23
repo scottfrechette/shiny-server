@@ -67,6 +67,8 @@ clt_wp <- clt_wp_tmp %>%
   select(week, team, wp) %>% 
   mutate(wp = scales::percent(wp, accuracy = 1))
 
+if (max(clt_scores$week) != weeks_played) {stop("Did not collect previous week scores")}
+
 # Fit Model ---------------------------------------------------------------
 
 clt_fit_season <- fit_team_season(clt_scores)
@@ -135,3 +137,5 @@ save(clt_schedule,
      clt_schedule_luck,
      clt_sim_standings_df,
      file = here::here("clt", "clt-data.RData"))
+
+dbDisconnect(clt_con)
