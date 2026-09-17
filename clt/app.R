@@ -23,7 +23,7 @@ sorting <- c("Yahoo Rank", "FVOA Rank", "SOS Rank", "SOR Rank", "Colley Rank", "
 today_week <- today() %>%
   floor_date(unit = "week", week_start = 2) %>%
   week()
-start_week <- 34
+start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
 
@@ -64,34 +64,22 @@ ui  <- navbarPage(
            h3("The Frechest of Takes"),
            h5(""),
            hr(),
-           tags$li("After 15 season we come to the end of another regular fantasy season - congrats to David, Diaz, PFinn, and Eric for making playoffs"),
-           tags$li("Looks like the strongest two teams made it and the next two strongest teams were playing for chance to make it but somehow the 6th and 7th strongest teams made it in instead"),
-           tags$li("Interestingly SOR was a good predictor as well with top 3 teams in and only Eric's team having 7th best SOR"),
-           tags$li("The ole BCS Colley algorithm also predicted top-3 with Eric being 5th best"),
-           tags$li("FVOA predicted the winner of all possible matchups 51% of the time, which is enough to make a living in Vegas. It's even better given FVOA needs time to warm up because it was only 45% accurate in first 7 weeks but 55% in last 8."),
-           tags$li("Time for a new tradition of summarizing each team with an award based on their performance:"),
-           tags$ol(
-             tags$li("David - \"Thanos Award\" for dominating entire season but losing control right at the end. Still powerful and dangerous, but no longer inevitable."),
-             tags$li("Diaz - \"Paper Tiger Award\" because the record says contender but the eye test says otherwise. Underlying strength doesn't match the resume."),
-             tags$li("PFinn - \"Han Solo Award\" for cutting it close and making it by skin of his teeth, and somehow survived despite not having overwhelming firepower"),
-             tags$li("Eric - \"Final Boss Award\" because although he barely made it everyone realizes they're facing the most dangerous team in the playoffs"),
-             tags$li("Scott - \"Infinity War Thor Award\" for having a team that showed up dropping the hammer just a little too late to change the outcome"),
-             tags$li("Chris - \"Rocky Award\" because he too some brutal early punches, found his footing, and fought back with consistency and heart all the way to the final bell but still lost"),
-             tags$li("Bobby - \"Aragorn Award\" for never being flash or hyped but quietly strong, reliable, and far better than standings give credit for"),
-             tags$li("Justin - \"Icarus Award\" for flying high early and looking unstoppable then lost altitude fast after getting too close to the sun"),
-             tags$li("Josh - \"NPC Award\" for being present all season and technically part of the story, but had no major impact, plot twists, or memorable moments"),
-             tags$li("Barrett - \"Joker Award\" for just wanting to see the season burn")),
-           # tags$li(HTML("<u><strong>Commish Corner</strong></u> - ")),
+           tags$li("Welcome back to another season of FVOA, where we have all the modeling needed to help you talk your shit"),
+           tags$li("As always I should probably tune FVOA to be more skeptical of trends so early in the season, but I suppose it continues the NFL tradition of week 1 overreactions"),
+           tags$li("That said for the most part there were no strong week 1 scores that lost, just David and Diaz who scored roughly what PFinn got"),
+           tags$li("Don't put money on this but with a tiny sample size FVOA is looking at PFinn and Chris as slightly overrated, so something to watch"),
+           tags$li("I hope Bobby enjoys being almost a 20-point favorite on me because I'm not sure I'd take me based on week 1 performance"),
+           tags$li(HTML("<u><strong>Commish Corner</strong></u> - FVOA agrees with Yahoo that Commish has the Game of the Week for 2nd week in a row, and I look forward to documenting his dominant team through the season here")),
            hr(),
-           h5("Playoff Projections", align = "center"),
+           # h5("Playoff Projections", align = "center"),
+           # br(),
+           # fluidRow(tableOutput("playoffs"), align = "center"),
+           h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
            br(),
-           fluidRow(tableOutput("playoffs"), align = "center"),
-           # h5(paste("Week", max(weeks) + 1, "Projections"), align = "center"),
-           # br(),
-           # fluidRow(tableOutput("weekly"), align="center"),
-           # h5("Season Projections", align = "center"),
-           # br(),
-           # fluidRow(tableOutput("simulation"), align = "center"),
+           fluidRow(tableOutput("weekly"), align="center"),
+           h5("Season Projections", align = "center"),
+           br(),
+           fluidRow(tableOutput("simulation"), align = "center"),
            hr(),
            p("FVOA Assumptions:"),
            tags$ol(
@@ -111,20 +99,6 @@ ui  <- navbarPage(
   
   tabPanel("Rankings",
            dataTableOutput("rankings"),
-           # sidebarLayout(
-           #   sidebarPanel(
-           #     uiOutput("sorting")
-           #   ),
-           #   mainPanel(tableOutput("rankings"))
-           # ),
-           # fluidRow(
-           #   column(2),
-           #   column(6, dataTableOutput("rankings")),
-           #   column(2)),
-           # fluidRow(dataTableOutput("rankings"), align = "center"),
-           # div(dataTableOutput("rankings"), style = "font-size:50%", align = 'center'),
-           # fluidRow(DT::dataTableOutput("rankings",width='500px')),
-           # fluidRow(dataTableOutput("rankings1"), align = 'center'),
            hr(),
            h5("Ranking Notes:"),
            tags$ol(
@@ -146,20 +120,16 @@ ui  <- navbarPage(
   # Simulate ----------------------------------------------------------------
   
   navbarMenu("Simulate",
-             # tabPanel("Season",
-             #          h3("Final Standings"),
-             #          h5("How do the simulations see the season playing out for you?"),
-             #          # fluidRow(dataTableOutput("simulated_standings")),
-             #          fluidRow(plotOutput("simulated_standings", width = "700px", height = "600px"), align = 'center'),
-             #          hr(),
-             #          h3("Playoff Leverage"),
-             #          h5("How much will winning/losing your next game affect your playoff chances?"),
-             #          fluidRow(plotOutput("playoff_leverage", width = "700px", height = "600px"), align = 'center'),
-             #          fluidRow(plotOutput("playoff_leverage_legend", width = "700px", height = "100px"), align = 'center')#,
-             #          # fluidRow(plotOutput("playoff_leverage", width = "80%"), align = "center"),
-             #          # fluidRow(plotOutput("playoff_leverage_legend", width = "80%", height = "100px"), align = "center")
-             #          
-             # ),
+             tabPanel("Season",
+                      h3("Final Standings"),
+                      h5("How do the simulations see the season playing out for you?"),
+                      fluidRow(plotOutput("simulated_standings", width = "700px", height = "600px"), align = 'center'),
+                      hr(),
+                      h3("Playoff Leverage"),
+                      h5("How much will winning/losing your next game affect your playoff chances?"),
+                      fluidRow(plotOutput("playoff_leverage", width = "700px", height = "600px"), align = 'center'),
+                      fluidRow(plotOutput("playoff_leverage_legend", width = "700px", height = "100px"), align = 'center')
+             ),
              tabPanel("Matchups",#"Simulate",
                       h3("Head-to-Head Matchups"),
                       p("Simulate any potential matchup:"),
@@ -182,22 +152,18 @@ ui  <- navbarPage(
            hr(),
            h4("Roster Evaluation"),
            p("How well have you managed your roster each week?"),
-           # fluidRow(plotOutput("manager", width = "80%"), align = "center"),
            fluidRow(plotOutput("manager", width = "600px", height = "600px"), align = 'center'),
            hr(),
            h4("Schedule Luck"),
            p("What would your rank be with other simulated schedules?"),
-           # fluidRow(plotOutput("schedule_luck", width = "80%"), align = "center"),
            fluidRow(plotOutput("schedule_luck", width = "600px", height = "600px"), align = 'center'),
            hr(),
            h4("Win Percentage for All Games"),
            p("How well would your team do if you were measured against every team each week?"),
-           # fluidRow(plotOutput("wpag", width = "80%"), align = "center"),
            fluidRow(plotOutput("wpag", width = "600px", height = "600px"), align = 'center'),
            hr(),
            h4("Win Percentage vs Points"),
            p("How is your team doing relative to total points scored?"),
-           # fluidRow(plotOutput("points_luck", width = "80%"), align = "center")
            fluidRow(plotOutput("points_luck", width = "600px", height = "600px"), align = 'center')
   ),
   
@@ -223,28 +189,28 @@ ui  <- navbarPage(
              tags$li("Zoom in on any part of the chart by dragging box over that area (double-click to return)"),
              tags$li(textOutput("weekly_text"))
            )
-  ),
+  )#,
   
   # Model Evaluation Tab ----------------------------------------------------
 
-  navbarMenu("Evaluate",
-             tabPanel("FVOA Evaluation",
-                      h3("How well is the FVOA model performing?"),
-                      hr(),
-                      fluidRow(plotOutput("eval_fvoa_plot", width = "600px", height = "300px"), align = "center"),
-                      br(),
-                      # p("Which teams screwed my model last week?"),
-                      fluidRow(plotOutput("eval_fvoa_team", width = "600px", height = "400px"), align = "center")
-             ),
-             tabPanel("Yahoo Evaluation",
-                      h3("How well are Yahoo projections performing?"),
-                      hr(),
-                      fluidRow(plotOutput("eval_proj_plot", width = "600px", height = "300px"), align = "center"),
-                      br(),
-                      # h5("How did your team perform against Yahoo projections?"),
-                      fluidRow(plotOutput("projected", width = "600px", height = "400px"), align = "center")
-             )
-  )
+  # navbarMenu("Evaluate",
+  #            tabPanel("FVOA Evaluation",
+  #                     h3("How well is the FVOA model performing?"),
+  #                     hr(),
+  #                     fluidRow(plotOutput("eval_fvoa_plot", width = "600px", height = "300px"), align = "center"),
+  #                     br(),
+  #                     # p("Which teams screwed my model last week?"),
+  #                     fluidRow(plotOutput("eval_fvoa_team", width = "600px", height = "400px"), align = "center")
+  #            ),
+  #            tabPanel("Yahoo Evaluation",
+  #                     h3("How well are Yahoo projections performing?"),
+  #                     hr(),
+  #                     fluidRow(plotOutput("eval_proj_plot", width = "600px", height = "300px"), align = "center"),
+  #                     br(),
+  #                     # h5("How did your team perform against Yahoo projections?"),
+  #                     fluidRow(plotOutput("projected", width = "600px", height = "400px"), align = "center")
+  #            )
+  # )
   
   
   # End of navbarPage
@@ -284,30 +250,6 @@ server <- function(input, output, session) {
   
   # Rankings ----------------------------------------------------------------
   
-  # output$sorting <- renderUI({
-  #   selectInput("sorting", "Sort Rankings By:", 
-  #               c(ranking_methods, "PF", "PA"))
-  # })
-  # 
-  # output$rankings <- renderTable({
-  # 
-  #   rankings <- clt_rankings %>%
-  #     select(1:8, SOS = 14, `SOS Rank` = 16, 20:23) %>%
-  #     mutate(SOR = percent(SOR, accuracy = 1))
-  # 
-  #   sort <- sorting[[input$sorting]]
-  # 
-  #   rank_sort <- arrange(rankings, rankings[[sort]])
-  # 
-  #   point_sort <- arrange(rankings, desc(rankings[[sort]]))
-  # 
-  #   if (sort %in% c("PF", "PA")) {
-  #     point_sort
-  #   } else {
-  #     rank_sort
-  #   }
-  # }, align = 'c', digits = 2)
-  
   output$rankings <- renderDataTable({
     
     clt_rankings %>% 
@@ -323,7 +265,6 @@ server <- function(input, output, session) {
     # autoWidth = T,
     columnDefs = list(list(className = "dt-center", targets = "_all"),
                       list(width = "10px", targets = "_all")),
-    # columnDefs = list(width = '10px', className = 'dt-center', targets = '_all'),
     autoWidth = F
   )
   )
@@ -368,28 +309,6 @@ server <- function(input, output, session) {
            x = "Rank",
            y = NULL)
   }, res = 96)
-  
-  # output$simulated_standings <- renderDataTable(
-  #   df %>%
-  #     spread(rank, pct) %>%
-  #     # arrange(-`1`, -`2`, -`3`, -`4`, -`5`, -`6`, -`7`, -`8`, -`9`, -`10`) %>%
-  #     arrange(-`1st`, -`2nd`, -`3rd`, -`4th`, -`5th`, -`6th`, -`7th`, -`8th`, -`9th`, -`10th`) %>%
-  #     formattable(
-  #       align = 'c',
-  #       list(
-  #         # area(col = c(2:11)) ~ color_bar("lightblue", fun = perc_scale)
-  #         # area(col = c(2:11)) ~ color_tile('white', "lightblue")
-  #         area(col = c(2:11)) ~ formatter("span",
-  #                                         style = function(x){
-  #                                           style(display = "block",
-  #                                                 padding = "0 4px",
-  #                                                 `border-radius` = "4px",
-  #                                                 `background-color` = colors)})
-  #         # `1` = color_bar('#0072B2'),
-  #         # `2`= color_tile(customGreen, customGreen0)
-  #       )) %>%
-  #     as.datatable()
-  # )
   
   # Weekly Charts -----------------------------------------------------------
   
