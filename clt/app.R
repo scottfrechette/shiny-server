@@ -64,12 +64,12 @@ ui  <- navbarPage(
            h3("The Frechest of Takes"),
            h5(""),
            hr(),
-           tags$li("Welcome back to another season of FVOA, where we have all the modeling needed to help you talk your shit"),
-           tags$li("As always I should probably tune FVOA to be more skeptical of trends so early in the season, but I suppose it continues the NFL tradition of week 1 overreactions"),
-           tags$li("That said for the most part there were no strong week 1 scores that lost, just David and Diaz who scored roughly what PFinn got"),
-           tags$li("Don't put money on this but with a tiny sample size FVOA is looking at PFinn and Chris as slightly overrated, so something to watch"),
-           tags$li("I hope Bobby enjoys being almost a 20-point favorite on me because I'm not sure I'd take me based on week 1 performance"),
-           tags$li(HTML("<u><strong>Commish Corner</strong></u> - FVOA agrees with Yahoo that Commish has the Game of the Week for 2nd week in a row, and I look forward to documenting his dominant team through the season here")),
+           tags$li("All these injuries really brought the scores back down which helped level the playing field for season projections"),
+           tags$li("After only two weeks Justin has moved up to the clear pole position with Chris in his rear view"),
+           tags$li("Looks like Bobby left over 50 points on his bench, mostly from Mahomes and Pats D...so I thank him for shitting the bed and helping me get a W"),
+           tags$li("PFinn's team is flirting with being overrated, so that's something to watch as the season unfolds"),
+           tags$li("Josh, David, and Diaz remain the last winless teams but all still have over 10% to make playoffs because FVOA knows this game is a rollercoaster"),
+           tags$li(HTML("<u><strong>Commish Corner</strong></u> - a bit of a comedown from the monster week 1 but still better than even odds to make playoffs")),
            hr(),
            # h5("Playoff Projections", align = "center"),
            # br(),
@@ -189,28 +189,28 @@ ui  <- navbarPage(
              tags$li("Zoom in on any part of the chart by dragging box over that area (double-click to return)"),
              tags$li(textOutput("weekly_text"))
            )
-  )#,
+  ),
   
   # Model Evaluation Tab ----------------------------------------------------
 
-  # navbarMenu("Evaluate",
-  #            tabPanel("FVOA Evaluation",
-  #                     h3("How well is the FVOA model performing?"),
-  #                     hr(),
-  #                     fluidRow(plotOutput("eval_fvoa_plot", width = "600px", height = "300px"), align = "center"),
-  #                     br(),
-  #                     # p("Which teams screwed my model last week?"),
-  #                     fluidRow(plotOutput("eval_fvoa_team", width = "600px", height = "400px"), align = "center")
-  #            ),
-  #            tabPanel("Yahoo Evaluation",
-  #                     h3("How well are Yahoo projections performing?"),
-  #                     hr(),
-  #                     fluidRow(plotOutput("eval_proj_plot", width = "600px", height = "300px"), align = "center"),
-  #                     br(),
-  #                     # h5("How did your team perform against Yahoo projections?"),
-  #                     fluidRow(plotOutput("projected", width = "600px", height = "400px"), align = "center")
-  #            )
-  # )
+  navbarMenu("Evaluate",
+             tabPanel("FVOA Evaluation",
+                      h3("How well is the FVOA model performing?"),
+                      hr(),
+                      fluidRow(plotOutput("eval_fvoa_plot", width = "600px", height = "300px"), align = "center"),
+                      br(),
+                      # p("Which teams screwed my model last week?"),
+                      fluidRow(plotOutput("eval_fvoa_team", width = "600px", height = "400px"), align = "center")
+             ),
+             tabPanel("Yahoo Evaluation",
+                      h3("How well are Yahoo projections performing?"),
+                      hr(),
+                      fluidRow(plotOutput("eval_proj_plot", width = "600px", height = "300px"), align = "center"),
+                      br(),
+                      # h5("How did your team perform against Yahoo projections?"),
+                      fluidRow(plotOutput("projected", width = "600px", height = "400px"), align = "center")
+             )
+  )
   
   
   # End of navbarPage
