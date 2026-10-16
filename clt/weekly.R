@@ -1,4 +1,3 @@
-
 # Setup -------------------------------------------------------------------
 
 # Load packages
@@ -8,6 +7,7 @@ suppressPackageStartupMessages(library(fvoa))
 suppressPackageStartupMessages(library(RSQLite))
 suppressPackageStartupMessages(library(DBI))
 
+# Use all available cores for rstanarm sampling
 options(mc.cores = parallel::detectCores())
 
 # Identify current week
@@ -17,11 +17,14 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
+current_season <- year(today())
+
+# NEW: skip cleanly outside the season so the Tuesday cron doesn't fail
+# in the offseason
 if (weeks_played < 1 || weeks_played > 17) {
-  message("Outside season, nothing to do")
+  message("Outside season (weeks_played = ", weeks_played, "), nothing to do")
   quit(save = "no", status = 0)
 }
-current_season <- year(today())
 
 # Scrape Data -------------------------------------------------------------
 
@@ -32,7 +35,8 @@ clt_team_tmp <- get_team(weeks_played, 'yahoo', leagueID = 175582, season = curr
 
 if(exists("clt_team_tmp")) {
   
-  dbSendQuery(clt_con, str_glue("DELETE from teams where week == {weeks_played} and season == {current_season}"))
+  # CHANGED: dbExecute instead of dbSendQuery (no dangling result set)
+  dbExecute(clt_con, str_glue("DELETE from teams where week == {weeks_played} and season == {current_season}"))
   
   dbWriteTable(clt_con,
                "teams", clt_team_tmp,
@@ -128,20 +132,6 @@ clt_sim_standings_df <- crossing(team = unique(clt_scores$team),
 
 # Save Data ---------------------------------------------------------------
 
-save(clt_schedule, 
-     clt_team, 
-     clt_draws, 
-     clt_simulated_records,
-     clt_rankings,
-     clt_lines,
-     clt_fvoa_season,
-     clt_model_eval,
-     clt_current_matchups,
-     # clt_playoffs,
-     clt_lineup_eval,
-     clt_playoff_leverage,
-     clt_schedule_luck,
-     clt_sim_standings_df,
-     file = here::here("clt", "clt-data.RData"))
+source(here::here("clt", "export.R"))
 
 dbDisconnect(clt_con)
