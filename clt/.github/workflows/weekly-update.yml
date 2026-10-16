@@ -1,0 +1,44 @@
+# Save as .github/workflows/weekly-update.yml
+# Rename clt/weekly.R below to whatever your pipeline script is called.
+name: weekly-update
+
+on:
+  schedule:
+    - cron: "0 11 * * 2" # Tuesdays 11:00 UTC (6-7am Central). Cron is UTC only.
+  workflow_dispatch: # lets you run it manually from the Actions tab
+
+permissions:
+  contents: write
+
+concurrency: weekly-update
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true # prebuilt Linux binaries: much faster installs
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          working-directory: clt # reads clt/DESCRIPTION
+          cache-version: 1 # bump to bust the cache
+
+      - name: Run pipeline
+        run: Rscript clt/weekly.R
+
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add clt/clt.sqlite clt/data/
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Weekly data update $(date -u +%F)"
+            git push
+          fi

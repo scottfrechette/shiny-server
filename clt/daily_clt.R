@@ -8,6 +8,8 @@ suppressPackageStartupMessages(library(fvoa))
 suppressPackageStartupMessages(library(RSQLite))
 suppressPackageStartupMessages(library(DBI))
 
+options(mc.cores = parallel::detectCores())
+
 # Identify current week
 today_week <- today() %>%
   floor_date(unit = "week", week_start = 2) %>%
@@ -15,6 +17,10 @@ today_week <- today() %>%
 start_week <- 35
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
+if (weeks_played < 1 || weeks_played > 17) {
+  message("Outside season, nothing to do")
+  quit(save = "no", status = 0)
+}
 current_season <- year(today())
 
 # Scrape Data -------------------------------------------------------------

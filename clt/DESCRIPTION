@@ -1,0 +1,18 @@
+Package: cltpipeline
+Title: Charlotte's Finest Weekly Pipeline
+Version: 0.0.1
+Description: Dependency list for the weekly GitHub Actions run. Not a real package.
+License: MIT
+Imports:
+    tidyverse,
+    lubridate,
+    RSQLite,
+    DBI,
+    here,
+    jsonlite,
+    rstanarm,
+    scales,
+    fvoa
+Remotes:
+    scottfrechette/fvoa
+    # To pin: scottfrechette/fvoa@<commit-sha>
