@@ -13,7 +13,8 @@ Imports:
     rstanarm,
     scales,
     tidybayes,
+    ffsched
     fvoa
 Remotes:
-    scottfrechette/fvoa,
-    tonyelhabr/ffsched
+    tonyelhabr/ffsched, 
+    scottfrechette/fvoa
