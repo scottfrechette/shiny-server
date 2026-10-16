@@ -12,6 +12,7 @@ Imports:
     jsonlite,
     rstanarm,
     scales,
+    tidybayes
     fvoa
 Remotes:
     scottfrechette/fvoa
