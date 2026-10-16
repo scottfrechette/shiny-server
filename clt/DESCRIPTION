@@ -13,7 +13,7 @@ Imports:
     rstanarm,
     scales,
     tidybayes,
-    ffsched
+    ffsched,
     fvoa
 Remotes:
     tonyelhabr/ffsched, 
