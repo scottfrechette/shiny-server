@@ -132,6 +132,24 @@ clt_sim_standings_df <- crossing(team = unique(clt_scores$team),
 
 # Save Data ---------------------------------------------------------------
 
+# Legacy: keep until the Shiny app is retired, since it loads this file
+save(clt_schedule, 
+     clt_team, 
+     clt_draws, 
+     clt_simulated_records,
+     clt_rankings,
+     clt_lines,
+     clt_fvoa_season,
+     clt_model_eval,
+     clt_current_matchups,
+     # clt_playoffs,
+     clt_lineup_eval,
+     clt_playoff_leverage,
+     clt_schedule_luck,
+     clt_sim_standings_df,
+     file = here::here("clt", "clt-data.RData"))
+
+# NEW: JSON snapshots -> clt/data/{season}/week-{NN}/
 source(here::here("clt", "export.R"))
 
 dbDisconnect(clt_con)
