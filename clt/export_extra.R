@@ -34,8 +34,9 @@ export_json(history, "records_history")  # every week's projections, for trend c
 # Schedule luck: "The Read" ---------------------------------------------------
 # clt_schedule_luck$data has one row per team x finishing rank, where pct is the
 # share of simulated random schedules that end with the team at that rank.
-# Assumes sim_rank is the typical finish under random schedules (it matches the
-# peak of each team's distribution in the sample rows).
+# sim_rank is the single most common finish (the mode), which can sit well away
+# from the average when the distribution is wide, so it is NOT used for luck.
+# Instead, compare the whole distribution to the team's actual rank.
 
 luck_dist <- clt_schedule_luck$data |>
   as_tibble() |>
@@ -44,12 +45,20 @@ luck_dist <- clt_schedule_luck$data |>
 schedule_luck <- luck_dist |>
   summarise(
     actual_rank = first(actual_rank),
-    sim_rank = first(sim_rank),
-    expected_rank = sum(rank * pct),                      # average finish across random schedules
-    p_as_good = sum(pct[rank <= first(actual_rank)]),     # share of random schedules at least this good
+    expected_rank = sum(rank * pct),                 # average finish across random schedules
+    p_better = sum(pct[rank < first(actual_rank)]),  # random schedules that leave the team ranked higher
+    p_same = sum(pct[rank == first(actual_rank)]),
+    p_worse = sum(pct[rank > first(actual_rank)]),   # random schedules that leave the team ranked lower
     .by = team
   ) |>
-  mutate(luck = sim_rank - actual_rank) |>                # positive = finished better than a typical schedule gives
+  mutate(
+    luck_score = p_worse - p_better,  # -1 to 1; positive = lucky (most random schedules would be worse)
+    luck_label = case_when(           # thresholds are a judgment call; tune once you see the real spread
+      luck_score >= 0.3 ~ "lucky",
+      luck_score <= -0.3 ~ "unlucky",
+      TRUE ~ "about even"
+    )
+  ) |>
   rename(Team = team)
 
 export_json(schedule_luck, "schedule_luck", required = TRUE)

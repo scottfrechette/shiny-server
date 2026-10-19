@@ -35,7 +35,7 @@ Return ONLY a JSON object. No prose, no code fences.
 - winner_win_prob is FVOA’s win probability for the listed winner and can be under 0.5, so do not call the winner the favorite unless it is above 0.5. 
 - A negative spread means the winner is laying points. 
 - leverage.json gives playoff odds if a team wins versus loses its next game. 
-- In schedule_luck.json, a small p_as_good means the team finished better than almost any random schedule would give it, so it was lucky.
+- In schedule_luck.json, p_better, p_same, and p_worse are the shares of 1,000 random schedules that would leave the team ranked higher than, at, or lower than its actual rank. luck_score is p_worse minus p_better, and luck_label summarizes it. Use luck_label; do not call a team lucky or unlucky when it says ‘about even’.
 
 # What a good take looks like
 
