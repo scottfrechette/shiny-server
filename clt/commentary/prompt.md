@@ -36,6 +36,7 @@ Return ONLY a JSON object. No prose, no code fences.
 - A negative spread means the winner is laying points. 
 - leverage.json gives playoff odds if a team wins versus loses its next game. 
 - In schedule_luck.json, p_better, p_same, and p_worse are the shares of 1,000 random schedules that would leave the team ranked higher than, at, or lower than its actual rank. luck_score is p_worse minus p_better, and luck_label summarizes it. Use luck_label; do not call a team lucky or unlucky when it says ‘about even’.
+- Use playoff_pct for playoff odds. Never add up the columns in odds.json to get playoff odds. Those columns are only for finish-position odds, such as the chance of finishing first or last.
 
 # What a good take looks like
 
