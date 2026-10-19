@@ -1,0 +1,98 @@
+---
+import Base from "../layouts/Base.astro";
+import { loadHome } from "../lib/data";
+
+const { latest, generatedAt, rows, commentary } = loadHome();
+
+const updated = generatedAt
+  ? new Date(generatedAt).toLocaleString("en-US", {
+      weekday: "short",
+      hour: "numeric",
+      minute: "2-digit",
+      timeZone: "America/Chicago",
+    })
+  : "";
+
+// Scale the FVOA bar across the league's range (FVOA can be negative)
+const fvoas = rows.map((r) => r.fvoa);
+const lo = Math.min(...fvoas);
+const hi = Math.max(...fvoas);
+const barWidth = (v: number) => (hi === lo ? 50 : 8 + ((v - lo) / (hi - lo)) * 92);
+
+const pct = (p: number | null) =>
+  p === null ? "–" : p < 0.005 ? "<1%" : p > 0.995 ? ">99%" : `${Math.round(p * 100)}%`;
+---
+
+<Base>
+  <header class="mb-4 flex items-baseline justify-between">
+    <h1 class="text-lg font-semibold">Charlotte's Finest</h1>
+    <p class="text-xs text-slate-500 dark:text-slate-400">
+      Week {latest.week}{updated && ` · updated ${updated} CT`}
+    </p>
+  </header>
+
+  <section class="mb-6 rounded-2xl bg-white p-4 shadow-sm dark:bg-slate-900">
+    <h2 class="mb-2 text-sm font-semibold">The Frechest of Takes</h2>
+    {
+      commentary ? (
+        <>
+          {commentary.week !== latest.week && (
+            <p class="mb-2 text-xs text-slate-500 dark:text-slate-400">
+              From week {commentary.week}
+            </p>
+          )}
+          <ul class="list-disc space-y-2 pl-5 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+            {commentary.bullets.map((b) => (
+              <li>{b}</li>
+            ))}
+            <li>
+              <u>
+                <strong>Commish Corner</strong>
+              </u>{" "}
+              - {commentary.commish_corner}
+            </li>
+          </ul>
+        </>
+      ) : (
+        <p class="text-sm text-slate-500 dark:text-slate-400">This week's take is coming soon.</p>
+      )
+    }
+  </section>
+
+  <section class="overflow-hidden rounded-2xl bg-white shadow-sm dark:bg-slate-900">
+    <div class="flex items-center justify-between px-4 pt-4 pb-2">
+      <h2 class="text-sm font-semibold">Power rankings</h2>
+      <p class="text-xs text-slate-500 dark:text-slate-400">FVOA · Playoff odds</p>
+    </div>
+    <ol>
+      {
+        rows.map((r) => (
+          <li class="grid grid-cols-[1.5rem_1fr_4rem_2.75rem] items-center gap-2 border-t border-slate-100 px-4 py-3 text-sm dark:border-slate-800">
+            <span class="text-slate-400">{r.fvoaRank}</span>
+            <span>
+              <span class="font-medium">{r.team}</span>
+              <span class="ml-1 text-xs text-slate-500 dark:text-slate-400">{r.record}</span>
+              {r.rankChange ? (
+                <span
+                  class={`ml-1 text-xs ${
+                    r.rankChange > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"
+                  }`}
+                >
+                  {r.rankChange > 0 ? "▲" : "▼"}
+                  {Math.abs(r.rankChange)}
+                </span>
+              ) : null}
+            </span>
+            <span class="h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+              <span
+                class="block h-full rounded-full bg-indigo-500"
+                style={`width:${barWidth(r.fvoa)}%`}
+              />
+            </span>
+            <span class="text-right tabular-nums">{pct(r.playoffPct)}</span>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+</Base>
