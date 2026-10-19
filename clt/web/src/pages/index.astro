@@ -13,14 +13,18 @@ const updated = generatedAt
     })
   : "";
 
-// Scale the FVOA bar across the league's range (FVOA can be negative)
-const fvoas = rows.map((r) => r.fvoa);
-const lo = Math.min(...fvoas);
-const hi = Math.max(...fvoas);
-const barWidth = (v: number) => (hi === lo ? 50 : 8 + ((v - lo) / (hi - lo)) * 92);
+// Power rankings are ordered by playoff odds, and the bar shows the same number
+const ranked = [...rows].sort((a, b) => (b.playoffPct ?? 0) - (a.playoffPct ?? 0));
 
 const pct = (p: number | null) =>
   p === null ? "–" : p < 0.005 ? "<1%" : p > 0.995 ? ">99%" : `${Math.round(p * 100)}%`;
+
+const ord = (n: number) => {
+  const s = ["th", "st", "nd", "rd"];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+};
+const signed = (v: number) => `${v >= 0 ? "+" : ""}${v.toFixed(2)}`;
 ---
 
 <Base>
@@ -62,37 +66,51 @@ const pct = (p: number | null) =>
   <section class="overflow-hidden rounded-2xl bg-white shadow-sm dark:bg-slate-900">
     <div class="flex items-center justify-between px-4 pt-4 pb-2">
       <h2 class="text-sm font-semibold">Power rankings</h2>
-      <p class="text-xs text-slate-500 dark:text-slate-400">FVOA · Playoff odds</p>
+      <p class="text-xs text-slate-500 dark:text-slate-400">Playoff odds</p>
     </div>
     <ol>
       {
-        rows.map((r) => (
-          <li class="grid grid-cols-[1.5rem_1fr_4rem_2.75rem] items-center gap-2 border-t border-slate-100 px-4 py-3 text-sm dark:border-slate-800">
-            <span class="text-slate-400">{r.fvoaRank}</span>
-            <span>
+        ranked.map((r, i) => (
+          <li class="border-t border-slate-100 px-4 py-3 dark:border-slate-800">
+            <div class="grid grid-cols-[1.5rem_1fr_3.5rem_2.5rem_2.25rem] items-center gap-2 text-sm">
+              <span class="text-slate-400">{i + 1}</span>
               <span class="font-medium">{r.team}</span>
-              <span class="ml-1 text-xs text-slate-500 dark:text-slate-400">{r.record}</span>
-              {r.rankChange ? (
+              <span class="h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                 <span
-                  class={`ml-1 text-xs ${
-                    r.rankChange > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"
-                  }`}
-                >
-                  {r.rankChange > 0 ? "▲" : "▼"}
-                  {Math.abs(r.rankChange)}
-                </span>
-              ) : null}
-            </span>
-            <span class="h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                  class="block h-full rounded-full bg-indigo-500"
+                  style={`width:${Math.max((r.playoffPct ?? 0) * 100, 1)}%`}
+                />
+              </span>
+              <span class="text-right tabular-nums">{pct(r.playoffPct)}</span>
               <span
-                class="block h-full rounded-full bg-indigo-500"
-                style={`width:${barWidth(r.fvoa)}%`}
-              />
-            </span>
-            <span class="text-right tabular-nums">{pct(r.playoffPct)}</span>
+                class={`text-xs tabular-nums ${
+                  r.playoffChange !== null && r.playoffChange > 0
+                    ? "text-emerald-600 dark:text-emerald-400"
+                    : "text-red-600 dark:text-red-400"
+                }`}
+              >
+                {r.playoffChange !== null &&
+                  Math.abs(r.playoffChange) >= 0.005 &&
+                  `${r.playoffChange > 0 ? "▲" : "▼"}${Math.round(Math.abs(r.playoffChange) * 100)}`}
+              </span>
+            </div>
+            <div class="mt-0.5 space-y-0.5 pl-8 text-xs text-slate-500 tabular-nums dark:text-slate-400">
+              <p>
+                {r.record}
+                {r.projWins !== null &&
+                  r.projPts !== null &&
+                  ` · ${r.projWins.toFixed(1)} proj wins · ${Math.round(r.projPts).toLocaleString("en-US")} proj pts`}
+              </p>
+              <p>FVOA {signed(r.fvoa)} ({ord(r.fvoaRank)})</p>
+            </div>
           </li>
         ))
       }
     </ol>
+    <p class="border-t border-slate-100 px-4 py-3 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
+      Ordered by playoff odds. FVOA is a team's expected margin against a historically average team,
+      with its rank in parentheses. The arrows next to the percentages are the change in playoff
+      odds, in points, since last week.
+    </p>
   </section>
 </Base>

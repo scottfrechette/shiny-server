@@ -21,6 +21,9 @@ export interface TeamRow {
   yahooRank: number;
   playoffPct: number | null; // fraction, 0.25 = 25%
   rankChange: number | null; // positive = moved up in FVOA rank vs last week
+  playoffChange: number | null; // change in playoff odds vs last week (fraction)
+  projWins: number | null; // full-season projection
+  projPts: number | null; // full-season projection
 }
 
 export interface Commentary {
@@ -40,18 +43,24 @@ export function loadHome() {
   const rankings = readJson<Json[]>(`${latest.path}/rankings.json`) ?? [];
   const facts = readJson<{ teams: Json[] }>(`${latest.path}/facts.json`);
   const factsByTeam = new Map((facts?.teams ?? []).map((t) => [t.Team, t]));
+  const projections = readJson<Json[]>(`${latest.path}/projections.json`) ?? [];
+  const projByTeam = new Map(projections.map((p) => [p.Team, p]));
 
   const rows: TeamRow[] = rankings
     .map((r) => {
       const f = factsByTeam.get(r.Team);
+      const p = projByTeam.get(r.Team);
       return {
         team: String(r.Team),
         record: String(r.Record ?? ""),
         fvoa: Number(r.FVOA),
         fvoaRank: Number(r["FVOA Rank"]),
         yahooRank: Number(r["Yahoo Rank"]),
-        playoffPct: f?.playoff_pct ?? null,
+        playoffPct: p?.playoff_pct ?? f?.playoff_pct ?? null,
         rankChange: f?.rank_change ?? null,
+        playoffChange: f?.playoff_change ?? null,
+        projWins: p?.proj_wins ?? null,
+        projPts: p?.proj_pf ?? null,
       };
     })
     .sort((a, b) => a.fvoaRank - b.fvoaRank);

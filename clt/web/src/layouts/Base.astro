@@ -6,13 +6,11 @@ interface Props {
 }
 const { title = "Charlotte's Finest" } = Astro.props;
 
-// Add entries as pages get built, e.g. { href: "/rankings", label: "Rankings" }.
-// The tab bar only shows once there is more than one.
+// The tab bar only shows when there is more than one entry.
 const nav = [
   { href: "/", label: "Home" },
   { href: "/week", label: "Week" },
   { href: "/rankings", label: "Rankings" },
-  { href: "/odds", label: "Odds" },
 ];
 const path = Astro.url.pathname;
 ---
