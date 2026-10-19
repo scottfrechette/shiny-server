@@ -1,4 +1,4 @@
-# Save as .github/workflows/weekly-update.yml
+# Save as .github/workflows/weekly-update.yml (replaces the earlier version)
 # Rename clt/weekly.R below to whatever your pipeline script is called.
 name: weekly-update
 
@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write # needed to open the commentary review PR
 
 concurrency: weekly-update
 
@@ -31,6 +32,7 @@ jobs:
       - name: Run pipeline
         run: Rscript clt/weekly.R
 
+      # Data goes straight to master: it is deterministic, no review needed
       - name: Commit results
         run: |
           git config user.name "github-actions[bot]"
@@ -42,3 +44,21 @@ jobs:
             git commit -m "Weekly data update $(date -u +%F)"
             git push
           fi
+
+      # Commentary is drafted by the Claude API and held for review in a PR
+      - name: Draft commentary
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: Rscript clt/commentary.R
+
+      - name: Open PR for review
+        uses: peter-evans/create-pull-request@v7
+        with:
+          add-paths: |
+            clt/data/**/commentary.json
+            clt/data/**/commentary.md
+          branch: commentary-draft
+          delete-branch: true
+          commit-message: "Draft commentary"
+          title: "Draft weekly commentary"
+          body-path: pr_body.md

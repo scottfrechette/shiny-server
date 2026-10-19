@@ -13,7 +13,7 @@ suppressPackageStartupMessages({
   library(jsonlite)
 })
 
-playoff_spots <- 6  # set to your league's playoff size
+playoff_spots <- 4  
 
 out_dir <- here::here("clt", "data", current_season,
                       sprintf("week-%02d", weeks_played))
@@ -54,6 +54,7 @@ export_json(clt_lineup_eval,       "lineup_eval")
 meta <- list(
   season = current_season,
   week = weeks_played,
+  playoff_spots = playoff_spots,
   generated_at = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
   fvoa_version = as.character(packageVersion("fvoa"))
 )

@@ -10,6 +10,7 @@ Imports:
     DBI,
     here,
     jsonlite,
+    httr2,
     rstanarm,
     scales,
     tidybayes,
