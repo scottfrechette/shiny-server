@@ -19,7 +19,7 @@ suppressPackageStartupMessages({
 `%||%` <- function(a, b) if (is.null(a)) b else a
 
 reg_season_weeks <- 15
-commish_team <- "Scott"
+commish_team <- "Barrett"
 model <- Sys.getenv("CLAUDE_MODEL", "claude-sonnet-5-5")
 force <- nzchar(Sys.getenv("FORCE_COMMENTARY"))
 
@@ -88,7 +88,7 @@ system_prompt <- paste0(
 
 # Call the Claude API -------------------------------------------------------
 
-call_claude <- function(system, user, model, max_tokens = 2500) {
+call_claude <- function(system, user, model, max_tokens = 16000) {
   resp <- request("https://api.anthropic.com/v1/messages") |>
     req_headers(
       `x-api-key` = Sys.getenv("ANTHROPIC_API_KEY"),
@@ -100,16 +100,20 @@ call_claude <- function(system, user, model, max_tokens = 2500) {
       system = system,
       messages = list(list(role = "user", content = user))
     )) |>
-    req_timeout(180) |>
+    req_timeout(300) |>
     req_retry(max_tries = 3) |>
     req_perform()
   body <- resp_body_json(resp)
+  message("stop_reason: ", body$stop_reason, " | blocks: ",
+          paste(vapply(body$content, function(b) b$type, character(1)), collapse = ", "))
   blocks <- Filter(function(b) identical(b$type, "text"), body$content)
   paste(vapply(blocks, function(b) b$text, character(1)), collapse = "")
 }
 
 text <- call_claude(system_prompt, user_msg, model)
-clean <- gsub("^```(json)?\\s*|\\s*```$", "", trimws(text))
+# clean <- gsub("^```(json)?\\s*|\\s*```$", "", trimws(text))
+m <- regmatches(text, regexpr("(?s)\\{.*\\}", text, perl = TRUE))
+clean <- if (length(m)) m else text
 result <- tryCatch(
   fromJSON(clean, simplifyVector = FALSE),
   error = function(e) stop("Model did not return valid JSON:\n", text, call. = FALSE)
