@@ -4,7 +4,7 @@ name: weekly-update
 
 on:
   schedule:
-    - cron: "0 11 * * 2" # Tuesdays 11:00 UTC (6-7am Central). Cron is UTC only.
+    - cron: "0 20 * * 2" # Tuesdays 11:00 UTC (6-7am Central). Cron is UTC only.
   workflow_dispatch: # lets you run it manually from the Actions tab
 
 permissions:
