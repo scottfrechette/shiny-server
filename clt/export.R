@@ -40,14 +40,11 @@ export_json <- function(x, name, required = FALSE) {
 # Core files: fail the run if any of these is missing
 export_json(clt_rankings,          "rankings",    required = TRUE)
 export_json(clt_sim_standings_df,  "odds",        required = TRUE)
-export_json(clt_current_matchups,  "matchups",    required = TRUE)
 export_json(clt_lines,             "lines",       required = TRUE)
 export_json(clt_fvoa_season,       "fvoa_season", required = TRUE)
 
 # Secondary files: warn and continue
 export_json(clt_model_eval,        "model_eval")
-export_json(clt_playoff_leverage,  "leverage")
-export_json(clt_schedule_luck,     "schedule_luck")
 export_json(clt_lineup_eval,       "lineup_eval")
 
 # Metadata + pointer so the frontend always knows where the latest week is

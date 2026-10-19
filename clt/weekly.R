@@ -151,5 +151,6 @@ save(clt_schedule,
 
 # NEW: JSON snapshots -> clt/data/{season}/week-{NN}/
 source(here::here("clt", "export.R"))
+source(here::here("clt", "export_extra.R"))
 
 dbDisconnect(clt_con)

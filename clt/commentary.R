@@ -62,7 +62,7 @@ read_raw <- function(name) {
   minify(paste(readLines(f, warn = FALSE), collapse = "\n"))
 }
 
-inputs <- c("facts", "rankings", "odds", "matchups", "model_eval",
+inputs <- c("facts", "rankings", "odds", "matchups", "model_eval", "projections", "schedule_luck", "leverage",
             if (mode == "season_end") "fvoa_season")
 raw <- Filter(Negate(is.null), setNames(lapply(inputs, read_raw), inputs))
 

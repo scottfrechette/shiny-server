@@ -31,6 +31,11 @@ Return ONLY a JSON object. No prose, no code fences.
 - rank_change = previous FVOA Rank minus current. Positive: moved up.
 - playoff_pct and the columns "1" to "10" in odds.json are probabilities stored as fractions (0.25 = 25%). Column "n" is the probability of finishing in standings position n.
 - Playoff spots are given in the user message.
+- matchups.json is next week’s slate. 
+- winner_win_prob is FVOA’s win probability for the listed winner and can be under 0.5, so do not call the winner the favorite unless it is above 0.5. 
+- A negative spread means the winner is laying points. 
+- leverage.json gives playoff odds if a team wins versus loses its next game. 
+- In schedule_luck.json, a small p_as_good means the team finished better than almost any random schedule would give it, so it was lucky.
 
 # What a good take looks like
 
