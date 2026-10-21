@@ -67,7 +67,8 @@ const n = (v: number) => Math.round(v).toLocaleString("en-US");
               data-yahoo={r["Yahoo Rank"]}
               data-sor={r["SOR Rank"]}
               data-pf={-r.PF}
-              class="border-t border-slate-100 dark:border-slate-800"
+              data-team={r.Team}
+              class="border-t border-slate-100 data-[mine=true]:bg-indigo-50 dark:border-slate-800 dark:data-[mine=true]:bg-indigo-950/40"
             >
               <td class="pos px-3 py-3 text-slate-400">{i + 1}</td>
               <td class="py-3 font-medium">{r.Team}</td>

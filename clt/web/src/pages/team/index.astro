@@ -1,0 +1,56 @@
+---
+import Base from "../../layouts/Base.astro";
+import { loadWeekFile } from "../../lib/week";
+import { slug } from "../../lib/teams";
+
+const teams = loadWeekFile<{ Team: string }[]>("rankings")
+  .map((r) => r.Team)
+  .sort((a, b) => a.localeCompare(b));
+---
+
+<Base title="My team · Charlotte's Finest">
+  <header class="mb-4">
+    <h1 class="text-lg font-semibold">Which team is yours?</h1>
+    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+      Your pick is saved on this device only, and your team gets highlighted across the site.
+    </p>
+  </header>
+
+  <ul class="grid grid-cols-2 gap-3">
+    {
+      teams.map((t) => (
+        <li>
+          <a
+            href={`/team/${slug(t)}`}
+            data-pick={t}
+            class="block rounded-2xl bg-white p-4 text-center text-sm font-medium shadow-sm active:bg-indigo-50 dark:bg-slate-900 dark:active:bg-indigo-950/40"
+          >
+            {t}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</Base>
+
+<script>
+  let saved: string | null = null;
+  try {
+    saved = localStorage.getItem("clt-team");
+  } catch {}
+
+  // Already picked: jump straight to your team, unless you came here to change it
+  const wantsChange = new URLSearchParams(location.search).has("change");
+  if (saved && !wantsChange) {
+    const link = document.querySelector<HTMLAnchorElement>(`[data-pick="${CSS.escape(saved)}"]`);
+    if (link) location.replace(link.href);
+  }
+
+  document.querySelectorAll<HTMLAnchorElement>("[data-pick]").forEach((a) => {
+    a.addEventListener("click", () => {
+      try {
+        localStorage.setItem("clt-team", a.dataset.pick!);
+      } catch {}
+    });
+  });
+</script>

@@ -27,3 +27,13 @@ export function pct(p: number | null | undefined): string {
   if (p > 0.995) return ">99%";
   return `${Math.round(p * 100)}%`;
 }
+
+// 1 -> "1st", 22 -> "22nd"
+export function ord(n: number): string {
+  const s = ["th", "st", "nd", "rd"];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
+export const signed = (v: number) => `${v >= 0 ? "+" : ""}${v.toFixed(2)}`;
+export const int = (v: number) => Math.round(v).toLocaleString("en-US");

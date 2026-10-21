@@ -11,6 +11,7 @@ const nav = [
   { href: "/", label: "Home" },
   { href: "/week", label: "Week" },
   { href: "/rankings", label: "Rankings" },
+  { href: "/team", label: "My Team" },
 ];
 const path = Astro.url.pathname;
 ---
@@ -43,7 +44,7 @@ const path = Astro.url.pathname;
                   href={item.href}
                   class:list={[
                     "block py-3 text-center text-xs font-medium",
-                    path === item.href
+                    (item.href === "/" ? path === "/" : path.startsWith(item.href))
                       ? "text-indigo-600 dark:text-indigo-400"
                       : "text-slate-500 dark:text-slate-400",
                   ]}
@@ -56,5 +57,16 @@ const path = Astro.url.pathname;
         </nav>
       )
     }
+    <script>
+      // Mark elements for the viewer's saved team; pages style them with data-[mine=true]:
+      try {
+        const mine = localStorage.getItem("clt-team");
+        if (mine) {
+          document.querySelectorAll<HTMLElement>("[data-team]").forEach((el) => {
+            if (el.dataset.team === mine) el.dataset.mine = "true";
+          });
+        }
+      } catch {}
+    </script>
   </body>
 </html>

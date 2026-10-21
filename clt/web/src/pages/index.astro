@@ -71,7 +71,10 @@ const signed = (v: number) => `${v >= 0 ? "+" : ""}${v.toFixed(2)}`;
     <ol>
       {
         ranked.map((r, i) => (
-          <li class="border-t border-slate-100 px-4 py-3 dark:border-slate-800">
+          <li
+            data-team={r.team}
+            class="border-t border-slate-100 px-4 py-3 data-[mine=true]:bg-indigo-50 dark:border-slate-800 dark:data-[mine=true]:bg-indigo-950/40"
+          >
             <div class="grid grid-cols-[1.5rem_1fr_3.5rem_2.5rem_2.25rem] items-center gap-2 text-sm">
               <span class="text-slate-400">{i + 1}</span>
               <span class="font-medium">{r.team}</span>

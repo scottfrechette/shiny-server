@@ -49,9 +49,15 @@ const spreadLabel = (g: (typeof games)[number]) =>
             </p>
           )}
           <div class="flex items-baseline justify-between text-sm font-medium">
-            <span>{g.left}</span>
+            <span
+              data-team={g.left}
+              class="data-[mine=true]:text-indigo-600 dark:data-[mine=true]:text-indigo-400"
+            >{g.left}</span>
             <span class="text-xs font-normal text-slate-400">vs</span>
-            <span>{g.right}</span>
+            <span
+              data-team={g.right}
+              class="data-[mine=true]:text-indigo-600 dark:data-[mine=true]:text-indigo-400"
+            >{g.right}</span>
           </div>
           <div class="my-2 flex h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
             <span class="bg-indigo-500" style={`width:${g.leftProb * 100}%`} />
