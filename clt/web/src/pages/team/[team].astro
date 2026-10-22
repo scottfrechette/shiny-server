@@ -142,14 +142,18 @@ const tiles = [
 
     <section class="rounded-2xl bg-white p-4 shadow-sm dark:bg-slate-900">
       <h2 class="mb-3 text-sm font-semibold">Where {team} finishes</h2>
-      <div class="flex h-20 items-end gap-1" role="img" aria-label={`Chance of finishing in each position for ${team}`}>
+      <div class="flex h-24 items-end gap-1" role="img" aria-label={`Chance of finishing in each position for ${team}`}>
         {
           finish.map((p, i) => (
-            <div
-              class:list={["flex-1 rounded-t", i < spots ? "bg-indigo-500" : "bg-slate-300 dark:bg-slate-700"]}
-              style={`height:${Math.max((p / maxFinish) * 100, 2)}%`}
-              title={`${ord(i + 1)}: ${pct(p)}`}
-            />
+            <div class="flex flex-1 flex-col items-center justify-end" title={`${ord(i + 1)}: ${pct(p)}`}>
+              <span class="mb-0.5 h-3 text-[10px] leading-3 text-slate-500 tabular-nums dark:text-slate-400">
+                {p >= 0.01 ? `${Math.round(p * 100)}%` : ""}
+              </span>
+              <div
+                class:list={["w-full rounded-t", i < spots ? "bg-indigo-500" : "bg-slate-300 dark:bg-slate-700"]}
+                style={`height:${Math.max((p / maxFinish) * 64, 2)}px`}
+              />
+            </div>
           ))
         }
       </div>

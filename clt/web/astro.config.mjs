@@ -2,7 +2,7 @@
  import tailwindcss from "@tailwindcss/vite";
 
  export default defineConfig({
-   site: "https://cltfinest.scottfrechette.com",
+   site: "https://c3fl.scottfrechette.com",
    vite: {
      plugins: [tailwindcss()],
    },
