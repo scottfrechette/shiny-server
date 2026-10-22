@@ -4,7 +4,7 @@ name: weekly-update
 
 on:
   schedule:
-    - cron: "0 14 * * 2" # Tuesdays 11:00 UTC (6-7am Central). Cron is UTC only.
+    - cron: "0 11 * * 2" # Tuesdays 11:00 UTC (6-7am Central). Cron is UTC only.
   workflow_dispatch: # lets you run it manually from the Actions tab
 
 permissions:
@@ -51,12 +51,20 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: Rscript clt/commentary.R
 
+      # If this step fails, the commentary PR still opens without The Read
+      - name: Draft The Read
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: Rscript clt/read.R
+
       - name: Open PR for review
         uses: peter-evans/create-pull-request@v7
         with:
           add-paths: |
             clt/data/**/commentary.json
             clt/data/**/commentary.md
+            clt/data/**/read.json
           branch: commentary-draft
           delete-branch: true
           commit-message: "Draft commentary"

@@ -37,3 +37,10 @@ export function ord(n: number): string {
 
 export const signed = (v: number) => `${v >= 0 ? "+" : ""}${v.toFixed(2)}`;
 export const int = (v: number) => Math.round(v).toLocaleString("en-US");
+
+// Like loadWeekFile, but returns null when the file doesn't exist (for example
+// when this week's commentary PR hasn't been merged yet)
+export function tryLoadWeekFile<T = any>(name: string): T | null {
+  const file = path.join(DATA_ROOT, latestWeek().path, `${name}.json`);
+  return fs.existsSync(file) ? (JSON.parse(fs.readFileSync(file, "utf8")) as T) : null;
+}

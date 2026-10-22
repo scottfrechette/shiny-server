@@ -1,0 +1,19 @@
+{
+  "season": 2026,
+  "week": 6,
+  "model": "claude-sonnet-5-5",
+  "generated_at": "2026-10-22T22:22:06Z",
+  "reads": {
+    "PFinn": "PFinn holds first place at 5-1, yet FVOA ranks the team third, and the schedule has been friendly: 88% of random schedules leave PFinn worse off. Odds sit at 50%, down 24 points. Beating Chris lifts them to 78%, while a loss drops them to 23%.",
+    "Justin": "Justin leads the league in points scored with 722 and sits second at 4-2, though FVOA slots the team fourth. Playoff odds are 50%, up 25 points on the week. Eric is next with Justin a one-point favorite: a win lifts odds to 70%, a loss sinks them to 23%.",
+    "Barrett": "Barrett owns the best playoff odds in the league at 60% and the top strength-of-record rank, so the 4-2 start holds up. FVOA ranks the team second, which roughly matches third in the standings. Beating Josh pushes odds to 85%, and losing drops them to 35%.",
+    "Scott": "Scott is the top team in FVOA, which is a coincidence of math and not of authorship, yet sits fourth in the standings at 4-2. Playoff odds slipped 18 points to 57%. David is next, and a win sends odds to 85% while a loss leaves them at 36%.",
+    "Chris": "Chris is 3-3 and fifth in the standings, though FVOA ranks the team seventh. Odds are 36%, down 7 points. The game against PFinn is the swing: a win lifts odds to 60%, while a loss collapses them to 7%, with Chris a half-point underdog.",
+    "Bobby": "Bobby is 3-3 and sixth in the standings, but FVOA ranks the team ninth, and the schedule has been kind: 86% of random schedules leave Bobby worse off. Odds fell 23 points to 21%. Diaz is next, with a win worth 39% and a loss cutting odds to 3%.",
+    "Diaz": "Diaz is 2-4 and seventh, but FVOA ranks the team fifth, and 78% of random schedules would have left Diaz better off. Odds climbed 21 points to 36%. Bobby is next with Diaz a one-point favorite, and a win moves odds to 61% versus 13% with a loss.",
+    "David": "David is 2-4 and eighth, exactly where FVOA has the team, yet playoff odds jumped 44 points to 44%. The schedule has helped, with 65% of random schedules leaving David worse off. Scott is next, David is a one-point underdog, and a win means 76% odds while a loss means 20%.",
+    "Eric": "Eric has the lowest FVOA rank in the league at 10th, and the 2-4 record in ninth is roughly in line with that. Playoff odds are 22%, down 3 points. Justin is next, and Eric is a one-point underdog; a win lifts odds to 35%, a loss leaves them at 3%.",
+    "Josh": "Josh is 1-5 and last in the standings, yet FVOA ranks the team sixth, and 96% of random schedules would have treated Josh better. Odds are 23%, down 18 points. Barrett is next with Josh a half-point underdog; a win is worth 41%, and a loss sinks odds to 5%."
+  },
+  "review_flags": []
+}

@@ -1,6 +1,6 @@
 ---
 import Base from "../../layouts/Base.astro";
-import { int, latestWeek, loadWeekFile, ord, pct, signed } from "../../lib/week";
+import { int, latestWeek, loadWeekFile, ord, pct, signed, tryLoadWeekFile } from "../../lib/week";
 import { slug } from "../../lib/teams";
 
 export function getStaticPaths() {
@@ -29,6 +29,10 @@ type Game = {
 const { team } = Astro.props as { team: string };
 const { week } = latestWeek();
 
+// Only this week's Read: an older one would contradict the tiles below it
+const readData = tryLoadWeekFile<{ reads: Record<string, string> }>("read");
+const read = readData?.reads?.[team];
+
 const me = loadWeekFile<Rank[]>("rankings").find((r) => r.Team === team)!;
 const projs = loadWeekFile<Proj[]>("projections");
 const proj = projs.find((p) => p.Team === team);
@@ -51,12 +55,12 @@ const finish = Array.from({ length: 10 }, (_, i) => Number(oddsRow?.[String(i + 
 const maxFinish = Math.max(...finish, 0.0001);
 
 const tiles = [
-  { label: "Record", value: me.Record, sub: `${ord(me["Yahoo Rank"])} in Yahoo` },
-  { label: "Strength of record", value: ord(me["SOR Rank"]), sub: "SOR rank" },
-  { label: "FVOA", value: signed(me.FVOA), sub: `${ord(me["FVOA Rank"])} strongest` },
   { label: "Playoff odds", value: pct(proj?.playoff_pct ?? null), sub: `Top ${spots} make it` },
   { label: "Proj wins", value: proj ? proj.proj_wins.toFixed(1) : "–", sub: "Full season" },
+  { label: "FVOA", value: signed(me.FVOA), sub: `${ord(me["FVOA Rank"])} strongest` },
   { label: "Proj points", value: proj ? int(proj.proj_pf) : "–", sub: `${ord(ptsRank)} in league` },
+  { label: "Record", value: me.Record, sub: `${ord(me["Yahoo Rank"])} in Yahoo` },
+  { label: "Strength of record", value: ord(me["SOR Rank"]), sub: "SOR rank" },
 ];
 ---
 
@@ -80,6 +84,15 @@ const tiles = [
         </p>
       </div>
     </header>
+
+    {
+      read && (
+        <section class="mb-4 rounded-2xl bg-white p-4 shadow-sm dark:bg-slate-900">
+          <h2 class="mb-2 text-sm font-semibold">The Read</h2>
+          <p class="text-sm leading-relaxed text-slate-700 dark:text-slate-300">{read}</p>
+        </section>
+      )
+    }
 
     <section class="mb-4 grid grid-cols-2 gap-3">
       {
