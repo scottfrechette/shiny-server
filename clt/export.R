@@ -78,15 +78,49 @@ odds_prev <- clt_simulated_records |>
   filter(week == weeks_played - 1) |>
   select(Team = team, prev_playoff_pct = playoffs)
 
+# Record versus scoring: does the record look better or worse than the points
+# scored suggest? A team within +/- scoring_band of the league-average points
+# counts as "about average". That cutoff is a judgment call: tune it once you
+# see real weeks.
+scoring_band <- 0.02
+
+# "3-2" or "3-2-1" -> win fraction, with a tie counting as half a win
+parse_win_pct <- function(rec) {
+  vapply(strsplit(as.character(rec), "-"), function(p) {
+    p <- as.numeric(p)
+    ties <- if (length(p) >= 3) p[3] else 0
+    (p[1] + 0.5 * ties) / (p[1] + p[2] + ties)
+  }, numeric(1))
+}
+
 facts <- clt_rankings |>
   select(Team, FVOA, fvoa_rank = `FVOA Rank`, yahoo_rank = `Yahoo Rank`,
-         sor_rank = `SOR Rank`, sos_rank = `SOS Rank`) |>
+         sor_rank = `SOR Rank`, sos_rank = `SOS Rank`,
+         record = Record, pf = PF) |>
   left_join(odds_now, by = "Team") |>
   left_join(odds_prev, by = "Team") |>
   mutate(rank_gap = yahoo_rank - fvoa_rank,  # positive = model likes them more than Yahoo
          playoff_change = playoff_pct - prev_playoff_pct,
-         rank_change = NA_real_) |>
-  select(-prev_playoff_pct)
+         rank_change = NA_real_,
+         win_frac = parse_win_pct(record),
+         pf_vs_avg_pct = (pf / mean(pf) - 1) * 100,
+         scoring = case_when(
+           pf_vs_avg_pct >= scoring_band * 100 ~ "above",
+           pf_vs_avg_pct <= -scoring_band * 100 ~ "below",
+           TRUE ~ "about"),
+         record_vs_scoring = case_when(
+           win_frac > 0.5 & scoring == "above" ~ "good: winning and scoring above the league average",
+           win_frac > 0.5 & scoring == "about" ~ "winning with about average scoring",
+           win_frac > 0.5 & scoring == "below" ~ "overrated: winning despite below-average scoring",
+           win_frac < 0.5 & scoring == "above" ~ "underrated: losing despite above-average scoring",
+           win_frac < 0.5 & scoring == "about" ~ "losing with about average scoring",
+           win_frac < 0.5 & scoring == "below" ~ "bad: losing and scoring below the league average",
+           scoring == "above" ~ "at .500 with above-average scoring",
+           scoring == "below" ~ "at .500 with below-average scoring",
+           TRUE ~ "at .500 with about average scoring"),
+         win_pct = round(win_frac * 100),
+         pf_vs_avg_pct = round(pf_vs_avg_pct, 1)) |>
+  select(-prev_playoff_pct, -win_frac, -scoring)
 
 # FVOA rank change still needs last week's snapshot
 prev_rankings <- file.path(

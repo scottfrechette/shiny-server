@@ -102,3 +102,17 @@ leverage <- clt_playoff_leverage$data |>
   )
 
 export_json(leverage, "leverage", required = TRUE)
+
+# Trends: weekly score and FVOA by team ------------------------------------
+# One row per team per week. The team page reads this for the "Weekly score"
+# and "FVOA" trend charts.
+
+trends <- as_tibble(clt_scores) |>
+  select(Team = team, week, score) |>
+  full_join(
+    as_tibble(clt_fvoa_season) |> select(Team = team, week, fvoa),
+    by = c("Team", "week")
+  ) |>
+  arrange(week, Team)
+
+export_json(trends, "trends", required = TRUE)

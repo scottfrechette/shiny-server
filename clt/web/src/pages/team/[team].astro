@@ -2,6 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import { int, latestWeek, loadWeekFile, ord, pct, signed, tryLoadWeekFile } from "../../lib/week";
 import { slug } from "../../lib/teams";
+import { buildChart, type Point } from "../../lib/chart";
 
 export function getStaticPaths() {
   const rows = loadWeekFile<{ Team: string }[]>("rankings");
@@ -53,6 +54,54 @@ const spots = loadWeekFile<{ playoff_spots?: number }>("meta").playoff_spots ?? 
 const oddsRow = loadWeekFile<Record<string, any>[]>("odds").find((o) => o.team === team);
 const finish = Array.from({ length: 10 }, (_, i) => Number(oddsRow?.[String(i + 1)] ?? 0));
 const maxFinish = Math.max(...finish, 0.0001);
+
+// Weekly trends. Playoff odds come from records_history.json (every week so far).
+// Weekly score and FVOA come from trends.json, which exists only once the
+// pipeline exports it; each chart appears only if its data is present.
+type Hist = { week: number; team: string; playoffs: number };
+type Trend = { Team: string; week: number; score: number | null; fvoa: number | null };
+
+function seriesOf<T>(
+  rows: T[],
+  teamOf: (r: T) => string,
+  weekOf: (r: T) => number,
+  valueOf: (r: T) => number | null | undefined,
+) {
+  const out: Record<string, Point[]> = {};
+  for (const r of rows) {
+    const v = valueOf(r);
+    if (v === null || v === undefined || Number.isNaN(v)) continue;
+    (out[teamOf(r)] ??= []).push({ week: weekOf(r), value: v });
+  }
+  return out;
+}
+
+const history = tryLoadWeekFile<Hist[]>("records_history") ?? [];
+const trends = tryLoadWeekFile<Trend[]>("trends") ?? [];
+
+const metricDefs = [
+  {
+    key: "odds",
+    label: "Playoff odds",
+    series: seriesOf(history, (r) => r.team, (r) => r.week, (r) => r.playoffs),
+    opts: { yMin: 0, yMax: 1, ticks: 2, fmt: (v: number) => `${Math.round(v * 100)}%` },
+  },
+  {
+    key: "score",
+    label: "Weekly score",
+    series: seriesOf(trends, (r) => r.Team, (r) => r.week, (r) => r.score),
+    opts: { fmt: (v: number) => v.toFixed(0) },
+  },
+  {
+    key: "fvoa",
+    label: "FVOA",
+    series: seriesOf(trends, (r) => r.Team, (r) => r.week, (r) => r.fvoa),
+    opts: { fmt: (v: number) => v.toFixed(1) },
+  },
+];
+const metrics = metricDefs
+  .filter((m) => (m.series[team]?.length ?? 0) > 0)
+  .map((m) => ({ ...m, chart: buildChart(m.series, team, m.opts) }));
 
 const tiles = [
   { label: "Playoff odds", value: pct(proj?.playoff_pct ?? null), sub: `Top ${spots} make it` },
@@ -140,6 +189,98 @@ const tiles = [
       }
     </section>
 
+    {
+      metrics.length > 0 && (
+        <section class="mb-4 rounded-2xl bg-white p-4 shadow-sm dark:bg-slate-900">
+          <div class="mb-3 flex items-center justify-between">
+            <h2 class="text-sm font-semibold">Trend</h2>
+            {metrics.length > 1 && (
+              <div class="flex gap-1.5">
+                {metrics.map((m, i) => (
+                  <button
+                    data-metric={m.key}
+                    aria-pressed={i === 0}
+                    class="rounded-full bg-slate-200 px-2.5 py-1 text-xs font-medium text-slate-700 aria-pressed:bg-indigo-600 aria-pressed:text-white dark:bg-slate-800 dark:text-slate-300"
+                  >
+                    {m.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {metrics.map((m, i) => (
+            <div data-panel={m.key} hidden={i !== 0}>
+              <svg
+                viewBox={`0 0 ${m.chart.W} ${m.chart.H}`}
+                class="w-full"
+                role="img"
+                aria-label={`${m.label} by week for ${team}`}
+              >
+                {m.chart.grid.map((g) => (
+                  <>
+                    <line
+                      x1={m.chart.padL}
+                      x2={m.chart.W - m.chart.padR}
+                      y1={g.y}
+                      y2={g.y}
+                      stroke-width="1"
+                      class="stroke-slate-200 dark:stroke-slate-800"
+                    />
+                    <text
+                      x={m.chart.padL - 6}
+                      y={g.y + 3}
+                      text-anchor="end"
+                      font-size="9"
+                      class="fill-slate-400"
+                    >
+                      {g.label}
+                    </text>
+                  </>
+                ))}
+                {m.chart.weekLabels.map((w) => (
+                  <text x={w.x} y={m.chart.H - 6} text-anchor="middle" font-size="9" class="fill-slate-400">
+                    {w.label}
+                  </text>
+                ))}
+                {m.chart.others.map((d) => (
+                  <path d={d} fill="none" stroke-width="1" class="stroke-slate-300 dark:stroke-slate-700" />
+                ))}
+                <path
+                  d={m.chart.mine}
+                  fill="none"
+                  stroke-width="2.5"
+                  stroke-linejoin="round"
+                  stroke-linecap="round"
+                  class="stroke-indigo-500"
+                />
+                {m.chart.points.map((p) => (
+                  <circle cx={p.cx} cy={p.cy} r="3" class="fill-indigo-500">
+                    <title>{`Week ${p.week}: ${m.opts.fmt(p.value)}`}</title>
+                  </circle>
+                ))}
+                {m.chart.last && (
+                  <text
+                    x={m.chart.last.cx + 4}
+                    y={Math.max(m.chart.last.cy - 8, 10)}
+                    text-anchor="end"
+                    font-size="10"
+                    font-weight="600"
+                    class="fill-slate-700 dark:fill-slate-200"
+                  >
+                    {m.opts.fmt(m.chart.last.value)}
+                  </text>
+                )}
+              </svg>
+            </div>
+          ))}
+          <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+            By week. Gray lines are the other nine teams.
+          </p>
+        </section>
+      )
+    }
+
     <section class="rounded-2xl bg-white p-4 shadow-sm dark:bg-slate-900">
       <h2 class="mb-3 text-sm font-semibold">Where {team} finishes</h2>
       <div class="flex h-24 items-end gap-1" role="img" aria-label={`Chance of finishing in each position for ${team}`}>
@@ -188,4 +329,14 @@ const tiles = [
     setBtn.hidden = true;
     badge.hidden = false;
   });
+
+  // Trend chart: switch between metrics
+  const chips = document.querySelectorAll<HTMLButtonElement>("[data-metric]");
+  const panels = document.querySelectorAll<HTMLElement>("[data-panel]");
+  chips.forEach((chip) =>
+    chip.addEventListener("click", () => {
+      chips.forEach((c) => c.setAttribute("aria-pressed", String(c === chip)));
+      panels.forEach((p) => (p.hidden = p.dataset.panel !== chip.dataset.metric));
+    }),
+  );
 </script>

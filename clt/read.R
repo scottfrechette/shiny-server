@@ -70,7 +70,8 @@ next_game <- bind_rows(
 
 team_facts <- rankings |>
   transmute(Team, record = Record, pf = round(PF), pa = round(PA), fvoa = round(FVOA, 2),
-            fvoa_rank = `FVOA Rank`, yahoo_rank = `Yahoo Rank`, sor_rank = `SOR Rank`) |>
+            fvoa_rank = `FVOA Rank`, yahoo_rank = `Yahoo Rank`, sor_rank = `SOR Rank`,
+            sos_rank = `SOS Rank`) |>
   mutate(pf_rank = rank(-pf, ties.method = "min"),
          pa_rank = rank(-pa, ties.method = "min")) |>  # 1 = most points scored against
   left_join(
@@ -78,7 +79,8 @@ team_facts <- rankings |>
                       proj_wins = round(proj_wins, 1), proj_pts = round(proj_pf)),
     by = "Team") |>
   left_join(
-    facts |> transmute(Team, rank_gap, playoff_change_pts = round(playoff_change * 100)),
+    facts |> transmute(Team, rank_gap, playoff_change_pts = round(playoff_change * 100),
+                       win_pct, pf_vs_avg_pct, record_vs_scoring),
     by = "Team") |>
   mutate(model_vs_standings = case_when(
     rank_gap >= 2 ~ "FVOA rates this team higher than its place in the standings",
@@ -154,7 +156,7 @@ data_nums <- as.numeric(unlist(regmatches(facts_json, gregexpr("-?[0-9]+\\.?[0-9
 
 allowed_ranks <- function(tm) {
   r <- team_facts[team_facts$Team == tm, ]
-  unique(c(r$fvoa_rank, r$yahoo_rank, r$sor_rank, r$pf_rank, r$pa_rank,
+  unique(c(r$fvoa_rank, r$yahoo_rank, r$sor_rank, r$sos_rank, r$pf_rank, r$pa_rank,
            r$schedule_actual_rank, floor(r$schedule_expected_rank),
            ceiling(r$schedule_expected_rank), meta$playoff_spots %||% 4))
 }
@@ -162,17 +164,17 @@ allowed_ranks <- function(tm) {
 flags <- character()
 for (tm in teams) {
   txt <- reads[[tm]]
-
+  
   n_words <- length(strsplit(trimws(txt), "\\s+")[[1]])
   if (n_words < 25 || n_words > 90) flags <- c(flags, sprintf("%s: %d words", tm, n_words))
-
+  
   pcts <- as.numeric(unlist(regmatches(txt, gregexpr("[0-9]+\\.?[0-9]*(?=%)", txt, perl = TRUE))))
   bad_pct <- pcts[!vapply(pcts, function(p) any(abs(data_nums - p) <= 1.5, na.rm = TRUE), logical(1))]
   if (length(bad_pct)) {
     flags <- c(flags, sprintf("%s: percentages not in the data: %s", tm,
                               paste0(bad_pct, "%", collapse = ", ")))
   }
-
+  
   ords <- as.numeric(unlist(regmatches(txt, gregexpr("[0-9]+(?=(st|nd|rd|th)\\b)", txt, perl = TRUE))))
   bad_ord <- ords[!ords %in% allowed_ranks(tm)]
   if (length(bad_ord)) {
