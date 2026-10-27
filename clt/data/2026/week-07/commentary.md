@@ -1,0 +1,10 @@
+## Week 7 draft (weekly mode)
+
+- Chris is the biggest riser, jumping from 7th to 2nd strongest, and his playoff odds jumped ~43 points to ~78%. He's still only 4-3 and in 5th place, because FVOA says his schedule has been unlucky.
+- Justin is the biggest FVOA disagreement: 3rd in the standings but only the 8th strongest team, down 4 spots this week. His playoff odds fell ~23 points to ~28%, so FVOA thinks the standings are being generous.
+- David is 2-5 and last, but FVOA has him as the 6th strongest team. He and Josh have the most unlucky schedules: ~79% of random schedules would have David ranked higher than 10th, and ~82% would have Josh above 9th. David's scoring is still 5.4% below the league average, though, so the schedule isn't the whole story.
+- Every team has a negative FVOA, so a historically average team would be favored over all ten of us. The top three of PFinn (~83%), Chris (~78%) and me (~75%) are well clear on playoff odds, and the next best is Barrett at ~40%. Next week's slate is tight too: nobody is above a 54% win probability and two games are pure coin flips.
+- The last-place race is a three-way mess: Bobby ~27%, Josh ~25% and Eric ~23%. Bobby has the weakest team and scoring 5.1% below average, but FVOA calls his schedule lucky, which is the only reason he's 3-4 and not worse.
+- <u><strong>Commish Corner</strong></u> - Commish still has the best strength of record in the league at 4-3, but he slid two spots to 4th strongest and his playoff odds dropped ~20 points to ~40%. Next up is the Game of the Week against me, where he's a ~48% underdog. A win lifts him to ~69% to make playoffs and a loss drops him to ~16%, so no pressure.
+
+_Merge to publish. Edit commentary.json in this PR first if anything needs fixing._
