@@ -18,8 +18,10 @@ suppressPackageStartupMessages({
 
 `%||%` <- function(a, b) if (is.null(a)) b else a
 
+source(here::here("clt", "commentary", "checks.R"))
+
 reg_season_weeks <- 15
-commish_team <- "Barrett"
+commish_team <- "Scott"
 model <- Sys.getenv("CLAUDE_MODEL", "claude-sonnet-5-5")
 force <- nzchar(Sys.getenv("FORCE_COMMENTARY"))
 
@@ -62,7 +64,8 @@ read_raw <- function(name) {
   minify(paste(readLines(f, warn = FALSE), collapse = "\n"))
 }
 
-inputs <- c("facts", "rankings", "odds", "matchups", "model_eval", "projections", "schedule_luck", "leverage",
+inputs <- c("facts", "rankings", "odds", "matchups", "model_eval",
+            "projections", "schedule_luck", "leverage", "bench",
             if (mode == "season_end") "fvoa_season")
 raw <- Filter(Negate(is.null), setNames(lapply(inputs, read_raw), inputs))
 
@@ -104,14 +107,12 @@ call_claude <- function(system, user, model, max_tokens = 16000) {
     req_retry(max_tries = 3) |>
     req_perform()
   body <- resp_body_json(resp)
-  message("stop_reason: ", body$stop_reason, " | blocks: ",
-          paste(vapply(body$content, function(b) b$type, character(1)), collapse = ", "))
+  message("stop_reason: ", body$stop_reason)
   blocks <- Filter(function(b) identical(b$type, "text"), body$content)
   paste(vapply(blocks, function(b) b$text, character(1)), collapse = "")
 }
 
 text <- call_claude(system_prompt, user_msg, model)
-# clean <- gsub("^```(json)?\\s*|\\s*```$", "", trimws(text))
 m <- regmatches(text, regexpr("(?s)\\{.*\\}", text, perl = TRUE))
 clean <- if (length(m)) m else text
 result <- tryCatch(
@@ -162,6 +163,11 @@ if (any(!supported)) {
 }
 
 # Write outputs -------------------------------------------------------------
+
+# Players may only be named if they appear in the data (see bench.json)
+flags <- c(flags, flag_player_names(
+  out_txt, paste(unlist(raw), collapse = " "), file.path(week_dir, "roster_names.json")
+))
 
 out <- list(
   season = latest$season,

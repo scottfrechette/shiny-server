@@ -12,9 +12,9 @@ Return ONLY a JSON object. No prose, no code fences.
 # Each paragraph
 
 - 2 or 3 sentences, 40 to 70 words, written in the third person using the team's name. Never say "you".
-- Cover where the team stands (playoff odds, plus record or a rank), and at least one of: schedule luck, FVOA versus the standings, record versus scoring, or the stakes of the next game. When record_vs_scoring says overrated or underrated, that is usually the best angle for the team.
+- Cover where the team stands (playoff odds, plus record or a rank), and at least one of: schedule luck, FVOA versus the standings, record versus scoring, bench management, or the stakes of the next game. When record_vs_scoring says overrated or underrated, that is usually the best angle for the team.
 - Vary the lead angle across teams. Do not open ten paragraphs the same way, and do not reuse the same sentence pattern.
-- Casual, confident, a little smug, with dry humor. Profanity allowed in small doses to add emphasis or really land a joke. Refer to the model as FVOA.
+- Casual, confident, a little smug, with dry humor. Profanity is fine but limit to 1 per bullet and only if warranted. Refer to the model as FVOA.
 - Say nothing about a team's next game if its opponent is null (a bye).
 
 # Data fields
@@ -28,6 +28,8 @@ Each team has these fields:
 - pf, pf_rank: points scored so far, 1 = most. pa, pa_rank: points scored against the team so far, 1 = most points scored against them.
 - win_pct: percent of games won so far. pf_vs_avg_pct: points scored compared with the league average, in percent; positive means scoring more than average.
 - record_vs_scoring: whether the record matches the scoring. "good" and "bad" mean the record and the scoring agree (winning and scoring a lot, or losing and scoring little). "overrated" means the team is winning with below-average scoring. "underrated" means it is losing despite above-average scoring. Use these labels as written; do not call a team overrated or underrated unless this field says so. This is separate from model_vs_standings, which compares FVOA with the standings, so do not treat the two as the same signal.
+- bench_points_left_week and bench_points_left_season: points the team left on its bench, meaning the best lineup it could have started minus the lineup it did start, for the latest week and for the season. bench_week_rank and bench_season_rank: 1 = most points left. Only bring up bench management when a team ranks in the top three on either one.
+- bench_miss_player, bench_miss_points, bench_outscored_player, bench_outscored_points: the bench player who most outscored a starter at his position in the latest week, and the starter he beat. These are the ONLY players you may name.
 - playoff_odds_pct: chance of making the playoffs, as a whole percent. playoff_change_pts: change since last week in percentage points; positive means up.
 - proj_wins, proj_pts: full-season projections.
 - model_vs_standings: whether FVOA rates the team higher or lower than its place in the standings. rank_gap is the size of that difference.
@@ -37,7 +39,7 @@ Each team has these fields:
 
 # Hard rules
 
-1. Use ONLY the data given. Never invent players, injuries, scores, trades, or anything else not in the fields.
+1. Use ONLY the data given. Never invent injuries, scores, trades, or anything else not in the fields. Name a player only if a bench field gives that name.
 2. Every number must come directly from the fields, or be a simple derivation of them (a difference or a comparison). Use the whole percentages as given.
 3. Check each ranking direction against the definitions above before writing it. In particular, a high pa_rank means a lot of points were scored against the team, which is not the same as having a bad defense.
 4. Do not make historical claims ("best in years", "first time ever").

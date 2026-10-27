@@ -11,16 +11,20 @@ type Row = {
   "FVOA Rank": number;
   "Yahoo Rank": number;
   "SOR Rank": number;
+  "SOS Rank": number;
 };
 
 const { week } = latestWeek();
 const rows = loadWeekFile<Row[]>("rankings").sort((a, b) => a["FVOA Rank"] - b["FVOA Rank"]);
 
+// Same order as the table columns
 const sorts = [
   { key: "fvoa", label: "FVOA" },
+  { key: "pf", label: "PF" },
+  { key: "pa", label: "PA" },
   { key: "yahoo", label: "Yahoo" },
-  { key: "sor", label: "Strength of record" },
-  { key: "pf", label: "Points for" },
+  { key: "sor", label: "SOR" },
+  { key: "sos", label: "SOS" },
 ];
 const n = (v: number) => Math.round(v).toLocaleString("en-US");
 ---
@@ -56,7 +60,8 @@ const n = (v: number) => Math.round(v).toLocaleString("en-US");
           <th class="py-3 text-right">PF</th>
           <th class="py-3 text-right">PA</th>
           <th class="py-3 text-right">Yahoo</th>
-          <th class="px-3 py-3 text-right">SOR</th>
+          <th class="py-3 pl-2 text-right">SOR</th>
+          <th class="px-3 py-3 text-right">SOS</th>
         </tr>
       </thead>
       <tbody id="rows">
@@ -66,7 +71,9 @@ const n = (v: number) => Math.round(v).toLocaleString("en-US");
               data-fvoa={r["FVOA Rank"]}
               data-yahoo={r["Yahoo Rank"]}
               data-sor={r["SOR Rank"]}
+              data-sos={r["SOS Rank"]}
               data-pf={-r.PF}
+              data-pa={-r.PA}
               data-team={r.Team}
               class="border-t border-slate-100 data-[mine=true]:bg-indigo-50 dark:border-slate-800 dark:data-[mine=true]:bg-indigo-950/40"
             >
@@ -77,7 +84,8 @@ const n = (v: number) => Math.round(v).toLocaleString("en-US");
               <td class="py-3 text-right">{n(r.PF)}</td>
               <td class="py-3 text-right">{n(r.PA)}</td>
               <td class="py-3 text-right">{r["Yahoo Rank"]}</td>
-              <td class="px-3 py-3 text-right">{r["SOR Rank"]}</td>
+              <td class="py-3 pl-2 text-right">{r["SOR Rank"]}</td>
+              <td class="px-3 py-3 text-right">{r["SOS Rank"]}</td>
             </tr>
           ))
         }
@@ -87,7 +95,8 @@ const n = (v: number) => Math.round(v).toLocaleString("en-US");
 
   <p class="mt-3 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
     FVOA is a team's expected margin against a historically average team. SOR (strength of record)
-    is how impressive the record is given the schedule played.
+    is how impressive the record is given the schedule played. PF is points for and PA is points
+    against. SOS is strength of schedule, where 1 is the hardest.
   </p>
 </Base>
 

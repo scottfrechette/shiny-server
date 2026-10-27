@@ -116,3 +116,68 @@ trends <- as_tibble(clt_scores) |>
   arrange(week, Team)
 
 export_json(trends, "trends", required = TRUE)
+
+# Bench points: points left on the bench ------------------------------------
+# points_left = the best lineup the team could have started minus what it
+# started, from fvoa::evaluate_lineup(). Wrapped so a problem here warns and
+# skips instead of failing the whole weekly run.
+
+bench_labels <- c("BN", "IR", "IR+", "NA")  # roster labels that mean "not started"
+
+build_bench <- function() {
+  rosters <- as_tibble(clt_team) |> mutate(points = coalesce(points, 0))
+  
+  # Sanity check: the starters' points should add up to the team score
+  check <- rosters |>
+    summarise(starters = sum(points[!roster %in% bench_labels]),
+              score = first(score), .by = c(team, week))
+  if (max(abs(check$starters - check$score)) > 1) {
+    stop("starters' points do not match team scores. Roster labels seen: ",
+         paste(sort(unique(rosters$roster)), collapse = ", "),
+         ". Update bench_labels to the ones that mean bench.", call. = FALSE)
+  }
+  
+  lineups <- as_tibble(evaluate_lineup(as_tibble(clt_team), flex = 0)) |>
+    mutate(points_left = pmax(round(optimal - actual, 1), 0))
+  
+  weekly <- lineups |> select(Team = team, week, optimal, actual, points_left)
+  
+  summary <- lineups |>
+    summarise(points_left_season = sum(points_left),
+              points_left_week = sum(points_left[week == weeks_played]),
+              .by = team) |>
+    mutate(points_left_week_rank = rank(-points_left_week, ties.method = "min"),
+           points_left_season_rank = rank(-points_left_season, ties.method = "min"))
+  
+  # Biggest single miss in the latest week: the bench player who most outscored
+  # the lowest-scoring starter at his position
+  latest <- rosters |> filter(week == weeks_played)
+  floors <- latest |>
+    filter(!roster %in% bench_labels) |>
+    summarise(starter_points = min(points), outscored_player = player[which.min(points)],
+              .by = c(team, position))
+  misses <- latest |>
+    filter(roster %in% bench_labels) |>
+    inner_join(floors, by = c("team", "position")) |>
+    mutate(margin = points - starter_points) |>
+    filter(margin > 0) |>
+    slice_max(margin, n = 1, by = team, with_ties = FALSE) |>
+    transmute(team, bench_miss_player = player, bench_miss_position = position,
+              bench_miss_points = round(points, 1), outscored_player,
+              outscored_points = round(starter_points, 1))
+  
+  bench <- summary |>
+    left_join(misses, by = "team") |>
+    mutate(across(c(points_left_week, points_left_season), \(v) round(v, 1))) |>
+    rename(Team = team)
+  
+  export_json(bench, "bench")
+  export_json(weekly, "bench_weekly")
+  # Used only by the commentary scripts, to flag player names the model should not use
+  write_json(sort(unique(clt_team$player)), file.path(out_dir, "roster_names.json"))
+}
+
+tryCatch(
+  build_bench(),
+  error = function(e) warning("Bench points skipped: ", conditionMessage(e), call. = FALSE)
+)

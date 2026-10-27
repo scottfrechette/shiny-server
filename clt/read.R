@@ -21,6 +21,8 @@ suppressPackageStartupMessages({
 
 `%||%` <- function(a, b) if (is.null(a)) b else a
 
+source(here::here("clt", "commentary", "checks.R"))
+
 model <- Sys.getenv("CLAUDE_MODEL", "claude-sonnet-5-5")
 force <- nzchar(Sys.getenv("FORCE_COMMENTARY"))
 
@@ -99,6 +101,23 @@ team_facts <- rankings |>
                      playoff_odds_if_lose_pct = round(playoff_if_lose * 100)),
     by = "Team")
 
+# Bench points (optional: missing if export_extra.R could not build them)
+bench_file <- file.path(week_dir, "bench.json")
+if (file.exists(bench_file)) {
+  team_facts <- team_facts |>
+    left_join(
+      fromJSON(bench_file) |>
+        transmute(Team,
+                  bench_points_left_week = points_left_week,
+                  bench_week_rank = points_left_week_rank,
+                  bench_points_left_season = points_left_season,
+                  bench_season_rank = points_left_season_rank,
+                  bench_miss_player, bench_miss_points,
+                  bench_outscored_player = outscored_player,
+                  bench_outscored_points = outscored_points),
+      by = "Team")
+}
+
 facts_json <- as.character(toJSON(team_facts, dataframe = "rows", na = "null",
                                   auto_unbox = TRUE, digits = 2))
 teams <- team_facts$Team
@@ -156,7 +175,7 @@ data_nums <- as.numeric(unlist(regmatches(facts_json, gregexpr("-?[0-9]+\\.?[0-9
 
 allowed_ranks <- function(tm) {
   r <- team_facts[team_facts$Team == tm, ]
-  unique(c(r$fvoa_rank, r$yahoo_rank, r$sor_rank, r$sos_rank, r$pf_rank, r$pa_rank,
+  unique(c(r$fvoa_rank, r$yahoo_rank, r$sor_rank, r$sos_rank, r$pf_rank, r$pa_rank, r$bench_week_rank, r$bench_season_rank,
            r$schedule_actual_rank, floor(r$schedule_expected_rank),
            ceiling(r$schedule_expected_rank), meta$playoff_spots %||% 4))
 }
@@ -183,6 +202,11 @@ for (tm in teams) {
 }
 extra <- setdiff(names(reads), teams)
 if (length(extra)) flags <- c(flags, paste("Unknown team names:", paste(extra, collapse = ", ")))
+
+# Players may only be named if they appear in the data (the bench fields)
+flags <- c(flags, flag_player_names(
+  paste(unlist(reads), collapse = " "), facts_json, file.path(week_dir, "roster_names.json")
+))
 
 # Write outputs -------------------------------------------------------------
 
