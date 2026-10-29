@@ -122,7 +122,7 @@ export_json(trends, "trends", required = TRUE)
 # started, from fvoa::evaluate_lineup(). Wrapped so a problem here warns and
 # skips instead of failing the whole weekly run.
 
-bench_labels <- c("BN", "IR", "IR+", "NA")  # roster labels that mean "not started"
+bench_labels <- cfg$bench_labels  # roster labels that mean "not started"
 
 build_bench <- function() {
   rosters <- as_tibble(clt_team) |> mutate(points = coalesce(points, 0))
@@ -137,7 +137,7 @@ build_bench <- function() {
          ". Update bench_labels to the ones that mean bench.", call. = FALSE)
   }
   
-  lineups <- as_tibble(evaluate_lineup(as_tibble(clt_team), flex = 0)) |>
+  lineups <- as_tibble(evaluate_lineup(as_tibble(clt_team), flex = cfg$lineup_flex)) |>
     mutate(points_left = pmax(round(optimal - actual, 1), 0))
   
   weekly <- lineups |> select(Team = team, week, optimal, actual, points_left)

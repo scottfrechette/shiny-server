@@ -21,6 +21,7 @@ suppressPackageStartupMessages({
 
 `%||%` <- function(a, b) if (is.null(a)) b else a
 
+source(here::here("clt", "config.R"))
 source(here::here("clt", "commentary", "checks.R"))
 
 model <- Sys.getenv("CLAUDE_MODEL", "claude-sonnet-5-5")
@@ -125,11 +126,11 @@ teams <- team_facts$Team
 # Call the Claude API -------------------------------------------------------
 
 read_text <- function(...) paste(readLines(here::here(...), warn = FALSE), collapse = "\n")
-system_prompt <- read_text("clt", "commentary", "read_prompt.md")
+system_prompt <- fill_template(read_text("clt", "commentary", "read_prompt.md"))
 user_msg <- paste0(
   "SEASON: ", latest$season, "\n",
   "WEEK: ", latest$week, " (games played)\n",
-  "PLAYOFF SPOTS: ", meta$playoff_spots %||% 4, "\n\n",
+  "PLAYOFF SPOTS: ", meta$playoff_spots %||% cfg$playoff_spots, "\n\n",
   "DATA (one object per team)\n", facts_json
 )
 
@@ -177,7 +178,7 @@ allowed_ranks <- function(tm) {
   r <- team_facts[team_facts$Team == tm, ]
   unique(c(r$fvoa_rank, r$yahoo_rank, r$sor_rank, r$sos_rank, r$pf_rank, r$pa_rank, r$bench_week_rank, r$bench_season_rank,
            r$schedule_actual_rank, floor(r$schedule_expected_rank),
-           ceiling(r$schedule_expected_rank), meta$playoff_spots %||% 4))
+           ceiling(r$schedule_expected_rank), meta$playoff_spots %||% cfg$playoff_spots))
 }
 
 flags <- character()

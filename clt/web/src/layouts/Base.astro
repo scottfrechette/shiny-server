@@ -1,10 +1,11 @@
 ---
 import "../styles/global.css";
+import { league } from "../lib/league";
 
 interface Props {
   title?: string;
 }
-const { title = "Charlotte's Finest" } = Astro.props;
+const { title = league.league_name } = Astro.props;
 
 // The tab bar only shows when there is more than one entry.
 const nav = [

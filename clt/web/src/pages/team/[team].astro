@@ -3,6 +3,7 @@ import Base from "../../layouts/Base.astro";
 import { int, latestWeek, loadWeekFile, ord, pct, signed, tryLoadWeekFile } from "../../lib/week";
 import { slug } from "../../lib/teams";
 import { buildChart, type Point } from "../../lib/chart";
+import { league } from "../../lib/league";
 
 export function getStaticPaths() {
   const rows = loadWeekFile<{ Team: string }[]>("rankings");
@@ -52,7 +53,7 @@ const spreadLabel =
 // Chance of finishing in each position 1-10; top N make the playoffs
 const spots = loadWeekFile<{ playoff_spots?: number }>("meta").playoff_spots ?? 4;
 const oddsRow = loadWeekFile<Record<string, any>[]>("odds").find((o) => o.team === team);
-const finish = Array.from({ length: 10 }, (_, i) => Number(oddsRow?.[String(i + 1)] ?? 0));
+const finish = Array.from({ length: league.num_teams }, (_, i) => Number(oddsRow?.[String(i + 1)] ?? 0));
 const maxFinish = Math.max(...finish, 0.0001);
 
 // Weekly trends. Playoff odds come from records_history.json (every week so far).
@@ -113,7 +114,7 @@ const tiles = [
 ];
 ---
 
-<Base title={`${team} · Charlotte's Finest`}>
+<Base title={`${team} · ${league.league_name}`}>
   <main data-page-team={team}>
     <header class="mb-4 flex items-start justify-between">
       <div>

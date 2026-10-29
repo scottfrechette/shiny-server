@@ -1,0 +1,17 @@
+{
+  "league_name": "Charlotte's Finest",
+  "short_name": "CLT Finest",
+  "takes_title": "The Frechest of Takes",
+  "timezone": "America/Chicago",
+  "author_name": "Scott",
+  "commissioner_team": "Scott",
+  "yahoo_league_id": 175582,
+  "season_week_offset": 35,
+  "regular_season_weeks": 15,
+  "last_data_week": 17,
+  "num_teams": 10,
+  "playoff_spots": 4,
+  "lineup_flex": 0,
+  "bench_labels": ["BN", "IR", "IR+", "NA"],
+  "scoring_band": 0.02
+}

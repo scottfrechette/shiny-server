@@ -14,7 +14,9 @@ suppressPackageStartupMessages({
   library(jsonlite)
 })
 
-playoff_spots <- 4
+if (!exists("cfg")) source(here::here("clt", "config.R"))
+
+playoff_spots <- cfg$playoff_spots
 
 out_dir <- here::here("clt", "data", current_season,
                       sprintf("week-%02d", weeks_played))
@@ -82,7 +84,7 @@ odds_prev <- clt_simulated_records |>
 # scored suggest? A team within +/- scoring_band of the league-average points
 # counts as "about average". That cutoff is a judgment call: tune it once you
 # see real weeks.
-scoring_band <- 0.02
+scoring_band <- cfg$scoring_band
 
 # "3-2" or "3-2-1" -> win fraction, with a tie counting as half a win
 parse_win_pct <- function(rec) {

@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import { latestWeek, loadWeekFile } from "../lib/week";
+import { league } from "../lib/league";
 
 type Row = {
   Team: string;
@@ -29,7 +30,7 @@ const sorts = [
 const n = (v: number) => Math.round(v).toLocaleString("en-US");
 ---
 
-<Base title="Rankings · Charlotte's Finest">
+<Base title={`Rankings · ${league.league_name}`}>
   <header class="mb-4 flex items-baseline justify-between">
     <h1 class="text-lg font-semibold">Power rankings</h1>
     <p class="text-xs text-slate-500 dark:text-slate-400">Week {week}</p>

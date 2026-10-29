@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import { loadHome } from "../lib/data";
+import { league } from "../lib/league";
 
 const { latest, generatedAt, rows, commentary } = loadHome();
 
@@ -9,7 +10,8 @@ const updated = generatedAt
       weekday: "short",
       hour: "numeric",
       minute: "2-digit",
-      timeZone: "America/Chicago",
+      timeZone: league.timezone,
+      timeZoneName: "short",
     })
   : "";
 
@@ -29,14 +31,14 @@ const signed = (v: number) => `${v >= 0 ? "+" : ""}${v.toFixed(2)}`;
 
 <Base>
   <header class="mb-4 flex items-baseline justify-between">
-    <h1 class="text-lg font-semibold">Charlotte's Finest</h1>
+    <h1 class="text-lg font-semibold">{league.league_name}</h1>
     <p class="text-xs text-slate-500 dark:text-slate-400">
-      Week {latest.week}{updated && ` · updated ${updated} CT`}
+      Week {latest.week}{updated && ` · updated ${updated}`}
     </p>
   </header>
 
   <section class="mb-6 rounded-2xl bg-white p-4 shadow-sm dark:bg-slate-900">
-    <h2 class="mb-2 text-sm font-semibold">The Frechest of Takes</h2>
+    <h2 class="mb-2 text-sm font-semibold">{league.takes_title}</h2>
     {
       commentary ? (
         <>

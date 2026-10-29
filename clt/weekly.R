@@ -7,6 +7,8 @@ suppressPackageStartupMessages(library(fvoa))
 suppressPackageStartupMessages(library(RSQLite))
 suppressPackageStartupMessages(library(DBI))
 
+source(here::here("clt", "config.R"))  # league settings from clt/league.json
+
 # Use all available cores for rstanarm sampling
 options(mc.cores = parallel::detectCores())
 
@@ -14,14 +16,14 @@ options(mc.cores = parallel::detectCores())
 today_week <- today() %>%
   floor_date(unit = "week", week_start = 2) %>%
   week()
-start_week <- 35
+start_week <- cfg$season_week_offset  # update each August
 current_week <- today_week - start_week
 weeks_played <- current_week - 1
 current_season <- year(today())
 
 # NEW: skip cleanly outside the season so the Tuesday cron doesn't fail
 # in the offseason
-if (weeks_played < 1 || weeks_played > 17) {
+if (weeks_played < 1 || weeks_played > cfg$last_data_week) {
   message("Outside season (weeks_played = ", weeks_played, "), nothing to do")
   quit(save = "no", status = 0)
 }
@@ -30,7 +32,7 @@ if (weeks_played < 1 || weeks_played > 17) {
 
 clt_con <- dbConnect(SQLite(), here::here("clt", "clt.sqlite"))
 
-clt_team_tmp <- get_team(weeks_played, 'yahoo', leagueID = 175582, season = current_season) %>% 
+clt_team_tmp <- get_team(weeks_played, 'yahoo', leagueID = cfg$yahoo_league_id, season = current_season) %>% 
   mutate(season = current_season, .before = 1)
 
 if(exists("clt_team_tmp")) {
@@ -48,7 +50,7 @@ if(exists("clt_team_tmp")) {
 
 # Sys.sleep(60)
 
-clt_wp_tmp <- get_win_prob(current_week, leagueID = 175582) %>% 
+clt_wp_tmp <- get_win_prob(current_week, leagueID = cfg$yahoo_league_id) %>% 
   mutate(season = current_season,
          week = current_week, .before = 1)
 
@@ -98,7 +100,8 @@ clt_simulated_records <- simulate_final_standings_season(clt_fit_season, clt_sch
 
 clt_current_matchups <- compare_current_matchups(clt_schedule, clt_fit, clt_wp, quality = T, clt_simulated_standings) %>%
   select(-Yahoo)
-clt_playoffs <- compare_playoff_teams(clt_fit, "David", "Diaz", "PFinn", "Eric")
+# compare_playoff_teams() was removed here: it hardcoded this league's team names
+# and its result was not saved or used
 clt_fvoa_season <- calculate_fvoa_season(clt_fit_season)
 clt_rankings <- calculate_rankings(clt_schedule, clt_fit) %>% 
   set_names("Team", "PF", "PA", 
@@ -113,13 +116,13 @@ clt_lines <- compare_league(clt_fit) %>%
   fvoa:::spread_league(.output = "spread") %>% 
   rename(Team = team)
 clt_lineup_eval <- clt_team %>% 
-  evaluate_lineup(flex = 0) %>% 
+  evaluate_lineup(flex = cfg$lineup_flex) %>% 
   plot_roster_skills()
 clt_model_eval <- evaluate_model(clt_fit_season)
 clt_playoff_leverage <- plot_playoff_leverage(clt_simulated_standings)
 clt_schedule_luck <- plot_schedule_luck(clt_schedule, clt_scores, clt_owners, sims = 1000)
 clt_sim_standings_df <- crossing(team = unique(clt_scores$team), 
-                                 rank = 1:10L) %>% 
+                                 rank = seq_len(cfg$num_teams)) %>% 
   left_join(count(clt_simulated_standings, team, rank),
             by = c("team", "rank")) %>% 
   replace_na(list(n = 0)) %>% 
@@ -128,7 +131,7 @@ clt_sim_standings_df <- crossing(team = unique(clt_scores$team),
   select(-n) %>% 
   # mutate(pct = scales::percent(pct)) %>% 
   spread(rank, pct) %>% 
-  arrange(-`1`, -`2`, -`3`, -`4`, -`5`, -`6`, -`7`, -`8`, -`9`, -`10`)
+  arrange(across(all_of(as.character(seq_len(cfg$num_teams))), \(x) -x))
 
 # Save Data ---------------------------------------------------------------
 

@@ -2,13 +2,14 @@
 import Base from "../../layouts/Base.astro";
 import { loadWeekFile } from "../../lib/week";
 import { slug } from "../../lib/teams";
+import { league } from "../../lib/league";
 
 const teams = loadWeekFile<{ Team: string }[]>("rankings")
   .map((r) => r.Team)
   .sort((a, b) => a.localeCompare(b));
 ---
 
-<Base title="My team · Charlotte's Finest">
+<Base title={`My team · ${league.league_name}`}>
   <header class="mb-4">
     <h1 class="text-lg font-semibold">Which team is yours?</h1>
     <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">

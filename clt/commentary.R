@@ -18,10 +18,11 @@ suppressPackageStartupMessages({
 
 `%||%` <- function(a, b) if (is.null(a)) b else a
 
+source(here::here("clt", "config.R"))
 source(here::here("clt", "commentary", "checks.R"))
 
-reg_season_weeks <- 15
-commish_team <- "Scott"
+reg_season_weeks <- cfg$regular_season_weeks
+commish_team <- cfg$commissioner_team
 model <- Sys.getenv("CLAUDE_MODEL", "claude-sonnet-5-5")
 force <- nzchar(Sys.getenv("FORCE_COMMENTARY"))
 
@@ -54,7 +55,7 @@ if (!nzchar(Sys.getenv("ANTHROPIC_API_KEY"))) {
 }
 
 mode <- if (week == 1) "opener" else if (week == reg_season_weeks) "season_end" else "weekly"
-playoff_spots <- meta$playoff_spots %||% 4
+playoff_spots <- meta$playoff_spots %||% cfg$playoff_spots
 
 # Build the prompt ----------------------------------------------------------
 
@@ -82,7 +83,7 @@ user_msg <- paste0(
 
 read_text <- function(...) paste(readLines(here::here(...), warn = FALSE), collapse = "\n")
 system_prompt <- paste0(
-  read_text("clt", "commentary", "prompt.md"),
+  fill_template(read_text("clt", "commentary", "prompt.md")),
   "\n\n# VOICE EXAMPLES\n",
   "Past posts, newest first. Imitate the tone and structure. ",
   "Never reuse their facts, numbers, or jokes.\n\n",
